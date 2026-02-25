@@ -1,6 +1,11 @@
 ---
 name: appwrite-backend
-description: Provides patterns and best practices for building with Appwrite BaaS (backend-as-a-service). Covers Auth, TablesDB, Storage, Functions, Messaging, and Realtime in Dart, Python, and TypeScript. Use when the user mentions Appwrite, Appwrite SDK, Appwrite database, Appwrite auth, Appwrite storage, Appwrite functions, or asks about backend-as-a-service with Appwrite.
+description: Appwrite BaaS patterns and best practices. Covers TablesDB, Auth, Storage, Functions, Messaging, and Realtime in Dart, Python, and TypeScript. Use when building with Appwrite SDK, Appwrite database, auth, storage, functions, or backend-as-a-service with Appwrite.
+license: MIT
+metadata:
+  author: sgaabdu4
+  version: "1.8.0"
+  tags: appwrite, backend, baas, dart, python, typescript
 ---
 
 # Appwrite Development
