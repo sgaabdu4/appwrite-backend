@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Appwrite 1.8+](https://img.shields.io/badge/Appwrite-1.8+-F02E65.svg)](https://appwrite.io)
 
+> **Disclaimer:** This is an unofficial community resource. It is not affiliated with, endorsed by, or sponsored by [Appwrite](https://appwrite.io). "Appwrite" is a trademark of Appwrite Ltd.
+
 ## Installation
 
 ```bash
