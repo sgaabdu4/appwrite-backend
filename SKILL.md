@@ -155,6 +155,7 @@ Details: [schema-management.md](references/schema-management.md)
 | Indexes | 100x faster on large tables |
 | Operators | No race conditions |
 | Bulk operations | N → 1 request |
+| Delta sync | Fetches only changed rows |
 
 Details: [performance.md](references/performance.md)
 
@@ -287,6 +288,7 @@ Details: [error-handling.md](references/error-handling.md)
 | `ColumnString` | `ColumnVarchar` or `ColumnText` | `string` type is deprecated |
 | Hand-writing types | `appwrite generate` | Schema drift, no autocomplete |
 | `databases.listDocuments()` | `tablesDB.listRows()` | Deprecated API |
+| Full re-fetch every sync | `Query.updatedAfter()` + per-table timestamps | Wastes bandwidth, slow |
 | Loop with `createRow()` | `createRows()` bulk | N requests vs 1 |
 
 ---

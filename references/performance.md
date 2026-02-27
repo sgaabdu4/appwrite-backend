@@ -114,6 +114,82 @@ await cmd.send_object(['DEL', 'user:$userId']);
 
 ---
 
+## Delta Sync (Incremental Pull)
+
+Fetch only rows that changed since the last sync instead of re-downloading everything. Uses `Query.updatedAfter()` with per-table timestamps.
+
+### Pattern
+
+```dart
+Future<List<T>> fetchUpdatedSince(String userId, DateTime since) async {
+  final results = <T>[];
+  String? cursor;
+
+  while (true) {
+    final rows = await tablesDB.listRows(
+      databaseId: dbId,
+      tableId: tableId,
+      queries: [
+        Query.equal('user_id', userId),
+        Query.updatedAfter(since.toUtc().toIso8601String()),
+        if (cursor != null) Query.cursorAfter(cursor),
+        Query.limit(100),
+      ],
+    );
+    results.addAll(rows.rows.map(fromRow));
+    if (rows.rows.length < 100) break;
+    cursor = rows.rows.last.$id;
+  }
+  return results;
+}
+```
+
+### Lightweight ID Fetch for Deletion Detection
+
+```dart
+Future<List<String>> fetchAllIds(String userId) async {
+  final ids = <String>[];
+  String? cursor;
+
+  while (true) {
+    final rows = await tablesDB.listRows(
+      databaseId: dbId,
+      tableId: tableId,
+      queries: [
+        Query.equal('user_id', userId),
+        Query.select([r'$id']),
+        if (cursor != null) Query.cursorAfter(cursor),
+        Query.limit(100),
+      ],
+    );
+    ids.addAll(rows.rows.map((r) => r.$id));
+    if (rows.rows.length < 100) break;
+    cursor = rows.rows.last.$id;
+  }
+  return ids;
+}
+```
+
+### Sync Flow
+
+1. Store per-table `lastSyncDate` locally after each sync
+2. On next sync: call `fetchUpdatedSince(lastSyncDate)` — merge changed rows locally
+3. Call `fetchAllIds()` — compare to local IDs, delete missing ones
+4. Store new `lastSyncDate`
+
+**First sync fallback:** If no per-table date exists, do a full `getAll()` pull once, then switch to delta.
+
+### When to Use
+
+| Scenario | Approach |
+|----------|----------|
+| Data rarely changes | Delta sync — fetches nothing when no changes |
+| Frequent small edits | Delta sync — fetches only changed rows |
+| Full data refresh needed | Full `getAll()` pull |
+| Real-time updates | Realtime subscriptions (not delta sync) |
+
+---
+
 ## Related
 
 - [pagination-performance.md](pagination-performance.md) — Cursor patterns, generators
