@@ -231,11 +231,102 @@ def fetch_all_rows(db_id: str, table_id: str, base_queries: list = []):
             break
 ```
 
+## Flutter Mixin Pattern
+
+Multiple datasources repeat the same cursor loop. A mixin extracts it once.
+
+```dart
+mixin AppwritePaginationMixin {
+  TablesDB get tablesDB;
+
+  static const _pageSize = 100;
+
+  /// Fetches all rows from [tableId] matching [queries] via cursor pagination.
+  /// Do not include Query.cursorAfter or Query.limit in [queries].
+  /// Returns empty list on 404.
+  Future<List<T>> fetchAllRows<T>({
+    required String tableId,
+    required List<String> queries,
+    required T Function(Row row) mapRow,
+  }) async {
+    try {
+      final results = <T>[];
+      String? cursor;
+
+      while (true) {
+        final response = await tablesDB.listRows(
+          databaseId: AppwriteConfig.databaseId,
+          tableId: tableId,
+          queries: [
+            ...queries,
+            if (cursor != null) Query.cursorAfter(cursor),
+            Query.limit(_pageSize),
+          ],
+          total: false,
+        );
+
+        results.addAll(response.rows.map(mapRow));
+
+        if (response.rows.length < _pageSize) break;
+        cursor = response.rows.last.$id;
+      }
+
+      return results;
+    } on AppwriteException catch (e) {
+      if (e.code == 404) return [];
+      rethrow;
+    }
+  }
+
+  /// Fetches all row IDs from [tableId] matching [queries].
+  Future<List<String>> fetchAllIds({
+    required String tableId,
+    required List<String> queries,
+  }) =>
+      fetchAllRows(
+        tableId: tableId,
+        queries: [...queries, Query.select([r'$id'])],
+        mapRow: (row) => row.$id,
+      );
+}
+```
+
+### Usage
+
+```dart
+class ExerciseRemoteDatasource with AppwritePaginationMixin {
+  ExerciseRemoteDatasource(this._tablesDB);
+  final TablesDB _tablesDB;
+
+  @override
+  TablesDB get tablesDB => _tablesDB;
+
+  Future<List<Exercise>> getAll(String userId) => fetchAllRows(
+        tableId: AppwriteConfig.exercisesTableId,
+        queries: [Query.equal('user_id', userId)],
+        mapRow: (row) => Exercise.fromRow(row),
+      );
+
+  Future<List<String>> getAllIds(String userId) => fetchAllIds(
+        tableId: AppwriteConfig.exercisesTableId,
+        queries: [Query.equal('user_id', userId)],
+      );
+}
+```
+
+### Design decisions
+
+- **Mixin over inheritance** — datasources may already extend another class; mixins don't conflict
+- **Generic `mapRow` callback** — each datasource maps its own types; the mixin handles pagination only
+- **404 → empty list** — the table or rows may not exist yet for a new user
+- **`total: false` always** — skips the COUNT query (see above)
+- **Centralized `databaseId`** — reads from `AppwriteConfig` instead of requiring a parameter
+
 ## Impact
 
-- **Latency:** 10-100x improvement on large datasets
-- **Cost:** Reduced database CPU usage
-- **Scale:** Enables infinite scroll and feeds at any scale
+- **Latency:** 10-100x faster on large datasets
+- **Cost:** less database CPU
+- **DRY:** ~50 lines removed per datasource with the mixin
 
 ## Related
 

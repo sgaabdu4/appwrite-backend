@@ -150,6 +150,7 @@ Details: [schema-management.md](references/schema-management.md)
 | Rule | Impact |
 |------|--------|
 | Cursor pagination | 10-100x faster than offset |
+| Pagination mixin (Dart) | ~50 lines saved per datasource |
 | `Query.select()` | 12-18x faster for relationships |
 | `total: false` | Eliminates COUNT scan |
 | Indexes | 100x faster on large tables |
@@ -157,7 +158,7 @@ Details: [schema-management.md](references/schema-management.md)
 | Bulk operations | N → 1 request |
 | Delta sync | Fetches only changed rows |
 
-Details: [performance.md](references/performance.md)
+Details: [performance.md](references/performance.md), [pagination-performance.md](references/pagination-performance.md)
 
 ---
 
