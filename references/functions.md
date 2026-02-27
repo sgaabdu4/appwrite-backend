@@ -139,25 +139,43 @@ export default async ({ req, res }: any) => {
 
 ## Input Validation & Responses
 
+> **Security:** All user input from `context.req.bodyJson` is untrusted. Always validate types, sanitize strings, and enforce length limits before processing.
+
 ```dart
 Future<dynamic> main(final context) async {
     if (context.req.method != 'POST') {
         return context.res.json({'error': 'Method not allowed'}, statusCode: 405);
     }
 
+    // ⚠️ UNTRUSTED INPUT — validate before use
     final body = context.req.bodyJson;
-    final email = body['email'] as String?;
-    if (email == null || !email.contains('@')) {
+    final email = _sanitizeString(body['email']);
+    if (email == null || !_isValidEmail(email)) {
         return context.res.json({'error': 'Invalid email'}, statusCode: 400);
+    }
+
+    final password = _sanitizeString(body['password']);
+    if (password == null || password.length < 8 || password.length > 128) {
+        return context.res.json({'error': 'Invalid password'}, statusCode: 400);
     }
 
     try {
         final user = await account.create(
-            userId: ID.unique(), email: email, password: body['password']);
+            userId: ID.unique(), email: email, password: password);
         return context.res.json({'userId': user.$id});
     } on AppwriteException catch (e) {
         return context.res.json({'error': e.message}, statusCode: e.code ?? 500);
     }
+}
+
+// Sanitization helpers
+String? _sanitizeString(dynamic value) {
+    if (value is! String) return null;
+    return value.trim().substring(0, value.length.clamp(0, 1000));
+}
+
+bool _isValidEmail(String email) {
+    return email.length <= 254 && RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(email);
 }
 ```
 

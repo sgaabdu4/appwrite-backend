@@ -17,12 +17,19 @@
 
 ## Error Handling & Idempotency
 
+> **Security:** Data from `context.req.bodyJson` and event payloads is untrusted. Validate and sanitize all fields before database operations. See [functions.md](functions.md) for sanitization patterns.
+
 ### Always Return Valid Responses
 
 ```dart
 Future<dynamic> main(final context) async {
     try {
-        final result = await processOrder(context.req.bodyJson);
+        // ⚠️ Validate bodyJson before passing to processOrder
+        final body = context.req.bodyJson;
+        if (body is! Map<String, dynamic>) {
+            return context.res.json({'error': 'Invalid payload'}, statusCode: 400);
+        }
+        final result = await processOrder(body);
         return context.res.json({'success': true, 'data': result});
     } catch (e) {
         context.error('Function failed: $e');
@@ -38,6 +45,9 @@ Event triggers can deliver the same event more than once. Use idempotency keys.
 ```dart
 Future<dynamic> main(final context) async {
     final eventId = context.req.headers['x-appwrite-event-id'];
+    if (eventId == null || eventId.isEmpty) {
+        return context.res.json({'error': 'Missing event ID'}, statusCode: 400);
+    }
 
     try {
         await tablesDB.getRow(
@@ -47,7 +57,13 @@ Future<dynamic> main(final context) async {
         if (e.code != 404) rethrow;
     }
 
-    await processEvent(context.req.bodyJson);
+    // ⚠️ Validate event payload before processing
+    final payload = context.req.bodyJson;
+    if (payload is! Map<String, dynamic>) {
+        return context.res.json({'error': 'Invalid payload'}, statusCode: 400);
+    }
+    
+    await processEvent(payload);
     await tablesDB.createRow(
         databaseId: 'db', tableId: 'processed_events', rowId: eventId,
         data: {'processedAt': DateTime.now().toIso8601String()});

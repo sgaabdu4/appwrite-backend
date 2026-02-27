@@ -62,7 +62,7 @@ await teams.createMembership(
     teamId: 'team_123',
     roles: ['member'],
     email: 'new@example.com',
-    url: 'https://app.com/accept-invite',
+    url: 'https://your-app.example.com/accept-invite',  // Your app's invite handler
 );
 ```
 
@@ -72,7 +72,7 @@ teams.create_membership(
     team_id='team_123',
     roles=['member'],
     email='new@example.com',
-    url='https://app.com/accept-invite',
+    url='https://your-app.example.com/accept-invite',  # Your app's invite handler
 )
 ```
 
@@ -82,7 +82,7 @@ await teams.createMembership({
     teamId: 'team_123',
     roles: ['member'],
     email: 'new@example.com',
-    url: 'https://app.com/accept-invite',
+    url: 'https://your-app.example.com/accept-invite',  // Your app's invite handler
 });
 ```
 
