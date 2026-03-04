@@ -13,17 +13,18 @@ metadata:
 ## Critical Rules
 
 1. **Use TablesDB API** — Collections API deprecated in 1.8.0
-2. **Use Query.select()** — Relationships return IDs only without it
-3. **Use cursor pagination** — Offset degrades on large tables
-4. **Use Operator for counters** — Avoids race conditions
-5. **Create indexes** — Queries without indexes scan entire tables
-6. **Init outside handler** — SDK/connections persist between warm invocations
-7. **Group functions by domain** — One per domain, not per operation
-8. **Event triggers over polling** — One trigger replaces thousands of requests
-9. **Use explicit string types** — `string` deprecated; use `varchar` or `text`/`mediumtext`/`longtext`
-10. **Use `appwrite generate`** — Type-safe SDK from your schema
-11. **Use Channel helpers** — Type-safe realtime subscriptions, not raw strings
-12. **Use Realtime queries** — Server-side event filtering, not client-side
+2. **Use `ID.unique()` for all IDs** — Row IDs (`rowId:`) and entity IDs in columns. Custom generators with names or timestamps overflow column limits and leak data. Generates ~20-char hex strings client-side.
+3. **Use Query.select()** — Relationships return IDs only without it
+4. **Use cursor pagination** — Offset degrades on large tables
+5. **Use Operator for counters** — Avoids race conditions
+6. **Create indexes** — Queries without indexes scan entire tables
+7. **Init outside handler** — SDK/connections persist between warm invocations
+8. **Group functions by domain** — One per domain, not per operation
+9. **Event triggers over polling** — One trigger replaces thousands of requests
+10. **Use explicit string types** — `string` deprecated; use `varchar` or `text`/`mediumtext`/`longtext`
+11. **Use `appwrite generate`** — Type-safe SDK from your schema
+12. **Use Channel helpers** — Type-safe realtime subscriptions, not raw strings
+13. **Use Realtime queries** — Server-side event filtering, not client-side
 
 ## Terminology (1.8.0+)
 
@@ -289,6 +290,7 @@ Details: [error-handling.md](references/error-handling.md)
 | `ColumnString` | `ColumnVarchar` or `ColumnText` | `string` type is deprecated |
 | Hand-writing types | `appwrite generate` | Schema drift, no autocomplete |
 | `databases.listDocuments()` | `tablesDB.listRows()` | Deprecated API |
+| Custom ID generators | `ID.unique()` | Overflow risk, info leakage |
 | Full re-fetch every sync | `Query.updatedAfter()` + per-table timestamps | Wastes bandwidth, slow |
 | Loop with `createRow()` | `createRows()` bulk | N requests vs 1 |
 
