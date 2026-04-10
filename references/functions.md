@@ -79,21 +79,32 @@ npx esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js
 
 ## Handler Pattern
 
-Initialize SDK, connections, and caches **outside the handler**. They persist between warm invocations.
+Initialize SDK and services **outside the handler** (warm-start). Refresh the dynamic API key on each call — it changes per execution.
 
 ### Dart
 
 ```dart
-// ✅ Initialize ONCE — reused across warm invocations
-final client = Client()
-    .setEndpoint(Platform.environment['APPWRITE_FUNCTION_API_ENDPOINT']!)
-    .setProject(Platform.environment['APPWRITE_FUNCTION_PROJECT_ID']!)
-    .setKey(Platform.environment['APPWRITE_FUNCTION_API_KEY']!);
+Client? _client;
+TablesDB? _tablesDB;
 
-final tablesDB = TablesDB(client);
+void _ensureInit(dynamic context) {
+  final apiKey = (context.req.headers['x-appwrite-key'] ?? '') as String;
+
+  if (_client != null) {
+    _client!.setKey(apiKey);
+    return;
+  }
+
+  _client = Client()
+      .setEndpoint(Platform.environment['APPWRITE_FUNCTION_API_ENDPOINT']!)
+      .setProject(Platform.environment['APPWRITE_FUNCTION_PROJECT_ID']!)
+      .setKey(apiKey);
+  _tablesDB = TablesDB(_client!);
+}
 
 Future<dynamic> main(final context) async {
-    final rows = await tablesDB.listRows(
+    _ensureInit(context);
+    final rows = await _tablesDB!.listRows(
         databaseId: 'db', tableId: 'items',
         queries: [Query.limit(10)], total: false);
     return context.res.json({'items': rows.rows});
@@ -103,14 +114,25 @@ Future<dynamic> main(final context) async {
 ### Python
 
 ```python
-client = Client()
-client.set_endpoint(os.environ['APPWRITE_FUNCTION_API_ENDPOINT'])
-client.set_project(os.environ['APPWRITE_FUNCTION_PROJECT_ID'])
-client.set_key(os.environ['APPWRITE_FUNCTION_API_KEY'])
+client = None
+tables_db = None
 
-tables_db = TablesDB(client)
+def _ensure_init(context):
+    global client, tables_db
+    api_key = context.req.headers.get('x-appwrite-key', '')
+
+    if client is not None:
+        client.set_key(api_key)
+        return
+
+    client = Client()
+    client.set_endpoint(os.environ['APPWRITE_FUNCTION_API_ENDPOINT'])
+    client.set_project(os.environ['APPWRITE_FUNCTION_PROJECT_ID'])
+    client.set_key(api_key)
+    tables_db = TablesDB(client)
 
 def main(context):
+    _ensure_init(context)
     rows = tables_db.list_rows(
         database_id='db', table_id='items',
         queries=[Query.limit(10)], total=False)
@@ -120,15 +142,27 @@ def main(context):
 ### TypeScript
 
 ```typescript
-const client = new Client()
-    .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT!)
-    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID!)
-    .setKey(process.env.APPWRITE_FUNCTION_API_KEY!);
+let client: Client | null = null;
+let tablesDB: TablesDB | null = null;
 
-const tablesDB = new TablesDB(client);
+function ensureInit(context: any) {
+    const apiKey = context.req.headers['x-appwrite-key'] ?? '';
+
+    if (client) {
+        client.setKey(apiKey);
+        return;
+    }
+
+    client = new Client()
+        .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT!)
+        .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID!)
+        .setKey(apiKey);
+    tablesDB = new TablesDB(client);
+}
 
 export default async ({ req, res }: any) => {
-    const rows = await tablesDB.listRows({
+    ensureInit({ req });
+    const rows = await tablesDB!.listRows({
         databaseId: 'db', tableId: 'items',
         queries: [Query.limit(10)], total: false});
     return res.json({ items: rows.rows });
@@ -183,12 +217,23 @@ bool _isValidEmail(String email) {
 
 ## Security
 
-### Minimal API Key Scopes
+### API Keys
+
+Appwrite auto-generates a short-lived API key per execution from the function's **scopes** (Console → Settings → Scopes). Use `context.req.headers['x-appwrite-key']` — no manual key management needed.
 
 ```
-✅ Key for "send-email": messaging.write only
-✅ Key for "list-products": tables.read only
-❌ Full admin key for every function
+✅ rows.read only for a read function
+✅ teams.read + teams.write + rows.read + rows.write for squad ops
+❌ All scopes for every function
+```
+
+### Execute Permissions
+
+```
+['users']              — any authenticated user
+['user:abc123']        — specific user only
+['team:teamABC']       — team members
+[]                     — server/event/schedule only
 ```
 
 ### Enforce Authorization Server-Side
@@ -208,27 +253,25 @@ Future<dynamic> main(final context) async {
 }
 ```
 
-Rotate function API keys every 1-3 months. Set expiration dates.
-
 ---
 
 ## Environment Variables
 
-Console → Functions → Settings → Environment Variables
+Console → Functions → Settings → Environment Variables. Use for non-secret config (database IDs, feature flags).
 
 ```dart
-// ✅ From environment
 final stripeKey = Platform.environment['STRIPE_SECRET_KEY']!;
-// ❌ NEVER hardcode
 ```
 
-### Built-In Variables
+### Built-In Variables & Headers
 
-| Variable | Description |
-|----------|-------------|
-| `APPWRITE_FUNCTION_API_ENDPOINT` | API endpoint URL |
-| `APPWRITE_FUNCTION_PROJECT_ID` | Current project ID |
-| `APPWRITE_FUNCTION_API_KEY` | Scoped API key |
+| Name | Source | Description |
+|------|--------|-------------|
+| `APPWRITE_FUNCTION_API_ENDPOINT` | Env var | API endpoint (auto-injected) |
+| `APPWRITE_FUNCTION_PROJECT_ID` | Env var | Project ID (auto-injected) |
+| `x-appwrite-key` | `req.headers` | Dynamic API key (scoped, short-lived) |
+| `x-appwrite-user-id` | `req.headers` | Caller's user ID (empty for server calls) |
+| `x-appwrite-user-jwt` | `req.headers` | Caller's JWT (client-SDK executions) |
 
 ---
 
