@@ -169,15 +169,15 @@ Details: [performance.md](references/performance.md), [pagination-performance.md
 appwrite generate
 ```
 
-Gen typed helpers into `generated/appwrite/` from DB schema. Autocomplete, compile-time validation, no hand-written types. Regen after schema change.
+Gen typed helpers from schema into `generated/appwrite/`. Autocomplete + compile checks. Regen after schema change.
 CLI flow: `login -> init project -> pull -> generate -> push`. Details: [appwrite-cli](./references/appwrite-cli.md)
 
 ---
 
 ## Authentication
 
-Email/password, OAuth (50+ providers), phone, magic link, anon, email OTP, custom token. MFA w/ TOTP, email, phone, recovery codes. SSR session handling. JWT for functions.
-SSR: cookie `a_session_<PROJECT_ID>`. Use admin client to create session, session client per request to read user context.
+Email/password, OAuth (50+ providers), phone, magic link, anon, email OTP, custom token. MFA: TOTP/email/phone/recovery. SSR sessions. JWT for functions.
+SSR cookie: `a_session_<PROJECT_ID>`. Admin client creates session. Per-request session client reads user context.
 
 Details: [authentication.md](references/authentication.md) | [auth-methods.md](references/auth-methods.md)
 
@@ -185,7 +185,7 @@ Details: [authentication.md](references/authentication.md) | [auth-methods.md](r
 
 ## Storage
 
-Upload, download, preview w/ transforms (resize, format conversion), file tokens for shareable URLs. HEIC, AVIF, WebP supported.
+Upload/download/preview w/ transforms (resize, format conversion). File tokens for shareable URLs. HEIC, AVIF, WebP supported.
 
 Details: [storage-files.md](references/storage-files.md)
 
@@ -260,7 +260,7 @@ permissions: [
 ```
 
 **Default:** deny all unless row/file perms set or inherited from table/bucket.
-**Use row/file perms** for per-resource ACL. If all resources share rules, set table/bucket perms and leave row/file perms empty.
+**Use row/file perms** for per-resource ACL. If all resources share rules, set table/bucket perms, leave row/file perms empty.
 **`write`** = `create + update + delete`
 **Avoid:** missing perms = lockout; `Role.any()` + `write`/`update`/`delete` = public mutation; `Permission.read(Role.any())` on sensitive data = public leak.
 **Roles:** `any()` | `guests()` | `users()` | `user(id)` | `team(id)` | `team(id, role)` | `label(name)`

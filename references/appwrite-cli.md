@@ -3,13 +3,14 @@
 ## Contents
 
 - Install + Login
-- Project Init
-- appwrite.config.json
-- Pull Existing Resources
-- Push Changes
-- Type-Safe SDK Generation
-- Non-Interactive CI
-- Debugging + Output
+- Init
+- Config File
+- Scope + Precedence
+- Pull
+- Push
+- Generate
+- CI
+- Debug
 - Related
 
 ## Install + Login
@@ -20,7 +21,7 @@ appwrite login
 appwrite login --endpoint "https://your-instance.com/v1"
 ```
 
-Verify project access:
+Check project access:
 
 ```shell
 appwrite projects get --project-id "<PROJECT_ID>"
@@ -28,7 +29,7 @@ appwrite projects get --project-id "<PROJECT_ID>"
 
 ---
 
-## Project Init
+## Init
 
 ```shell
 appwrite init project
@@ -39,13 +40,13 @@ appwrite init teams
 appwrite init topics
 ```
 
-Use `init` once per resource type. CLI writes config into repo.
+Run `init` once per resource type. CLI writes repo config.
 
 ---
 
-## appwrite.config.json
+## Config File
 
-All managed resources live in root `appwrite.config.json`.
+Root file: `appwrite.config.json`.
 
 ```json
 {
@@ -60,11 +61,35 @@ All managed resources live in root `appwrite.config.json`.
 }
 ```
 
-Commit config. Treat as deploy manifest.
+Commit file. Treat as deploy manifest.
 
 ---
 
-## Pull Existing Resources
+## Scope + Precedence
+
+Two scopes:
+
+1. Local project config: `appwrite.config.json`
+2. Global CLI config: `appwrite client`
+
+Global config can override local config (non-interactive mode).
+
+```shell
+appwrite client --endpoint "https://your-instance.com/v1" --project-id "<PROJECT_ID>" --key "<API_KEY>"
+```
+
+Rules:
+
+- `appwrite client` does not rewrite local `appwrite.config.json`.
+- Non-interactive mode targets one project at time.
+- Inspect active global config: `appwrite client --debug`.
+- Clear global override: `appwrite client --reset`.
+
+Use local file for repo dev. Set global client config at CI job start.
+
+---
+
+## Pull
 
 ```shell
 appwrite pull functions
@@ -74,11 +99,11 @@ appwrite pull teams
 appwrite pull topics
 ```
 
-Pull before large edits if Console changed out-of-band.
+Pull before big edits if Console changed out-of-band.
 
 ---
 
-## Push Changes
+## Push
 
 ```shell
 appwrite push functions
@@ -88,11 +113,11 @@ appwrite push teams
 appwrite push topics
 ```
 
-Push only changed resource type during local work.
+Push changed resource type only.
 
 ---
 
-## Type-Safe SDK Generation
+## Generate
 
 ```shell
 appwrite generate
@@ -104,7 +129,7 @@ Regen after schema change or pull.
 
 ---
 
-## Non-Interactive CI
+## CI
 
 ```shell
 appwrite push all --all --force
@@ -115,11 +140,11 @@ appwrite push teams --all --force
 appwrite push topics --all --force
 ```
 
-Use `--force` only in CI/non-interactive flows.
+Use `--force` only for CI/non-interactive.
 
 ---
 
-## Debugging + Output
+## Debug
 
 ```shell
 appwrite users list --json
@@ -132,7 +157,10 @@ appwrite tables-db get-row \
 appwrite login --report
 ```
 
-`--json` for scripts. `--verbose` for full error log. `--console --open` jumps to Console. `--report` builds GitHub error link.
+- `--json`: scripts
+- `--verbose`: full errors
+- `--console --open`: open Console
+- `--report`: build GitHub issue link
 
 ---
 
