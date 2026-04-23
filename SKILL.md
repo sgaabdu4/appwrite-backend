@@ -1,6 +1,6 @@
 ---
 name: appwrite-backend
-description: Appwrite BaaS patterns and best practices. Covers TablesDB, Auth, Storage, Functions, Messaging, and Realtime in Dart, Python, and TypeScript. Use when building with Appwrite SDK, Appwrite database, auth, storage, functions, or backend-as-a-service with Appwrite.
+description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TS. Use for Appwrite SDK, DB, auth, storage, fn, BaaS. Patterns+rules only.
 license: MIT
 metadata:
   author: sgaabdu4
@@ -12,18 +12,18 @@ metadata:
 
 ## Critical Rules
 
-1. **Use TablesDB API** — Collections API deprecated in 1.8.0
-2. **Use `ID.unique()` for all IDs** — Row IDs (`rowId:`) and entity IDs in columns. Custom generators with names or timestamps overflow column limits and leak data. Generates ~20-char hex strings client-side.
-3. **Use Query.select()** — Relationships return IDs only without it
+1. **Use TablesDB API** — Collections API deprecated 1.8.0
+2. **Use `ID.unique()` for all IDs** — Row IDs (`rowId:`) + entity IDs in columns. Custom gen w/ names/timestamps overflow column limits, leak data. ~20-char hex client-side.
+3. **Use Query.select()** — Relationships return IDs only without
 4. **Use cursor pagination** — Offset degrades on large tables
 5. **Use Operator for counters** — Avoids race conditions
-6. **Create indexes** — Queries without indexes scan entire tables
+6. **Create indexes** — Queries without scan entire tables
 7. **Init outside handler** — SDK/connections persist between warm invocations
-8. **Group functions by domain** — One per domain, not per operation
+8. **Group functions by domain** — One per domain, not per op
 9. **Event triggers over polling** — One trigger replaces thousands of requests
 10. **Use explicit string types** — `string` deprecated; use `varchar` or `text`/`mediumtext`/`longtext`
-11. **Use `appwrite generate`** — Type-safe SDK from your schema
-12. **Use Channel helpers** — Type-safe realtime subscriptions, not raw strings
+11. **Use `appwrite generate`** — Type-safe SDK from schema
+12. **Use Channel helpers** — Type-safe realtime subs, not raw strings
 13. **Use Realtime queries** — Server-side event filtering, not client-side
 
 ## Terminology (1.8.0+)
@@ -94,7 +94,7 @@ await tablesDB.upsertRow(databaseId: 'db', tableId: 'settings', rowId: 'prefs',
 await tablesDB.deleteRow(databaseId: 'db', tableId: 'users', rowId: 'user_123');
 ```
 
-**Bulk:** See [bulk-operations.md](references/bulk-operations.md) | **Chunked ID queries:** See [chunked-queries.md](references/chunked-queries.md)
+**Bulk:** [bulk-operations.md](references/bulk-operations.md) | **Chunked ID queries:** [chunked-queries.md](references/chunked-queries.md)
 
 ---
 
@@ -107,7 +107,7 @@ await tablesDB.deleteRow(databaseId: 'db', tableId: 'users', rowId: 'user_123');
 **Timestamp:** `createdAfter` | `createdBefore` | `updatedAfter` | `updatedBefore`
 **Spatial:** `distanceEqual` | `distanceLessThan` | `distanceGreaterThan` | `intersects` | `overlaps` | `touches` | `crosses` (+ `not` variants)
 
-All prefixed with `Query.`. Details: [query-optimization.md](references/query-optimization.md)
+All prefixed `Query.`. Details: [query-optimization.md](references/query-optimization.md)
 
 ---
 
@@ -138,7 +138,7 @@ Details: [atomic-operators.md](references/atomic-operators.md)
 | `mediumtext` | 4,194,303 | Prefix only | Articles |
 | `longtext` | 1,073,741,823 | Prefix only | Large documents |
 
-> **`string` is deprecated.** Use `varchar` for queryable, `text` for non-indexed.
+> **`string` deprecated.** Use `varchar` for queryable, `text` for non-indexed.
 
 **Other:** `integer` | `float` | `boolean` | `datetime` | `email` | `url` | `ip` | `enum` | `relationship` | `point` | `line` | `polygon`
 
@@ -169,13 +169,13 @@ Details: [performance.md](references/performance.md), [pagination-performance.md
 appwrite generate
 ```
 
-Generates typed helpers into `generated/appwrite/` from your database schema. Autocomplete, compile-time validation, no hand-written types. Regenerate after schema changes.
+Generates typed helpers into `generated/appwrite/` from DB schema. Autocomplete, compile-time validation, no hand-written types. Regenerate after schema changes.
 
 ---
 
 ## Authentication
 
-Email/password, OAuth (50+ providers), phone, magic link, anonymous, email OTP, custom token. MFA with TOTP, email, phone, recovery codes. SSR session handling. JWT for functions.
+Email/password, OAuth (50+ providers), phone, magic link, anonymous, email OTP, custom token. MFA w/ TOTP, email, phone, recovery codes. SSR session handling. JWT for functions.
 
 Details: [authentication.md](references/authentication.md) | [auth-methods.md](references/auth-methods.md)
 
@@ -183,7 +183,7 @@ Details: [authentication.md](references/authentication.md) | [auth-methods.md](r
 
 ## Storage
 
-Upload, download, preview with transformations (resize, format conversion), file tokens for shareable URLs. Supports HEIC, AVIF, WebP.
+Upload, download, preview w/ transformations (resize, format conversion), file tokens for shareable URLs. Supports HEIC, AVIF, WebP.
 
 Details: [storage-files.md](references/storage-files.md)
 
@@ -198,7 +198,7 @@ sub.stream.listen((e) => print(e.events));
 
 **Channels:** `account` | `databases.<DB>.tables.<TABLE>.rows` | `buckets.<BUCKET>.files`
 
-**Channel helpers (preferred):** Use `Channel` class for type-safe subscriptions with IDE autocomplete:
+**Channel helpers (preferred):** `Channel` class for type-safe subs w/ IDE autocomplete:
 
 ```typescript
 import { Client, Realtime, Channel, Query } from "appwrite";
@@ -215,7 +215,7 @@ Details: [realtime.md](references/realtime.md)
 
 ## Functions
 
-Init SDK outside handler. Group by domain. Use event triggers, not polling.
+Init SDK outside handler. Group by domain. Event triggers, not polling.
 
 Details: [functions.md](references/functions.md) | [functions-advanced.md](references/functions-advanced.md)
 
@@ -277,32 +277,32 @@ Details: [error-handling.md](references/error-handling.md)
 
 | Wrong | Right | Why |
 |-------|-------|-----|
-| N+1 queries | `Query.select(['col', 'relation.col'])` | Eliminates extra round-trips |
+| N+1 queries | `Query.select(['col', 'relation.col'])` | Kills extra round-trips |
 | Read-modify-write | `Operator.increment()` | Race condition |
 | Large offsets | `Query.cursorAfter(id)` | O(n) vs O(1) |
-| Skip totals | `total: false` | Eliminates COUNT scan |
+| Skip totals | `total: false` | Kills COUNT scan |
 | Missing indexes | Create for queried columns | Queries scan entire table |
-| SDK init inside handler | Init outside for warm reuse | Repeated setup on every call |
-| Hardcoded secrets | Environment variables | Security risk |
+| SDK init inside handler | Init outside for warm reuse | Repeated setup each call |
+| Hardcoded secrets | Env vars | Security risk |
 | Polling | Realtime or event triggers | Wasted executions |
-| Client-side filtering | Realtime queries | Server does the work |
+| Client-side filtering | Realtime queries | Server does work |
 | Raw channel strings | `Channel` helpers | Typos, no autocomplete |
-| `ColumnString` | `ColumnVarchar` or `ColumnText` | `string` type is deprecated |
+| `ColumnString` | `ColumnVarchar` or `ColumnText` | `string` deprecated |
 | Hand-writing types | `appwrite generate` | Schema drift, no autocomplete |
 | `databases.listDocuments()` | `tablesDB.listRows()` | Deprecated API |
 | Custom ID generators | `ID.unique()` | Overflow risk, info leakage |
 | Full re-fetch every sync | `Query.updatedAfter()` + per-table timestamps | Wastes bandwidth, slow |
-| Loop with `createRow()` | `createRows()` bulk | N requests vs 1 |
+| Loop w/ `createRow()` | `createRows()` bulk | N requests vs 1 |
 
 ---
 
 ## Cost Optimization
 
-1. `Query.select()` — reduces bandwidth
+1. `Query.select()` — cuts bandwidth
 2. Cursor pagination + `total: false` — fastest queries
 3. Realtime over polling — one connection vs repeated calls
-4. Batch operations — 1 execution vs N
-5. WebP at quality 80 — smallest files, universal support
+4. Batch ops — 1 execution vs N
+5. WebP quality 80 — smallest files, universal support
 6. Init outside handler — fewer cold starts
 7. Budget cap — Organization → Billing → Budget cap
 

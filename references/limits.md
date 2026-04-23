@@ -24,7 +24,7 @@
 
 ### Chunking Large ID Lists
 
-Exceeding 100 values in `Query.equal()` throws an error. Chunk IDs into batches of 100 and fetch in parallel.
+>100 values in `Query.equal()` throws. Chunk to 100, fetch parallel.
 
 **Full patterns:** See [bulk-operations.md](bulk-operations.md#chunked-id-queries).
 
@@ -64,7 +64,7 @@ await tablesDB.updateRow(
 
 ### Session Limit Behavior
 
-Exceeding the session limit deletes the oldest session automatically.
+Over limit → oldest session auto-deleted.
 
 ```dart
 // Check active sessions
@@ -91,7 +91,7 @@ await account.deleteSessions();
 
 ### Large File Upload
 
-SDKs chunk files >5MB automatically.
+SDKs chunk >5MB auto.
 
 ```dart
 // Dart - Works automatically for any size
@@ -135,7 +135,7 @@ Query.select(['*', 'author.*', 'author.company.*', 'author.company.ceo.*'])
 Query.select(['*', 'author.company.ceo.assistant.*'])
 ```
 
-Use cursor pagination for tables with >1,000 rows. See [pagination-performance.md](pagination-performance.md).
+Cursor pagination for >1,000 rows. See [pagination-performance.md](pagination-performance.md).
 
 ---
 

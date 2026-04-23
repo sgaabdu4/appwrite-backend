@@ -1,6 +1,6 @@
 # Locale
 
-Reference data for countries, currencies, languages, and locations.
+Ref data: countries, currencies, languages, locations.
 
 ---
 
@@ -99,7 +99,7 @@ for (final lang in languages.languages) {
 
 ## User Location
 
-Get approximate location from IP.
+Approx location from IP.
 
 ```dart
 final location = await locale.get();
@@ -117,16 +117,16 @@ print(location.currency);        // USD
 
 ## Use Cases
 
-- **Dropdowns:** Country/language selectors
-- **Validation:** Phone number formatting by country
-- **Localization:** Currency display by region
-- **Compliance:** EU/non-EU detection
+- **Dropdowns:** country/language selectors
+- **Validation:** phone format by country
+- **Localization:** currency by region
+- **Compliance:** EU/non-EU detect
 
 ---
 
 ## Caching
 
-Locale data rarely changes. Cache responses:
+Locale data rare change. Cache responses:
 
 ```dart
 // Cache for 24 hours

@@ -13,17 +13,17 @@
 
 ## Query.select() Rule
 
-**Always use Query.select(). It controls payload size and expands relationships.**
+**Always use Query.select(). Controls payload size, expands relationships.**
 
 ### Why
 
-Without select:
-- Returns all columns (wasted bandwidth)
-- Relationships return IDs only (useless data)
+No select:
+- Returns all columns (waste bandwidth)
+- Relationships return IDs only (useless)
 
 With select:
 - Returns only requested columns (smaller payload)
-- Relationships return full objects (12-18x faster than N+1)
+- Relationships return full objects (12-18x faster vs N+1)
 
 ### Example
 
@@ -52,15 +52,15 @@ final posts = await tablesDB.listRows(
 
 ## Inversion Queries
 
-Filter by exclusion without fetching and filtering client-side.
+Filter by exclusion. No client-side fetch+filter.
 
 | Query | Description |
 |-------|-------------|
-| `Query.notSearch(attr, value)` | Text doesn't match search |
-| `Query.notContains(attr, value)` | Array/string doesn't contain |
+| `Query.notSearch(attr, value)` | Text no match search |
+| `Query.notContains(attr, value)` | Array/string no contain |
 | `Query.notBetween(attr, start, end)` | Value outside range |
-| `Query.notStartsWith(attr, value)` | Doesn't start with prefix |
-| `Query.notEndsWith(attr, value)` | Doesn't end with suffix |
+| `Query.notStartsWith(attr, value)` | No start with prefix |
+| `Query.notEndsWith(attr, value)` | No end with suffix |
 
 ### Example
 
@@ -92,7 +92,7 @@ free_content = tables_db.list_rows(
 
 ## Time Helper Queries
 
-Cleaner time-based filtering.
+Cleaner time filter.
 
 | Query | Description |
 |-------|-------------|
@@ -101,7 +101,7 @@ Cleaner time-based filtering.
 | `Query.updatedBefore(datetime)` | Updated before timestamp |
 | `Query.updatedAfter(datetime)` | Updated after timestamp |
 
-Combine `createdAfter` + `createdBefore` for range filtering.
+Combine `createdAfter` + `createdBefore` for range.
 
 ### Example
 
@@ -134,7 +134,7 @@ orders = tables_db.list_rows(
 
 ## Spatial Queries
 
-Geo-based filtering with spatial indexes.
+Geo filter via spatial index.
 
 ### Distance Queries
 
@@ -149,16 +149,16 @@ Geo-based filtering with spatial indexes.
 
 | Query | Description |
 |-------|-------------|
-| `Query.intersects(attr, geometry)` | Geometries share space |
+| `Query.intersects(attr, geometry)` | Share space |
 | `Query.notIntersects(attr, geometry)` | No shared space |
 | `Query.overlaps(attr, geometry)` | Partial overlap |
 | `Query.notOverlaps(attr, geometry)` | No partial overlap |
 | `Query.touches(attr, geometry)` | Boundaries touch |
-| `Query.notTouches(attr, geometry)` | Boundaries don't touch |
+| `Query.notTouches(attr, geometry)` | Boundaries no touch |
 | `Query.crosses(attr, geometry)` | Line crosses geometry |
-| `Query.notCrosses(attr, geometry)` | Line doesn't cross |
+| `Query.notCrosses(attr, geometry)` | Line no cross |
 
-Also supported on spatial columns: `Query.equal`, `Query.notEqual`, `Query.contains`, `Query.notContains`.
+Spatial columns also support: `Query.equal`, `Query.notEqual`, `Query.contains`, `Query.notContains`.
 
 ### Examples
 
@@ -205,13 +205,13 @@ const violations = await tablesDB.listRows({
 
 **Requirements:**
 - Column type: `point`, `line`, or `polygon`
-- Geo queries require a spatial index for performance
+- Geo queries need spatial index for perf
 
 ---
 
 ## Logical Operators
 
-Combine queries with AND/OR logic.
+Combine via AND/OR.
 
 ```dart
 // Dart - Complex conditions
@@ -230,7 +230,7 @@ final results = await tablesDB.listRows(
 );
 ```
 
-**Nesting limit:** 3 levels maximum
+**Nest limit:** 3 levels max
 
 ---
 
@@ -255,7 +255,7 @@ final results = await tablesDB.listRows(
 | `Query.distanceLessThan()` | spatial |
 | `Query.intersects()` | spatial |
 
-Queries without indexes scan the entire table.
+No index → scan whole table.
 
 ---
 

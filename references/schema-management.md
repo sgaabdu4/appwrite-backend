@@ -13,13 +13,13 @@
 
 ## Full Schema Creation
 
-Create complete tables with columns and indexes in one atomic call. You can read and write immediately. Failure rolls back all changes.
+Create tables + columns + indexes one atomic call. Read/write immediate. Fail → rollback all.
 
 ### Why
 
-- **Atomic:** All-or-nothing creation prevents partial schemas
-- **Synchronous:** Table ready immediately on return
-- **Reliable:** Eliminates setup script failures and race conditions
+- **Atomic:** all-or-nothing, no partial schema
+- **Synchronous:** table ready on return
+- **Reliable:** kills setup script fail + race
 
 ### Usage
 
@@ -56,7 +56,7 @@ tables_db.create_table(
 )
 ```
 
-TypeScript follows the same pattern with camelCase.
+TypeScript same pattern, camelCase.
 
 ---
 
@@ -66,18 +66,18 @@ TypeScript follows the same pattern with camelCase.
 
 | Type | Max Chars | Storage | Indexing | Use Case |
 |------|-----------|---------|----------|----------|
-| `varchar` | 16,383 | Inline (counts toward 64KB row size) | Fully indexable if size < 768 | Names, slugs, identifiers — anything you query/sort/filter |
-| `text` | 16,383 | Off-page (20-byte pointer in row) | Prefix indexing only | Descriptions, notes — no full indexing needed |
+| `varchar` | 16,383 | Inline (counts toward 64KB row size) | Fully indexable if size < 768 | Names, slugs, identifiers — query/sort/filter |
+| `text` | 16,383 | Off-page (20-byte pointer in row) | Prefix indexing only | Descriptions, notes — no full indexing |
 | `mediumtext` | 4,194,303 | Off-page | Prefix indexing only | Articles, blog posts |
 | `longtext` | 1,073,741,823 | Off-page | Prefix indexing only | Large documents |
 
-> **`string` is deprecated.** It abstracted away four storage types based on size. Use the explicit types above instead.
+> **`string` deprecated.** Abstracted 4 storage types by size. Use explicit types.
 
 #### Varchar vs Text
 
-Both share the same max size but differ in storage:
-- **`varchar`** — stored inline, counts toward 64KB row budget. Fully indexable when size < 768 chars. Use for short, queryable strings.
-- **`text`** — stored off-page with a 20-byte pointer. Doesn't consume row size budget but only supports prefix indexing. Use when you don't need full indexing.
+Same max, different storage:
+- **`varchar`** — inline, counts toward 64KB row budget. Full index when size < 768. Use for short queryable strings.
+- **`text`** — off-page, 20-byte pointer. No row budget hit, prefix index only. Use when full index not needed.
 
 ### Numeric
 
@@ -107,7 +107,7 @@ Both share the same max size but differ in storage:
 
 ### Encrypted String
 
-Encrypt sensitive data at rest with AES-128-GCM. Non-queryable.
+Encrypt at rest via AES-128-GCM. Non-queryable.
 
 ```dart
 // Dart - Encrypted column (Pro/Scale/Self-hosted)
@@ -120,9 +120,9 @@ await tablesDB.createColumnString(
 );
 ```
 
-**Use for:** SSN, admin notes, IP addresses, sensitive identifiers.
+**Use for:** SSN, admin notes, IP addresses, sensitive IDs.
 
-**Encrypted columns support storage and retrieval only** — querying, filtering, and indexing excluded.
+**Encrypted = store/retrieve only** — no query/filter/index.
 
 ---
 
@@ -151,16 +151,16 @@ await tablesDB.createIndex(
 
 ### Index Rules
 
-- Order columns by selectivity (most selective first)
-- Indexing supports scalar columns only (arrays and relationships excluded)
-- `Query.search()` requires a fulltext index
-- Geo queries require a spatial index
+- Order by selectivity (most selective first)
+- Scalar columns only (no arrays/relationships)
+- `Query.search()` needs fulltext index
+- Geo queries need spatial index
 
 ---
 
 ## Auto-Increment
 
-Automatic `$sequence` column that increments with each insert. Useful for:
+Auto `$sequence` column, bumps each insert. Use for:
 
 - Invoice numbers
 - Activity logs
@@ -191,7 +191,7 @@ final invoices = await tablesDB.listRows(
 
 ## Timestamp Overrides
 
-Manually set `$createdAt` and `$updatedAt` for data migrations. Preserves original timestamps.
+Manual set `$createdAt`/`$updatedAt` for migrations. Keeps original timestamps.
 
 ```dart
 // Dart - Import with original timestamps
@@ -217,15 +217,15 @@ tables_db.create_row(
 ```
 
 **Use for:**
-- Data migrations from other systems
-- Backfilling historical data
+- Migration from other systems
+- Backfill historical data
 - Audit trail preservation
 
 ---
 
 ## Upsert
 
-Create or update in a single call. If the row exists, update it. If not, create it.
+Create or update one call. Exist → update. Else → create.
 
 ```dart
 // Dart - Upsert row
@@ -240,12 +240,12 @@ await tablesDB.upsertRow(
 );
 ```
 
-Python uses `upsert_row()`, TypeScript uses `upsertRow()` — same parameters.
+Python `upsert_row()`, TypeScript `upsertRow()` — same params.
 
 **Benefits:**
-- Single network call
-- No race conditions
-- Cleaner code (no if-exists check)
+- One network call
+- No race
+- Cleaner (no if-exists)
 
 ---
 
@@ -253,7 +253,7 @@ Python uses `upsert_row()`, TypeScript uses `upsertRow()` — same parameters.
 
 ### Import
 
-Import rows from CSV files without custom scripts.
+Import CSV rows, no custom scripts.
 
 ```dart
 // Via Appwrite Console or CLI
@@ -262,24 +262,24 @@ Import rows from CSV files without custom scripts.
 
 **Use for:**
 - Data migration
-- Seeding test environments
-- Bulk data import
+- Seed test envs
+- Bulk import
 
 ### Export
 
-Export filtered data to CSV directly from Console.
+Export filtered data → CSV from Console.
 
 **Features:**
-- Apply queries before export
-- Select specific columns
+- Queries before export
+- Pick columns
 - Custom delimiter
 - Background execution
-- Email notification on completion
+- Email on done
 
 ---
 
 ## Related
 
-- Transactions for atomic multi-table operations
-- Bulk operations for batch inserts
-- Relationships for table connections
+- Transactions — atomic multi-table ops
+- Bulk ops — batch inserts
+- Relationships — table connections

@@ -1,6 +1,6 @@
 # Self-Hosting
 
-Production setup, scaling, and security.
+Prod setup, scaling, security.
 
 ---
 
@@ -39,11 +39,11 @@ docker run -it --rm \
 
 ### Manual Install
 
-1. Download [docker-compose.yml](https://appwrite.io/install/compose) and [.env](https://appwrite.io/install/env)
-2. Place both in an `appwrite/` directory
+1. Grab [docker-compose.yml](https://appwrite.io/install/compose) + [.env](https://appwrite.io/install/env)
+2. Put both in `appwrite/` dir
 3. Run: `docker compose up -d --remove-orphans`
 
-After `.env` changes: `docker compose up -d` then `docker compose exec appwrite vars` to verify.
+After `.env` change: `docker compose up -d` then `docker compose exec appwrite vars` to verify.
 
 ---
 
@@ -51,7 +51,7 @@ After `.env` changes: `docker compose up -d` then `docker compose exec appwrite 
 
 ### Encryption Key
 
-Set `_APP_OPENSSL_KEY_V1` immediately after installation — encrypts all sensitive data. Changing it later destroys existing encrypted data. Store in a secrets manager.
+Set `_APP_OPENSSL_KEY_V1` right after install — encrypts sensitive data. Change later = destroy existing encrypted data. Store in secrets manager.
 
 ### Force HTTPS
 
@@ -63,9 +63,9 @@ _APP_OPTIONS_ROUTER_FORCE_HTTPS=enabled
 
 | Variable | Effect |
 |----------|--------|
-| `_APP_CONSOLE_WHITELIST_ROOT` | Only first user signs up; others join by invitation |
-| `_APP_CONSOLE_WHITELIST_EMAILS` | Comma-separated allowed emails |
-| `_APP_CONSOLE_WHITELIST_IPS` | Comma-separated allowed IPs |
+| `_APP_CONSOLE_WHITELIST_ROOT` | First user signs up; rest by invite |
+| `_APP_CONSOLE_WHITELIST_EMAILS` | Comma-sep allowed emails |
+| `_APP_CONSOLE_WHITELIST_IPS` | Comma-sep allowed IPs |
 
 ### Rate Limiting
 
@@ -74,13 +74,13 @@ _APP_OPTIONS_ABUSE=enabled   # production (default)
 _APP_OPTIONS_ABUSE=disabled  # development only
 ```
 
-Client SDK requests are rate-limited. Server SDK requests with API keys bypass limits.
+Client SDK rate-limited. Server SDK w/ API keys bypass.
 
 ---
 
 ## Email Delivery (SMTP)
 
-Auth emails require SMTP. Use a third-party service (Mailgun, SendGrid, AWS SES) — self-hosted SMTP risks spam folders.
+Auth emails need SMTP. Use 3rd-party (Mailgun, SendGrid, AWS SES) — self-hosted SMTP = spam folder risk.
 
 ```bash
 _APP_SMTP_HOST=smtp.mailgun.org
@@ -101,7 +101,7 @@ _APP_ENV=production
 _APP_LOGGING_CONFIG=sentry://PUBLIC_KEY@HOST:PORT/PROJECT_ID
 ```
 
-Other providers: Raygun, AppSignal, LogOwl.
+Others: Raygun, AppSignal, LogOwl.
 
 ---
 
@@ -126,7 +126,7 @@ docker compose up --scale appwrite-worker-functions=4 -d
 ### Performance Tuning
 
 ```bash
-_APP_WORKER_PER_CORE=6  # default; increase for I/O, decrease for CPU
+_APP_WORKER_PER_CORE=6  # default; raise for I/O, drop for CPU
 ```
 
 ### Log Rotation
@@ -152,5 +152,5 @@ maxmemory-policy allkeys-lru
 ## Related
 
 - [self-hosting-ops.md](self-hosting-ops.md) — Backups, updates, maintenance, storage adapters, runtimes
-- [health.md](health.md) — Health checks and monitoring
+- [health.md](health.md) — Health checks + monitoring
 - [performance.md](performance.md) — Optimization checklist

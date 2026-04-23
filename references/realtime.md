@@ -20,7 +20,7 @@
 
 ## Connection
 
-Subscribe to changes via WebSocket.
+Subscribe changes via WebSocket.
 
 ```dart
 // Dart
@@ -97,7 +97,7 @@ functions.[FUNCTION_ID].executions       # Function executions
 
 ## Channel Helpers (Type-Safe)
 
-Use `Channel` class instead of raw strings. Provides IDE autocomplete, compile-time validation, and self-documenting subscriptions. Available in Web, Flutter, Apple, and Android client SDKs. Old string-based channels still work.
+Use `Channel` class, not raw strings. Gives IDE autocomplete, compile-time validation, self-documenting subs. In Web, Flutter, Apple, Android client SDKs. Old string channels still work.
 
 ```typescript
 // TypeScript (Client SDK)
@@ -138,7 +138,7 @@ final sub = await realtime.subscribe(
 
 ### Event Filtering with Helpers
 
-Chain `.create()`, `.update()`, or `.delete()` to filter by event type:
+Chain `.create()`, `.update()`, `.delete()` to filter by event type:
 
 ```typescript
 // Only row updates in a table
@@ -161,7 +161,7 @@ const sub = await realtime.subscribe([
 
 ## Realtime Queries (Server-Side Filtering)
 
-Pass `Query` helpers when subscribing to filter events on the server. Callbacks fire only when the payload matches your conditions. Uses the same query syntax as TablesDB.
+Pass `Query` helpers on subscribe to filter events server-side. Callback fires only on payload match. Same query syntax as TablesDB.
 
 ```typescript
 import { Client, Realtime, Channel, Query } from "appwrite";
@@ -222,7 +222,7 @@ subscription.stream
 
 ## Multiple Channels
 
-Subscribe to multiple channels at once.
+Subscribe many channels at once.
 
 ```dart
 // Dart
@@ -251,7 +251,7 @@ subscription.close();
 
 ## Bulk Operation Events
 
-Realtime fires for bulk operations too.
+Realtime fires for bulk ops too.
 
 ```dart
 // Bulk update triggers events for each affected row
@@ -268,7 +268,7 @@ await tablesdb.updateRows(
 
 ## Permissions
 
-Users only receive events for resources they can read.
+Users get events only for resources they can read.
 
 ```dart
 // User A subscribes to orders
@@ -305,7 +305,7 @@ realtime.on('disconnected', () => console.log('Disconnected'));
 
 ## Versioning Pattern (Cache Invalidation)
 
-Create a version row and subscribe to it instead of polling. Re-fetch only when the version updates.
+Make version row, subscribe to it instead of poll. Re-fetch on version update.
 
 ```dart
 // 1. Create a version row (one per table/resource group)
@@ -338,24 +338,24 @@ await tablesdb.updateRow(
 );
 ```
 
-The versioning pattern replaces periodic polling with a single lightweight subscription. Clients sit idle until data changes.
+Versioning swaps periodic polling for one light sub. Clients idle til data change.
 
 ---
 
 ## Performance Tips
 
-1. **Subscribe specific channels** — Avoid broad subscriptions
-2. **Filter server-side** — Use Realtime queries to reduce callback noise
-3. **Use Channel helpers** — Type-safe, catches errors at compile time
-4. **Unsubscribe when done** — Clean up subscriptions
+1. **Subscribe specific channels** — No broad subs
+2. **Filter server-side** — Realtime queries cut callback noise
+3. **Use Channel helpers** — Type-safe, compile-time errors
+4. **Unsubscribe when done** — Clean up subs
 5. **Batch UI updates** — Debounce rapid events
-6. **Use versioning pattern** — One subscription replaces repeated polling calls
+6. **Use versioning pattern** — One sub replaces repeat polling
 
 ---
 
 ## SSR Considerations
 
-Realtime requires WebSocket. For SSR:
+Realtime needs WebSocket. For SSR:
 
 ```typescript
 // TypeScript - Check for browser
@@ -368,5 +368,5 @@ if (typeof window !== 'undefined') {
 
 ## Related
 
-- TablesDB for data operations
+- TablesDB for data ops
 - Functions for event processing

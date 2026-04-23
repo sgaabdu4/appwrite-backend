@@ -18,9 +18,9 @@
 
 ## Why
 
-Read-modify-write creates race conditions. Two concurrent requests read the same value, increment locally, and write back—losing one increment.
+Read-modify-write = race condition. Two concurrent reqs read same value, increment local, write back — lose one increment.
 
-Operators execute atomically on the server. No conflicts. No lost updates.
+Operators atomic on server. No conflict. No lost update.
 
 ## The Problem
 
@@ -67,30 +67,30 @@ await tablesDB.updateRow(
 
 | Operator | Description |
 |----------|-------------|
-| `Operator.arrayAppend([...])` | Add items to end |
-| `Operator.arrayPrepend([...])` | Add items to start |
-| `Operator.arrayInsert(index, value)` | Insert at position |
+| `Operator.arrayAppend([...])` | Add to end |
+| `Operator.arrayPrepend([...])` | Add to start |
+| `Operator.arrayInsert(index, value)` | Insert at pos |
 | `Operator.arrayRemove(value)` | Remove first occurrence |
-| `Operator.arrayUnique()` | Remove duplicates |
-| `Operator.arrayIntersect([...])` | Keep only matching items |
-| `Operator.arrayDiff([...])` | Remove matching items |
-| `Operator.arrayFilter(condition)` | Filter by condition |
+| `Operator.arrayUnique()` | Dedupe |
+| `Operator.arrayIntersect([...])` | Keep matching |
+| `Operator.arrayDiff([...])` | Remove matching |
+| `Operator.arrayFilter(condition)` | Filter by cond |
 
 ### String
 
 | Operator | Description |
 |----------|-------------|
-| `Operator.stringConcat(value)` | Append to string |
-| `Operator.stringReplace(search, replace)` | Find and replace |
+| `Operator.stringConcat(value)` | Append str |
+| `Operator.stringReplace(search, replace)` | Find+replace |
 
 ### Boolean & Date
 
 | Operator | Description |
 |----------|-------------|
-| `Operator.toggle()` | Flip boolean value |
-| `Operator.dateAddDays(n)` | Add days to date |
-| `Operator.dateSubDays(n)` | Subtract days from date |
-| `Operator.dateSetNow()` | Set to current timestamp |
+| `Operator.toggle()` | Flip bool |
+| `Operator.dateAddDays(n)` | Add days |
+| `Operator.dateSubDays(n)` | Sub days |
+| `Operator.dateSetNow()` | Set now |
 
 ## Examples
 
@@ -184,7 +184,7 @@ tables_db.update_row(
 
 ## Operators in Transactions
 
-Operators work inside transactions for complex atomic workflows.
+Operators work in transactions for complex atomic flows.
 
 ```dart
 // Dart - Transfer between accounts
@@ -211,13 +211,13 @@ await tablesDB.updateTransaction(transactionId: tx.$id, commit: true);
 
 ## Impact
 
-- **Consistency:** Eliminates race conditions
-- **Latency:** One roundtrip instead of two
-- **Bandwidth:** No need to fetch current value
-- **Reliability:** Server guarantees atomicity
+- **Consistency:** Kill race conditions
+- **Latency:** 1 roundtrip not 2
+- **Bandwidth:** No fetch current
+- **Reliability:** Server atomic guarantee
 
 ## Related
 
-- Transactions for multi-row atomicity
-- Bulk operations for batch updates
-- Upsert for create-or-update patterns
+- Transactions — multi-row atomic
+- Bulk ops — batch updates
+- Upsert — create-or-update

@@ -11,7 +11,7 @@
 
 ## Storage Adapters
 
-Default is local disk. Use external storage for multi-node deployments.
+Default local disk. External storage for multi-node.
 
 | Adapter | Variable | Use When |
 |---------|----------|----------|
@@ -22,13 +22,13 @@ Default is local disk. Use external storage for multi-node deployments.
 | Akamai (Linode) | `_APP_STORAGE_DEVICE=linode` | Akamai infrastructure |
 | Wasabi | `_APP_STORAGE_DEVICE=wasabi` | S3-compatible, cheap storage |
 
-Each adapter requires access key, secret, region, and bucket env vars. Local storage limits you to a single node.
+Each adapter needs access key, secret, region, bucket env vars. Local = single node only.
 
 ---
 
 ## Function Runtimes
 
-Enable only the runtimes you need:
+Enable only runtimes needed:
 
 ```bash
 _APP_FUNCTIONS_RUNTIMES=dart-3.5,node-22.0,python-3.12
@@ -45,11 +45,11 @@ _APP_FUNCTIONS_RUNTIMES=dart-3.5,node-22.0,python-3.12
 
 ### Function Domain SSL
 
-Provide wildcard SSL certificates for function domains:
+Wildcard SSL certs for function domains:
 
 **Manual:** `docker compose exec appwrite ssl --domain="<id>.functions.yourdomain.com"`
 
-**Automated:** Configure DNS provider (Cloudflare, DigitalOcean) in docker-compose.yml for wildcard cert generation.
+**Automated:** Configure DNS provider (Cloudflare, DigitalOcean) in docker-compose.yml for wildcard cert gen.
 
 ---
 
@@ -77,7 +77,7 @@ docker compose exec -T mariadb sh -c \
   'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < dump.sql
 ```
 
-For databases over 5 GB, use `mariabackup` for faster physical backups.
+DBs >5 GB: use `mariabackup` for faster physical backups.
 
 ### Volume Backup
 
@@ -96,9 +96,9 @@ Key volumes: `appwrite-uploads`, `appwrite-functions`, `appwrite-builds`, `appwr
 
 ### Critical
 
-`_APP_OPENSSL_KEY_V1` encrypts all sensitive data. Copy this exact value when restoring, or you lose encrypted data permanently.
+`_APP_OPENSSL_KEY_V1` encrypts all sensitive data. Copy exact value when restoring or lose encrypted data forever.
 
-Follow the 3-2-1 rule: 3 copies, 2 media, 1 offsite. Test restores quarterly.
+3-2-1 rule: 3 copies, 2 media, 1 offsite. Test restores quarterly.
 
 ---
 
@@ -106,7 +106,7 @@ Follow the 3-2-1 rule: 3 copies, 2 media, 1 offsite. Test restores quarterly.
 
 ### Upgrade Path
 
-Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1`. Pin a specific version — never use `latest`.
+Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1`. Pin version — never `latest`.
 
 ```bash
 docker run -it --rm \
@@ -123,7 +123,7 @@ cd appwrite/
 docker compose exec appwrite migrate
 ```
 
-**Before every upgrade:** Back up, review changelog, test on non-production first.
+**Before every upgrade:** back up, review changelog, test non-prod first.
 
 ---
 
@@ -137,12 +137,12 @@ docker compose exec appwrite migrate
 | `_APP_MAINTENANCE_RETENTION_AUDIT` | 1209600s (14d) | Max audit log age |
 | `_APP_MAINTENANCE_RETENTION_ABUSE` | 86400s (1d) | Max abuse log age |
 
-Use the Health API (admin key) to monitor services. See [health.md](health.md).
+Health API (admin key) monitors services. See [health.md](health.md).
 
 ---
 
 ## Related
 
-- [self-hosting.md](self-hosting.md) — Installation, security, scaling
-- [health.md](health.md) — Health checks and monitoring
-- [functions.md](functions.md) — Cold starts, function architecture
+- [self-hosting.md](self-hosting.md) — Install, security, scaling
+- [health.md](health.md) — Health checks, monitoring
+- [functions.md](functions.md) — Cold starts, function arch

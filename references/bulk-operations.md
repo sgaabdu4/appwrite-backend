@@ -15,11 +15,11 @@
 
 ## Overview
 
-Bulk API processes multiple rows in single requests. Use for mass imports, updates, and deletes.
+Bulk API process many rows per request. Use for mass import/update/delete.
 
-**Key difference from Transactions:**
-- Transactions: All-or-nothing atomicity
-- Bulk: Independent operations, partial success allowed
+**Key diff from Transactions:**
+- Transactions: all-or-nothing atomic
+- Bulk: independent ops, partial success OK
 
 ---
 
@@ -112,7 +112,7 @@ Max rows per bulk create/update/delete: **1000**.
 
 ## Error Handling
 
-Bulk operations return partial results on failure.
+Bulk ops return partial results on failure.
 
 ```dart
 try {
@@ -130,9 +130,9 @@ try {
 
 ## Performance Tips
 
-1. **Batch in 500-row chunks** — Stay under limits, balance latency
-2. **Use for independent ops** — No dependencies between rows
-3. **Prefer transactions for related data** — When atomicity matters
+1. **Batch 500-row chunks** — under limit, balance latency
+2. **Independent ops only** — no row deps
+3. **Transactions for related data** — when atomic matters
 
 ---
 
@@ -214,6 +214,6 @@ await tablesDB.bulkDeleteRows(
 
 ## Related
 
-- [chunked-queries.md](chunked-queries.md) — Chunked ID queries for large lists
-- Transactions for atomic operations
+- [chunked-queries.md](chunked-queries.md) — chunked ID queries for big lists
+- Transactions for atomic ops
 - Operators for atomic field updates

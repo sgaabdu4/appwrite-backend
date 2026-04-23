@@ -9,14 +9,14 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in this skill, please report it responsibly:
+Found vuln in skill? Report responsibly:
 
 1. **Do NOT open a public issue** for security vulnerabilities
 2. Email security concerns to the repository owner
 3. Include:
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Potential impact
+   - Vuln description
+   - Repro steps
+   - Impact
    - Suggested fix (if any)
 
 ### Response Timeline
@@ -27,23 +27,23 @@ If you discover a security vulnerability in this skill, please report it respons
 
 ### What to Expect
 
-- We take all security reports seriously
-- We will investigate and respond promptly
-- We will credit reporters in our changelog (unless you prefer anonymity)
+- All reports taken seriously
+- Prompt investigation + response
+- Reporter credit in changelog (unless anonymous preferred)
 
 ## Security Best Practices for Users
 
-When using this skill:
+Using skill:
 
-1. **Never commit secrets** - Use environment variables for API keys
-2. **Review generated code** - Always review code suggestions before running
-3. **Keep dependencies updated** - Regularly update your Appwrite SDK version
-4. **Use proper permissions** - Follow principle of least privilege in Appwrite
+1. **Never commit secrets** - Env vars for API keys
+2. **Review generated code** - Review before run
+3. **Keep dependencies updated** - Update Appwrite SDK often
+4. **Use proper permissions** - Least privilege in Appwrite
 
 ## Scope
 
-This security policy applies to the skill documentation and any included code examples. The policy does not cover:
+Policy covers skill docs + included code examples. Not covered:
 
-- Third-party dependencies
-- The Appwrite platform itself
-- Your implementation of the patterns described
+- Third-party deps
+- Appwrite platform itself
+- Your implementation of patterns

@@ -1,6 +1,6 @@
 # Chunked ID Queries
 
-`Query.equal()` accepts max 100 IDs per call. Chunk larger lists.
+`Query.equal()` max 100 IDs per call. Chunk bigger lists.
 
 ## Contents
 
@@ -130,9 +130,9 @@ const patients = await fetchByIds<Patient>('db', 'patients', patientIds,
 
 ## When to Use
 
-- Fetching specific rows by known IDs
-- Loading related data from ID references
-- More efficient than fetching all + filtering in-memory
+- Fetch specific rows by known IDs
+- Load related data from ID refs
+- Faster than fetch-all + in-memory filter
 
 ---
 

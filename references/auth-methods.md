@@ -17,7 +17,7 @@
 
 ## OAuth 2.0 Login
 
-Redirect users to a third-party provider for authentication.
+Redirect user to 3rd-party provider.
 
 ### Client-Side
 
@@ -44,13 +44,13 @@ final result = await account.createOAuth2Token(
 final session = await account.createSession(userId: userId, secret: secret);
 ```
 
-Supported: Google, Apple, GitHub, Microsoft, Discord, Spotify, Twitch, Facebook, Amazon, LinkedIn, and [30+ more](https://appwrite.io/docs/products/auth/oauth2).
+Supported: Google, Apple, GitHub, Microsoft, Discord, Spotify, Twitch, Facebook, Amazon, LinkedIn, [30+ more](https://appwrite.io/docs/products/auth/oauth2).
 
 ---
 
 ## Magic Link Login
 
-Passwordless auth via email link.
+Passwordless via email link.
 
 ```dart
 // Step 1: Send magic link
@@ -68,7 +68,7 @@ final session = await account.createSession(userId: userId, secret: secret);
 
 ## Email OTP
 
-6-digit codes via email. Includes security phrase to prevent phishing.
+6-digit code via email. Security phrase blocks phishing.
 
 ```dart
 // Send OTP
@@ -90,13 +90,13 @@ await account.updatePhoneSession(userId: userId, secret: '123456');
 
 ### Mock Phone Numbers
 
-Test without SMS costs. Console → Auth → Security → Mock Numbers. Add: `+15551234567` → OTP: `123456`.
+Test, no SMS cost. Console → Auth → Security → Mock Numbers. Add: `+15551234567` → OTP: `123456`.
 
 ---
 
 ## Anonymous Session
 
-Guest users who can convert to permanent accounts.
+Guest user, convert to permanent later.
 
 ```dart
 final session = await account.createAnonymousSession();
@@ -109,7 +109,7 @@ await account.updateEmail(email: 'user@example.com', password: 'securepassword')
 
 ## Custom Token Login
 
-For biometric, passkey, or custom auth flows.
+Biometric, passkey, custom flows.
 
 ```typescript
 // Server SDK — create token
@@ -171,7 +171,7 @@ final current = await account.getSession(sessionId: 'current');
 
 ## User Preferences
 
-Store user-specific settings (max 64KB).
+Store user settings (max 64KB).
 
 ```dart
 await account.updatePrefs(prefs: {'theme': 'dark', 'notifications': true});
@@ -182,7 +182,7 @@ final prefs = await account.getPrefs();
 
 ## Session Alerts
 
-Notify users of new session creation from unknown device/location.
+Notify user on new session from unknown device/location.
 
 ```dart
 await account.updatePrefs(prefs: {'sessionAlerts': true});

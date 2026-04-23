@@ -15,7 +15,7 @@
 
 ## Website Screenshots
 
-Capture screenshots of any URL.
+Capture screenshot of any URL.
 
 ```dart
 // Dart
@@ -55,15 +55,15 @@ const screenshot = await avatars.getScreenshot({
 ### Use Cases
 
 - Link previews
-- OG image generation
-- Competitor monitoring
-- Documentation
+- OG image gen
+- Competitor monitor
+- Docs
 
 ---
 
 ## Initials Avatars
 
-Generate avatars from user names.
+Gen avatars from user names.
 
 ```dart
 // Dart
@@ -115,7 +115,7 @@ final flag = avatars.getFlag(code: 'us', width: 100);
 final icon = avatars.getCreditCard(code: 'visa', width: 100);
 ```
 
-Supported codes: `visa`, `mastercard`, `amex`, `discover`, `jcb`, `unionpay`, `diners`
+Codes: `visa`, `mastercard`, `amex`, `discover`, `jcb`, `unionpay`, `diners`
 
 ---
 
@@ -143,7 +143,7 @@ final favicon = avatars.getFavicon(url: 'https://github.com');
 
 ## QR Codes
 
-Generate QR codes from text or URLs.
+Gen QR from text/URL.
 
 ```dart
 // Dart
@@ -176,7 +176,7 @@ const qr = await avatars.getQR({
 
 ## Image Avatars
 
-Generate placeholder images.
+Gen placeholder images.
 
 ```dart
 // Dart - Placeholder
@@ -191,14 +191,14 @@ final image = avatars.getImage(
 
 ## Performance Tips
 
-1. **Cache avatars** - URLs are deterministic
-2. **Use CDN** - Serve from edge
-3. **Size appropriately** - Match output dimensions to display size
-4. **Batch with SSR** - Pre-generate for SSR pages
+1. **Cache avatars** - URLs deterministic
+2. **Use CDN** - serve from edge
+3. **Size right** - match output dim to display size
+4. **Batch w/ SSR** - pre-gen for SSR pages
 
 ---
 
 ## Related
 
 - Storage for custom avatars
-- Functions for custom generation
+- Functions for custom gen

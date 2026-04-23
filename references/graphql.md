@@ -18,7 +18,7 @@
 POST /v1/graphql
 ```
 
-Required headers:
+Headers required:
 - `X-Appwrite-Project: <project-id>`
 - `X-Appwrite-Key: <api-key>` (server) or `X-Appwrite-JWT: <jwt>` (client)
 
@@ -26,7 +26,7 @@ Required headers:
 
 ## Introspection
 
-Explore available types and operations.
+Explore types + ops.
 
 ```graphql
 query {
@@ -122,7 +122,7 @@ mutation {
 
 ## Batching
 
-Combine multiple operations in single request.
+Combine ops in one request.
 
 ```graphql
 query BatchedQueries {
@@ -144,19 +144,19 @@ query BatchedQueries {
 
 ## File Uploads via GraphQL
 
-Use REST API for file uploads.
+Use REST for uploads.
 
 ---
 
 ## Rate Limits
 
-REST API rate limits apply.
+REST limits apply.
 
 ---
 
 ## SDK Usage
 
-Use HTTP client or dedicated GraphQL library.
+HTTP client or GraphQL lib.
 
 ```typescript
 // TypeScript - Basic fetch
@@ -182,12 +182,12 @@ const { data, errors } = await response.json();
 ## When to Use GraphQL
 
 ✅ **Recommended:**
-- Fetch multiple resources in one request
-- Client needs specific field selection
-- Avoiding over-fetching
+- Multi-resource fetch, one request
+- Client picks fields
+- Avoid over-fetch
 
 ❌ **Use REST instead:**
-- File uploads/downloads
-- Bulk operations
+- File up/download
+- Bulk ops
 - Transactions
-- Realtime subscriptions
+- Realtime subs

@@ -17,7 +17,7 @@
 
 ## Overview
 
-Send push notifications, emails, and SMS to users.
+Send push, email, SMS to users.
 
 ---
 
@@ -96,14 +96,14 @@ await messaging.createPush(
 | Parameter | Effect |
 |-----------|--------|
 | `image` | Image in expanded notification (URL) |
-| `sound` | Custom notification sound (file name in app bundle) |
-| `badge` | iOS app icon badge count |
-| `action` | URL or deep link; opens on tap |
-| `data` | Key-value payload for app-side logic (invisible to user) |
+| `sound` | Custom sound (file in app bundle) |
+| `badge` | iOS badge count |
+| `action` | URL/deep link on tap |
+| `data` | Key-value payload for app logic (user-invisible) |
 
 ### Silent / Background Push
 
-Send data silently to the app — triggers background refresh:
+Data-only push, triggers background refresh:
 
 ```dart
 // Dart — silent push (data only, omit title/body)
@@ -120,7 +120,7 @@ await messaging.createPush(
 
 ### Configure SMTP Provider
 
-Set up in Console → Messaging → Providers → Add SMTP.
+Console → Messaging → Providers → Add SMTP.
 
 ### Send Email
 
@@ -180,7 +180,7 @@ await messaging.createSms(
 
 ## Direct Targeting
 
-Send to specific users instead of topics.
+Send to users, not topics.
 
 ```dart
 // Dart - Send to specific users
@@ -196,7 +196,7 @@ await messaging.createPush(
 
 ## Scheduled Messages
 
-Send at specific time.
+Send at time.
 
 ```dart
 // Dart
@@ -213,7 +213,7 @@ await messaging.createPush(
 
 ## Message Status
 
-Track delivery status.
+Track delivery.
 
 ```dart
 // Dart
@@ -227,7 +227,7 @@ print(message.deliveredTotal);
 
 ## Targets
 
-User devices registered for push.
+User devices for push.
 
 ```dart
 // Dart - List user's targets
@@ -242,10 +242,10 @@ for (final target in targets.targets) {
 
 ## Performance Tips
 
-1. **Use topics** - Batch sends over individual targeting
-2. **Schedule off-peak** - Avoid rate limits
+1. **Use topics** - Batch > individual
+2. **Schedule off-peak** - Dodge rate limits
 3. **Track opens** - Monitor engagement
-4. **Segment users** - Create targeted topics
+4. **Segment users** - Targeted topics
 
 ---
 

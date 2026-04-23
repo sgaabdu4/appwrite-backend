@@ -17,9 +17,9 @@
 
 ## Why
 
-Offset pagination degrades linearly. The database reads N rows before returning results. At offset 10,000, it reads 10,000 rows just to skip them.
+Offset pagination degrades linear. DB reads N rows before return. At offset 10,000, reads 10,000 rows to skip.
 
-Cursor pagination jumps directly to the target row using an index. Performance stays constant regardless of position.
+Cursor jumps direct to target row via index. Constant perf regardless of position.
 
 | Records | Offset 10,000 | Cursor |
 |---------|---------------|--------|
@@ -99,7 +99,7 @@ const nextCursor = response.rows[response.rows.length - 1].$id;
 
 ## Combine with Skip Totals
 
-The `total=false` parameter skips the COUNT query — another full table scan. Combine with cursor pagination for maximum performance.
+`total=false` skips COUNT query — another full table scan. Combine w/ cursor for max perf.
 
 ```dart
 // Maximum performance - cursor + skip total
@@ -117,9 +117,9 @@ final response = await tablesDB.listRows(
 
 ## When Offset is Acceptable
 
-Small lookup tables with <1,000 rows:
+Small lookup tables <1,000 rows:
 - Countries, currencies, categories
-- Static configuration data
+- Static config data
 - Dropdown options
 
 ## Complete Pagination Pattern
@@ -233,7 +233,7 @@ def fetch_all_rows(db_id: str, table_id: str, base_queries: list = []):
 
 ## Flutter Mixin Pattern
 
-Multiple datasources repeat the same cursor loop. A mixin extracts it once.
+Multiple datasources repeat same cursor loop. Mixin extracts once.
 
 ```dart
 mixin AppwritePaginationMixin {
@@ -316,20 +316,20 @@ class ExerciseRemoteDatasource with AppwritePaginationMixin {
 
 ### Design decisions
 
-- **Mixin over inheritance** — datasources may already extend another class; mixins don't conflict
-- **Generic `mapRow` callback** — each datasource maps its own types; the mixin handles pagination only
-- **404 → empty list** — the table or rows may not exist yet for a new user
-- **`total: false` always** — skips the COUNT query (see above)
-- **Centralized `databaseId`** — reads from `AppwriteConfig` instead of requiring a parameter
+- **Mixin over inheritance** — datasources may extend other class; mixins no conflict
+- **Generic `mapRow` callback** — each datasource maps own types; mixin handles pagination only
+- **404 → empty list** — table/rows may not exist yet for new user
+- **`total: false` always** — skips COUNT query (see above)
+- **Centralized `databaseId`** — reads from `AppwriteConfig` not param
 
 ## Impact
 
 - **Latency:** 10-100x faster on large datasets
-- **Cost:** less database CPU
-- **DRY:** ~50 lines removed per datasource with the mixin
+- **Cost:** less DB CPU
+- **DRY:** ~50 lines removed per datasource w/ mixin
 
 ## Related
 
 - Skip totals for count elimination
-- Indexes for query performance
+- Indexes for query perf
 - Query.select() for payload reduction

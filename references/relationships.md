@@ -27,7 +27,7 @@
 
 ## Opt-In Loading
 
-**Relationships return IDs by default.** Use `Query.select()` to expand.
+**Relationships return IDs by default.** `Query.select()` to expand.
 
 ### IDs Only (Default)
 
@@ -56,7 +56,7 @@ final posts = await tablesDB.listRows(
 
 ## Why This Matters
 
-Consider a post with 100 comments, each with an author. Without select, relationships return IDs only. You'd need 100+ queries to get author names.
+Post w/ 100 comments, each w/ author. No select → IDs only → 100+ queries for names.
 
 ```dart
 // ❌ N+1 PROBLEM - 101 queries
@@ -141,7 +141,7 @@ await tablesDB.createRelationship(
 
 ## Nested Select
 
-Expand nested relationships up to 3 levels.
+Expand nested rels up to 3 levels.
 
 ```dart
 final posts = await tablesDB.listRows(
@@ -158,13 +158,13 @@ final posts = await tablesDB.listRows(
 );
 ```
 
-**Limit:** Maximum 3 levels of nesting.
+**Limit:** Max 3 levels nesting.
 
 ---
 
 ## Filtering on Relationships
 
-Query through relationships.
+Query through rels.
 
 ```dart
 // Posts by specific author name
@@ -214,10 +214,10 @@ await tablesDB.updateRow(
 
 ## Performance Tips
 
-1. **Always use Query.select()** - Control what loads
-2. **Limit nested depth** - Load only the levels you need
-3. **Index foreign keys** - Speeds up relationship queries
-4. **Prefer cursor pagination** - When loading related rows
+1. **Always use Query.select()** — control what loads
+2. **Limit nested depth** — load only levels needed
+3. **Index foreign keys** — speeds rel queries
+4. **Prefer cursor pagination** — when loading related rows
 
 ---
 

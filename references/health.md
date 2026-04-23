@@ -1,6 +1,6 @@
 # Health
 
-System health checks for self-hosted Appwrite deployments.
+Health checks self-hosted Appwrite.
 
 ---
 
@@ -63,7 +63,7 @@ print(avHealth.status);  // 'pass' if ClamAV running
 
 ## Queue Monitoring
 
-Check background job queues.
+Check bg job queues.
 
 ```dart
 // All queues
@@ -88,7 +88,7 @@ final migrations = await health.getQueueMigrations();
 
 ## Certificate Check
 
-Verify SSL certificate validity.
+Verify SSL cert valid.
 
 ```dart
 final certHealth = await health.getCertificate(domain: 'cloud.appwrite.io');
@@ -114,19 +114,19 @@ print(timeHealth.localTime);       // Server time
 print(timeHealth.diff);            // Difference in ms
 ```
 
-Time differences >30 seconds cause authentication issues.
+Time diff >30s break auth.
 
 ---
 
 ## Public Cloud Note
 
-Health endpoints require admin API key. Appwrite manages Cloud health internally — these endpoints apply to self-hosted only.
+Health endpoints need admin API key. Cloud managed internally — endpoints self-hosted only.
 
 ---
 
 ## Monitoring Integration
 
-Use health checks for:
+Health check uses:
 
 - **Uptime monitors:** Pingdom, UptimeRobot
 - **Kubernetes probes:** Liveness/readiness
@@ -157,7 +157,7 @@ app.get('/health', async (req, res) => {
 
 ## Horizontal Scaling (Self-Hosted)
 
-Appwrite runs as multiple Docker containers. Stateless containers scale by replication; stateful containers need cluster configuration.
+Appwrite = many Docker containers. Stateless scale by replication; stateful need cluster config.
 
 ### What to Scale
 
@@ -177,7 +177,7 @@ Appwrite runs as multiple Docker containers. Stateless containers scale by repli
 docker compose up --scale appwrite-worker-functions=4 -d
 ```
 
-Route all traffic through a load balancer. Configure inter-container communication through Docker environment variables.
+Route traffic through load balancer. Inter-container comms via Docker env vars.
 
 ### Performance Tuning
 
@@ -188,22 +188,22 @@ _APP_WORKER_PER_CORE=6  # default, tune based on workload
 
 ### Stateful Containers
 
-**MariaDB:** Configure primary-replica replication. Appwrite writes to primary; replicas handle read queries.
+**MariaDB:** Primary-replica replication. Writes → primary; reads → replicas.
 
-**Redis:** Use Redis Sentinel for failover or Redis Cluster for sharding. Appwrite uses Redis for caching and pub/sub (Realtime). Set memory limits to prevent OOM:
+**Redis:** Sentinel for failover, Cluster for sharding. Redis = cache + pub/sub (Realtime). Set mem limits prevent OOM:
 
 ```bash
 maxmemory 256mb
 maxmemory-policy allkeys-lru
 ```
 
-**Storage:** Switch from local to S3-compatible storage (`_APP_STORAGE_DEVICE=s3`) so all nodes access the same files. Local disk limits you to a single node.
+**Storage:** Switch local → S3-compatible (`_APP_STORAGE_DEVICE=s3`) so all nodes share files. Local disk = single node only.
 
 ### Monitoring Scaled Deployments
 
-Use the health endpoints above per container instance. Route health checks through your load balancer to catch unhealthy nodes.
+Use health endpoints per container. Route health checks via load balancer catch bad nodes.
 
-For full self-hosting guide (installation, backups, updates, maintenance), see [self-hosting.md](self-hosting.md).
+Full self-hosting guide (install, backups, updates, maintenance): [self-hosting.md](self-hosting.md).
 
 ---
 

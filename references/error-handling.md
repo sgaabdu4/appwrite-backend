@@ -11,15 +11,15 @@
 
 ## Rate Limiting
 
-Rate limits apply to Client SDKs. Server SDKs with API keys bypass them.
+Rate limits hit Client SDKs. Server SDKs w/ API keys bypass.
 
 ### Response Headers
 
 | Header | Description |
 |--------|-------------|
-| `X-RateLimit-Limit` | Max requests per window |
-| `X-RateLimit-Remaining` | Requests left in window |
-| `X-RateLimit-Reset` | Unix timestamp when window resets |
+| `X-RateLimit-Limit` | Max req per window |
+| `X-RateLimit-Remaining` | Req left in window |
+| `X-RateLimit-Reset` | Unix ts when window reset |
 
 ### 429 Response
 
@@ -101,10 +101,10 @@ const result = await withRetry(() => tablesDB.createRow({...}));
 
 ## Dev Keys
 
-Bypass rate limits during development.
+Bypass rate limits in dev.
 
 1. Console → Project Settings → Dev keys → Add key
-2. Add header to requests:
+2. Add header to req:
 
 ```dart
 // Dart - Client SDK only
@@ -114,7 +114,7 @@ final client = Client()
     .addHeader('X-Appwrite-Dev-Key', 'your-dev-key');
 ```
 
-**Never use in production.** Dev keys expose your app to abuse.
+**Never in prod.** Dev keys expose app to abuse.
 
 ---
 
@@ -122,12 +122,12 @@ final client = Client()
 
 | Code | Meaning | Solution |
 |------|---------|----------|
-| 400 | Bad request | Check request structure |
+| 400 | Bad request | Check req structure |
 | 401 | Unauthorized | Check API key/session |
-| 403 | Forbidden | Check permissions |
+| 403 | Forbidden | Check perms |
 | 404 | Not found | Verify resource exists |
-| 409 | Conflict | ID already exists |
-| 429 | Rate limited | Implement backoff |
+| 409 | Conflict | ID exists |
+| 429 | Rate limited | Backoff |
 | 500 | Server error | Retry, contact support |
 
 ---
@@ -195,7 +195,7 @@ try {
 
 ## Timeout Handling
 
-API timeout: 15 seconds. Long operations may fail.
+API timeout: 15s. Long ops may fail.
 
 ```dart
 // Dart - Handle timeout
@@ -210,5 +210,5 @@ try {
 
 ## Related
 
-- Rate limits for limits info
-- Performance for query optimization
+- Rate limits → limits info
+- Performance → query optimization

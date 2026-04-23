@@ -12,7 +12,7 @@
 
 ## Architecture
 
-**Group functions by domain.** Each function owns one domain — not one operation, not everything.
+**Group functions by domain.** Each function own one domain — not one operation, not everything.
 
 ```
 ✅ api-users          — all user endpoints (CRUD, profile, settings)
@@ -24,7 +24,7 @@
 ❌ create-user        — one function per operation
 ```
 
-**Warm-start advantage:** More requests per function means instances stay warm. A function handling 50 user operations gets 50x traffic vs one handling just "create user" — so it rarely cold-starts.
+**Warm-start advantage:** More requests per function = instances stay warm. Function handling 50 user ops gets 50x traffic vs one handling just "create user" — rarely cold-starts.
 
 ### Route Handling Inside Domain Functions
 
@@ -45,7 +45,7 @@ Future<dynamic> main(final context) async {
 
 ### When to Split
 
-Split when a domain function has operations with vastly different resource needs, exceeds timeout limits, or needs different API key scopes.
+Split when domain function has ops w/ vastly different resource needs, exceeds timeout, or needs different API key scopes.
 
 ---
 
@@ -59,13 +59,13 @@ Split when a domain function has operations with vastly different resource needs
 | Node.js + ESBuild | Fast | npm ecosystem needed |
 | Python | Slowest | Data processing, ML |
 
-**Bundle interpreted languages** into a single file:
+**Bundle interpreted languages** to single file:
 
 ```bash
 npx esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js
 ```
 
-**Keep dependencies minimal.** Every dep adds cold start time.
+**Keep deps minimal.** Every dep adds cold start time.
 
 ### Specifications
 
@@ -79,7 +79,7 @@ npx esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js
 
 ## Handler Pattern
 
-Initialize SDK and services **outside the handler** (warm-start). Refresh the dynamic API key on each call — it changes per execution.
+Init SDK + services **outside handler** (warm-start). Refresh dynamic API key each call — changes per execution.
 
 ### Dart
 
@@ -173,7 +173,7 @@ export default async ({ req, res }: any) => {
 
 ## Input Validation & Responses
 
-> **Security:** All user input from `context.req.bodyJson` is untrusted. Always validate types, sanitize strings, and enforce length limits before processing.
+> **Security:** All user input from `context.req.bodyJson` untrusted. Always validate types, sanitize strings, enforce length limits before processing.
 
 ```dart
 Future<dynamic> main(final context) async {
@@ -219,7 +219,7 @@ bool _isValidEmail(String email) {
 
 ### API Keys
 
-Appwrite auto-generates a short-lived API key per execution from the function's **scopes** (Console → Settings → Scopes). Use `context.req.headers['x-appwrite-key']` — no manual key management needed.
+Appwrite auto-generates short-lived API key per execution from function's **scopes** (Console → Settings → Scopes). Use `context.req.headers['x-appwrite-key']` — no manual key mgmt.
 
 ```
 ✅ rows.read only for a read function

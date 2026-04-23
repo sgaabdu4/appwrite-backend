@@ -21,13 +21,13 @@
 | Bulk operations | N requests → 1 | [bulk-operations.md](bulk-operations.md) |
 | Realtime | WebSocket vs polling | [realtime.md](realtime.md) |
 | Image caching | WebP/AVIF 30-55% smaller | [storage-files.md](storage-files.md) |
-| Redis cache (self-hosted) | Cut DB reads for hot data | See below |
+| Redis cache (self-hosted) | Cut DB reads hot data | See below |
 
 ---
 
 ## Checklist
 
-Before deploying:
+Pre-deploy:
 
 - [ ] All filter/sort columns indexed
 - [ ] Lists use `Query.select()` for needed fields only
@@ -46,8 +46,8 @@ Before deploying:
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Query >500ms | Missing index | Add index for queried columns |
-| Latency increases over time | Offset pagination | Switch to cursor |
-| High client memory | Fetching all data | Use generators |
+| Latency grows over time | Offset pagination | Switch to cursor |
+| High client memory | Fetch all data | Use generators |
 | Duplicate data in responses | Missing Query.select() | Select only needed fields |
 | Lost counter updates | Read-modify-write | Use Operator.increment() |
 
@@ -66,7 +66,7 @@ Before deploying:
 
 ## Self-Hosted: Redis Caching
 
-Self-hosted Appwrite includes Redis. Use it to cache frequent reads and cut database load.
+Self-hosted Appwrite ships Redis. Cache frequent reads, cut DB load.
 
 ### Cache-Aside Pattern (Function-Level)
 
@@ -98,14 +98,14 @@ Future<Map<String, dynamic>> getCachedRow(String key, Future<Map<String, dynamic
 
 | Cache | Skip Cache |
 |-------|-----------|
-| User profiles read 100x/min | Data that changes every request |
-| Config/settings (changes rarely) | Writes (always go to TablesDB) |
+| User profiles read 100x/min | Data changes every request |
+| Config/settings (rarely change) | Writes (go to TablesDB) |
 | Computed aggregations | Security-sensitive data |
 | API responses shared across users | Per-user real-time data |
 
 ### Invalidation
 
-Invalidate on write. Use Appwrite event triggers to clear stale cache entries:
+Invalidate on write. Appwrite event triggers clear stale entries:
 
 ```dart
 // In your data-update function: clear the cache key after writing
@@ -116,7 +116,7 @@ await cmd.send_object(['DEL', 'user:$userId']);
 
 ## Delta Sync (Incremental Pull)
 
-Fetch only rows that changed since the last sync instead of re-downloading everything. Uses `Query.updatedAfter()` with per-table timestamps.
+Fetch only rows changed since last sync, not re-download all. Uses `Query.updatedAfter()` with per-table timestamps.
 
 ### Pattern
 
@@ -173,19 +173,19 @@ Future<List<String>> fetchAllIds(String userId) async {
 ### Sync Flow
 
 1. Store per-table `lastSyncDate` locally after each sync
-2. On next sync: call `fetchUpdatedSince(lastSyncDate)` — merge changed rows locally
-3. Call `fetchAllIds()` — compare to local IDs, delete missing ones
+2. Next sync: call `fetchUpdatedSince(lastSyncDate)` — merge changed rows locally
+3. Call `fetchAllIds()` — diff vs local IDs, delete missing
 4. Store new `lastSyncDate`
 
-**First sync fallback:** If no per-table date exists, do a full `getAll()` pull once, then switch to delta.
+**First sync fallback:** No per-table date → full `getAll()` pull once, then switch to delta.
 
 ### When to Use
 
 | Scenario | Approach |
 |----------|----------|
-| Data rarely changes | Delta sync — fetches nothing when no changes |
+| Data rarely changes | Delta sync — fetches nothing on no change |
 | Frequent small edits | Delta sync — fetches only changed rows |
-| Full data refresh needed | Full `getAll()` pull |
+| Full refresh needed | Full `getAll()` pull |
 | Real-time updates | Realtime subscriptions (not delta sync) |
 
 ---

@@ -17,7 +17,7 @@
 
 ## Error Handling & Idempotency
 
-> **Security:** Data from `context.req.bodyJson` and event payloads is untrusted. Validate and sanitize all fields before database operations. See [functions.md](functions.md) for sanitization patterns.
+> **Security:** `context.req.bodyJson` + event payload untrusted. Validate+sanitize all fields before DB ops. See [functions.md](functions.md) sanitization patterns.
 
 ### Always Return Valid Responses
 
@@ -40,7 +40,7 @@ Future<dynamic> main(final context) async {
 
 ### Design for Idempotency
 
-Event triggers can deliver the same event more than once. Use idempotency keys.
+Event trigger deliver same event >1x. Use idempotency key.
 
 ```dart
 Future<dynamic> main(final context) async {
@@ -76,7 +76,7 @@ Future<dynamic> main(final context) async {
 
 ## Caching
 
-Global variables persist across warm invocations.
+Global vars persist across warm invocations.
 
 ```dart
 Map<String, dynamic> _cache = {};
@@ -99,14 +99,14 @@ Future<dynamic> main(final context) async {
 }
 ```
 
-**Cache:** Configuration, lookup tables, rate-limit counters.
-**Skip:** User-specific data, frequently changing data.
+**Cache:** config, lookup tables, rate-limit counters.
+**Skip:** user-specific, frequently changing.
 
 ---
 
 ## Logging
 
-Use `context.log()` for info, `context.error()` for errors. Disable in production for performance; re-enable for debugging.
+`context.log()` info, `context.error()` errors. Disable in prod for perf; re-enable to debug.
 
 Console → Functions → Settings → Logging
 
@@ -114,7 +114,7 @@ Console → Functions → Settings → Logging
 
 ## Event Triggers
 
-**Prefer over polling.** One trigger replaces thousands of requests.
+**Prefer over polling.** One trigger replace thousands of requests.
 
 | Event | Use Case |
 |-------|----------|
@@ -146,7 +146,7 @@ Future<dynamic> main(final context) async {
 | Report generation | 60s |
 | Data migration | 300s |
 
-Break long tasks into async executions:
+Break long tasks to async executions:
 
 ```dart
 final execution = await functions.createExecution(
@@ -199,7 +199,7 @@ await functions.createExecution(
 
 ## CI/CD Deployment
 
-**Git (recommended):** Console → Functions → Settings → Connect Git Repository. Push to branch → auto deploy.
+**Git (recommended):** Console → Functions → Settings → Connect Git Repository. Push branch → auto deploy.
 
 **CLI:** `appwrite deploy function --function-id my-function`
 
@@ -207,7 +207,7 @@ await functions.createExecution(
 
 ## Function Domains
 
-Map custom domains: `https://api.example.com/path` → Function execution.
+Map custom domain: `https://api.example.com/path` → function execution.
 
 Console → Functions → Settings → Domains.
 

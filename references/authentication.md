@@ -59,7 +59,7 @@ final newCodes = await account.updateMfaRecoveryCodes();
 
 ## SSR Authentication
 
-Server-side session handling for Next.js, SvelteKit, Nuxt, etc.
+Server-side session for Next.js, SvelteKit, Nuxt, etc.
 
 ### Create Session Server-Side
 
@@ -106,7 +106,7 @@ export async function GET({ cookies }) {
 
 ## User Labels
 
-Labels enable role-based permissions. Server SDK only.
+Role-based permissions. Server SDK only.
 
 ```dart
 await users.updateLabels(userId: 'user_123', labels: ['premium', 'beta-tester']);
@@ -120,7 +120,7 @@ Permission.update(Role.label('admin'))
 
 ## JWT for Functions
 
-Create JWT for server-side user context.
+JWT for server-side user context.
 
 ```dart
 final jwt = await users.createJWT(userId: 'user_123');
@@ -161,6 +161,6 @@ await account.createEmailPasswordSession(email: 'user@example.com', password: 'p
 
 ## Related
 
-- [auth-methods.md](auth-methods.md) — OAuth, magic link, OTP, anonymous, phone, custom token, session management
+- [auth-methods.md](auth-methods.md) — OAuth, magic link, OTP, anonymous, phone, custom token, session mgmt
 - Teams for group permissions
 - Permissions for access control

@@ -1,11 +1,11 @@
 # Appwrite Backend Skill
 
-> Patterns and best practices for building with Appwrite BaaS using Dart, Python, and TypeScript.
+> Patterns + best practices for Appwrite BaaS. Dart, Python, TypeScript.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Appwrite 1.8+](https://img.shields.io/badge/Appwrite-1.8+-F02E65.svg)](https://appwrite.io)
 
-> **Disclaimer:** This is an unofficial community resource. It is not affiliated with, endorsed by, or sponsored by [Appwrite](https://appwrite.io). "Appwrite" is a trademark of Appwrite Ltd.
+> **Disclaimer:** Unofficial community resource. Not affiliated/endorsed/sponsored by [Appwrite](https://appwrite.io). "Appwrite" trademark of Appwrite Ltd.
 
 ## Installation
 
@@ -13,7 +13,7 @@
 npx skills add sgaabdu4/appwrite-backend
 ```
 
-Or manually clone into `~/.claude/skills/`:
+Or clone into `~/.claude/skills/`:
 
 ```bash
 git clone https://github.com/sgaabdu4/appwrite-backend ~/.claude/skills/appwrite-backend
@@ -21,22 +21,22 @@ git clone https://github.com/sgaabdu4/appwrite-backend ~/.claude/skills/appwrite
 
 ## What's Included
 
-This skill provides AI agents with comprehensive guidance for Appwrite development:
+Skill gives AI agents Appwrite dev guidance:
 
 ### Core Coverage
-- **TablesDB** — CRUD operations, queries, relationships, transactions, bulk operations
-- **Authentication** — OAuth, email/password, phone, JWT, MFA, session management
-- **Storage** — File uploads, previews, transformations, file tokens
-- **Functions** — Cold start optimization, event triggers, domain grouping
-- **Realtime** — WebSocket subscriptions, channel patterns, server-side filtering
-- **Messaging** — Push notifications, email, SMS
+- **TablesDB** — CRUD, queries, relationships, transactions, bulk ops
+- **Authentication** — OAuth, email/password, phone, JWT, MFA, sessions
+- **Storage** — uploads, previews, transforms, file tokens
+- **Functions** — cold start opt, event triggers, domain grouping
+- **Realtime** — WebSocket subs, channels, server-side filters
+- **Messaging** — push, email, SMS
 
 ### Key Patterns
-- TablesDB API (Collections API deprecated in 1.8.0)
-- Atomic operators for race-free updates
-- Cursor pagination for performance
-- Query.select() for relationship expansion
-- Type-safe SDK generation with `appwrite generate`
+- TablesDB API (Collections API deprecated 1.8.0)
+- Atomic operators, race-free updates
+- Cursor pagination, perf
+- Query.select() relationship expansion
+- Type-safe SDK gen `appwrite generate`
 
 ## Reference Files
 
@@ -54,41 +54,41 @@ This skill provides AI agents with comprehensive guidance for Appwrite developme
 | Performance | [performance.md](references/performance.md) |
 | Error Handling | [error-handling.md](references/error-handling.md) |
 
-See [SKILL.md](SKILL.md) for the complete reference list.
+Full list → [SKILL.md](SKILL.md).
 
 ## Compatible Agents
 
 - [Claude Code](https://code.claude.com/)
 - [Cursor](https://cursor.sh/)
 - [Windsurf](https://windsurf.ai/)
-- Any agent supporting the [Agent Skills](https://agentskills.io/) standard
+- Any agent on [Agent Skills](https://agentskills.io/) standard
 
 ## Usage
 
-Once installed, the skill automatically activates when you:
-- Mention Appwrite, TablesDB, or Appwrite SDK
-- Work with Appwrite authentication, storage, or functions
-- Ask about backend-as-a-service patterns
+Auto-activates when:
+- Mention Appwrite, TablesDB, Appwrite SDK
+- Work Appwrite auth/storage/functions
+- Ask BaaS patterns
 
-Or invoke directly:
+Direct invoke:
 ```
 /appwrite-backend
 ```
 
 ## Contributing
 
-Contributions are welcome! Please:
+PRs welcome:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/add-new-pattern`)
-3. Follow existing documentation style
-4. Submit a pull request
+1. Fork repo
+2. Feature branch (`git checkout -b feature/add-new-pattern`)
+3. Match existing doc style
+4. Submit PR
 
 ### Guidelines
-- Keep SKILL.md under 500 lines
-- Add detailed patterns to `references/` files
-- Include code examples in Dart, Python, and TypeScript
-- Test with Appwrite 1.8+
+- SKILL.md <500 lines
+- Detail patterns → `references/`
+- Code examples: Dart, Python, TypeScript
+- Test Appwrite 1.8+
 
 ## License
 

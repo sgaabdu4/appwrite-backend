@@ -21,14 +21,14 @@
 | Buckets (count) | 1 | Unlimited |
 | Functions (count) | 2 | Unlimited |
 
-> **"Unlimited" means the NUMBER of databases/buckets/functions you can create — NOT unlimited reads/writes.** All database reads, writes, and API responses consume bandwidth. Pro includes 2 TB; overages are billed as add-ons until your budget cap.
+> **"Unlimited" = COUNT of databases/buckets/functions — NOT unlimited reads/writes.** All DB reads, writes, API responses consume bandwidth. Pro = 2 TB; overage billed as add-on until budget cap.
 
 ### What Costs Money
 
-- **Bandwidth:** All API request/response data (including database reads/writes)
-- **Storage:** Files in buckets + database storage
-- **Executions:** Each function invocation
-- **MAU:** Unique logged-in users per month
+- **Bandwidth:** all API request/response data (incl. DB reads/writes)
+- **Storage:** bucket files + DB storage
+- **Executions:** each function invocation
+- **MAU:** unique logged-in users/month
 
 ---
 
@@ -46,7 +46,7 @@
 
 ### Batch Function Operations
 
-One execution doing 10 operations beats 10 executions.
+1 exec doing 10 ops beats 10 execs.
 
 ```python
 # ❌ 10 function calls (10 executions)
@@ -64,7 +64,7 @@ functions.create_execution(
 
 ## Image Transformation Cache
 
-Appwrite caches transformed images. Identical URLs serve from cache.
+Appwrite caches transformed images. Identical URLs = cache hit.
 
 ```dart
 // First request: computed
@@ -72,7 +72,7 @@ Appwrite caches transformed images. Identical URLs serve from cache.
 storage.getFilePreview(bucketId: 'img', fileId: 'id', width: 400, output: 'webp');
 ```
 
-Use consistent URLs to maximize cache hits.
+Consistent URLs maximize cache hits.
 
 ---
 
@@ -86,13 +86,13 @@ Console → Organization → Billing → Budget cap
 | Storage | Auto-buy until cap | Uploads disabled |
 | Executions | Auto-buy until cap | Functions disabled |
 
-Set budget caps to prevent unexpected charges.
+Set budget caps to prevent surprise charges.
 
 ### Budget Alerts
 
 Console → Organization → Billing → Budget Alerts
 
-Alerts warn you before the budget cap stops services. Set alerts at 50%, 75%, and 90% of your cap to react before hitting hard limits.
+Alerts warn before cap stops services. Set at 50%, 75%, 90% of cap to react before hard limits.
 
 ---
 
@@ -100,7 +100,7 @@ Alerts warn you before the budget cap stops services. Set alerts at 50%, 75%, an
 
 Console → Organization → Usage
 
-Track bandwidth, storage, executions, and MAU against your limits.
+Track bandwidth, storage, executions, MAU vs limits.
 
 ---
 
