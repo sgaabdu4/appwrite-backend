@@ -4,6 +4,7 @@
 
 - MFA/2FA
 - SSR Authentication
+- SSR Hardening
 - User Labels
 - JWT for Functions
 - Security Settings
@@ -99,6 +100,61 @@ export async function GET({ cookies }) {
     } catch {
         return { user: null };
     }
+}
+```
+
+---
+
+## SSR Hardening
+
+Use exact cookie name: `a_session_<PROJECT_ID>`. Generic `session` cookie breaks Appwrite SSR patterns.
+
+Use admin client to create session or call privileged APIs. Use per-request session client to read user-scoped data.
+
+Forward browser user agent on session client for debug + security context.
+
+```dart
+final adminClient = Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('PROJECT_ID')
+    .setKey('API_KEY');
+
+final session = request.cookies['a_session_[PROJECT_ID]'];
+final sessionClient = Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('PROJECT_ID');
+
+if (session != null) {
+    sessionClient.setSession(session);
+    sessionClient.setForwardedUserAgent(request.headers['user-agent']);
+}
+```
+
+```python
+admin_client = Client().set_endpoint('https://cloud.appwrite.io/v1').set_project('PROJECT_ID').set_key('API_KEY')
+
+session = request.cookies.get('a_session_[PROJECT_ID]')
+session_client = Client().set_endpoint('https://cloud.appwrite.io/v1').set_project('PROJECT_ID')
+
+if session:
+    session_client.set_session(session)
+    session_client.set_forwarded_user_agent(request.headers.get('user-agent'))
+```
+
+```typescript
+const adminClient = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('PROJECT_ID')
+    .setKey('API_KEY');
+
+const session = req.cookies['a_session_[PROJECT_ID]'];
+const sessionClient = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject('PROJECT_ID');
+
+if (session) {
+    sessionClient.setSession(session);
+    sessionClient.setForwardedUserAgent(req.headers['user-agent']);
 }
 ```
 

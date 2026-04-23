@@ -170,12 +170,14 @@ appwrite generate
 ```
 
 Gen typed helpers into `generated/appwrite/` from DB schema. Autocomplete, compile-time validation, no hand-written types. Regen after schema change.
+CLI flow: `login -> init project -> pull -> generate -> push`. Details: [appwrite-cli](./references/appwrite-cli.md)
 
 ---
 
 ## Authentication
 
 Email/password, OAuth (50+ providers), phone, magic link, anon, email OTP, custom token. MFA w/ TOTP, email, phone, recovery codes. SSR session handling. JWT for functions.
+SSR: cookie `a_session_<PROJECT_ID>`. Use admin client to create session, session client per request to read user context.
 
 Details: [authentication.md](references/authentication.md) | [auth-methods.md](references/auth-methods.md)
 
@@ -257,7 +259,12 @@ permissions: [
 ]
 ```
 
+**Default:** deny all unless row/file perms set or inherited from table/bucket.
+**Use row/file perms** for per-resource ACL. If all resources share rules, set table/bucket perms and leave row/file perms empty.
+**`write`** = `create + update + delete`
+**Avoid:** missing perms = lockout; `Role.any()` + `write`/`update`/`delete` = public mutation; `Permission.read(Role.any())` on sensitive data = public leak.
 **Roles:** `any()` | `guests()` | `users()` | `user(id)` | `team(id)` | `team(id, role)` | `label(name)`
+Details: [permissions](./references/permissions.md) | [teams](references/teams.md) | [storage-files](references/storage-files.md)
 
 ---
 
@@ -268,6 +275,7 @@ Default page: 25 · Bulk: 1000 rows · `Query.equal()`: 100 values · Nesting: 3
 ## Error Codes
 
 `400` Bad request · `401` Unauthorized · `403` Forbidden · `404` Not found · `409` Conflict · `429` Rate limited (client SDKs only)
+Catch `AppwriteException`. `429` -> exponential backoff.
 
 Details: [error-handling.md](references/error-handling.md)
 
@@ -314,8 +322,9 @@ Details: [cost-optimization.md](references/cost-optimization.md)
 
 **Data:** [schema-management](references/schema-management.md) · [query-optimization](references/query-optimization.md) · [atomic-operators](references/atomic-operators.md) · [relationships](references/relationships.md) · [transactions](references/transactions.md) · [bulk-operations](references/bulk-operations.md) · [chunked-queries](references/chunked-queries.md)
 **Performance:** [performance](references/performance.md) · [pagination-performance](references/pagination-performance.md) · [cost-optimization](references/cost-optimization.md)
-**Auth:** [authentication](references/authentication.md) · [auth-methods](references/auth-methods.md) · [teams](references/teams.md)
+**Auth:** [authentication](references/authentication.md) · [auth-methods](references/auth-methods.md) · [permissions](./references/permissions.md) · [teams](references/teams.md)
 **Services:** [storage-files](references/storage-files.md) · [functions](references/functions.md) · [functions-advanced](references/functions-advanced.md) · [realtime](references/realtime.md) · [messaging](references/messaging.md) · [webhooks](references/webhooks.md) · [avatars](references/avatars.md) · [graphql](references/graphql.md) · [locale](references/locale.md)
+**Tooling:** [appwrite-cli](./references/appwrite-cli.md)
 **Platform:** [error-handling](references/error-handling.md) · [limits](references/limits.md) · [health](references/health.md) · [self-hosting](references/self-hosting.md) · [self-hosting-ops](references/self-hosting-ops.md)
 
 ---
