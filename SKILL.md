@@ -169,13 +169,13 @@ Details: [performance.md](references/performance.md), [pagination-performance.md
 appwrite generate
 ```
 
-Generates typed helpers into `generated/appwrite/` from DB schema. Autocomplete, compile-time validation, no hand-written types. Regenerate after schema changes.
+Gen typed helpers into `generated/appwrite/` from DB schema. Autocomplete, compile-time validation, no hand-written types. Regen after schema change.
 
 ---
 
 ## Authentication
 
-Email/password, OAuth (50+ providers), phone, magic link, anonymous, email OTP, custom token. MFA w/ TOTP, email, phone, recovery codes. SSR session handling. JWT for functions.
+Email/password, OAuth (50+ providers), phone, magic link, anon, email OTP, custom token. MFA w/ TOTP, email, phone, recovery codes. SSR session handling. JWT for functions.
 
 Details: [authentication.md](references/authentication.md) | [auth-methods.md](references/auth-methods.md)
 
@@ -183,7 +183,7 @@ Details: [authentication.md](references/authentication.md) | [auth-methods.md](r
 
 ## Storage
 
-Upload, download, preview w/ transformations (resize, format conversion), file tokens for shareable URLs. Supports HEIC, AVIF, WebP.
+Upload, download, preview w/ transforms (resize, format conversion), file tokens for shareable URLs. HEIC, AVIF, WebP supported.
 
 Details: [storage-files.md](references/storage-files.md)
 
