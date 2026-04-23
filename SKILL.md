@@ -1,6 +1,6 @@
 ---
 name: appwrite-backend
-description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TS. Use for Appwrite SDK, DB, auth, storage, fn, BaaS. Patterns+rules only.
+description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TS. Use for Appwrite SDK, DB, auth, storage, fn, cli. Patterns+rules only.
 license: MIT
 metadata:
   author: sgaabdu4
@@ -25,6 +25,24 @@ metadata:
 11. **Use `appwrite generate`** — Type-safe SDK from schema
 12. **Use Channel helpers** — Type-safe realtime subs, not raw strings
 13. **Use Realtime queries** — Server-side event filtering, not client-side
+
+## CLI Quick Check (Top)
+
+```shell
+appwrite -v
+appwrite client --debug
+appwrite projects get --project-id "<PROJECT_ID>"
+```
+
+If not set:
+
+```shell
+appwrite login --endpoint "https://<ENDPOINT>/v1"
+appwrite init project
+```
+
+Rules: `appwrite.config.json` = local project config. `appwrite client ...` = global override (non-interactive). Clear override: `appwrite client --reset`.
+Details: [appwrite-cli](./references/appwrite-cli.md)
 
 ## Terminology (1.8.0+)
 
