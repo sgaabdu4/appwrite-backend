@@ -38,6 +38,7 @@ Python and TypeScript follow the same pattern with `create_file_token()` / `crea
 ## Chunked Uploads
 
 Large files upload in chunks. SDKs handle this automatically.
+Current SDKs can upload chunks in parallel when the runtime supports overlapping HTTP requests. Keep `createFile` calls unchanged; update the official SDK instead of writing custom chunk/upload HTTP.
 
 ### Limits
 

@@ -8,6 +8,7 @@
 - User Labels
 - JWT for Functions
 - Security Settings
+- Email Policies
 - Email/Password Auth
 - Related
 
@@ -200,6 +201,20 @@ Console → Auth → Security:
 | Personal data | Block name/email in password |
 | Session limits | Max sessions per user |
 | Session length | Default session duration |
+
+---
+
+## Email Policies
+
+Use Auth email policies to block signup/update emails by category:
+
+| Policy | Blocks |
+|--------|--------|
+| Free providers | Gmail, Yahoo, Outlook, similar consumer inboxes |
+| Aliased addresses | Plus-tags/subaddresses/provider aliases |
+| Disposable providers | Temporary/throwaway inboxes |
+
+Configure in Console → Auth → Security or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
 
 ---
 

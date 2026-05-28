@@ -12,6 +12,8 @@
 - SDK Usage
 - When to Use GraphQL
 
+> SDK-first rule: prefer official Appwrite SDK service clients (`TablesDB`, `Storage`, `Users`, etc.). Raw GraphQL/REST HTTP (`fetch`, `requests`, `dio`, `package:http`, `curl`) is a violation unless the SDK has no supported equivalent and the user explicitly approves.
+
 ## Endpoint
 
 ```
@@ -144,50 +146,31 @@ query BatchedQueries {
 
 ## File Uploads via GraphQL
 
-Use REST for uploads.
+Use the official Storage SDK for uploads.
 
 ---
 
 ## Rate Limits
 
-REST limits apply.
+Appwrite API limits apply.
 
 ---
 
 ## SDK Usage
 
-HTTP client or GraphQL lib.
-
-```typescript
-// TypeScript - Basic fetch
-const response = await fetch('https://cloud.appwrite.io/v1/graphql', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-Appwrite-Project': projectId,
-        'X-Appwrite-Key': apiKey,
-    },
-    body: JSON.stringify({
-        query: `
-            query { tablesdbListRows(tableId: "products") { rows { id name } } }
-        `,
-    }),
-});
-
-const { data, errors } = await response.json();
-```
+Use official SDK service clients. Do not hand-roll Appwrite HTTP calls in TypeScript, Dart, Flutter, Python, or shell.
 
 ---
 
 ## When to Use GraphQL
 
-✅ **Recommended:**
-- Multi-resource fetch, one request
-- Client picks fields
-- Avoid over-fetch
+✅ **Allowed only with explicit approval:**
+- SDK has no supported equivalent
+- One-off admin/debug task, not app code
 
-❌ **Use REST instead:**
+❌ **Use SDK instead:**
 - File up/download
 - Bulk ops
 - Transactions
 - Realtime subs
+- TablesDB CRUD/queries

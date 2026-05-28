@@ -13,6 +13,7 @@
 ## Architecture
 
 **Group functions by domain.** Each function own one domain — not one operation, not everything.
+Use official SDK packages only. For self-hosted Appwrite `1.9.0`, pin Dart Functions/server code to `dart_appwrite: 21.1.0`; for Appwrite Cloud, use the latest stable SDK supported by the runtime.
 
 ```
 ✅ api-users          — all user endpoints (CRUD, profile, settings)
@@ -52,6 +53,8 @@ Split when domain function has ops w/ vastly different resource needs, exceeds t
 ## Cold Start Optimization
 
 ### Language Choice
+
+Cloud runtime note: Appwrite Cloud supports Dart `3.12` for Functions. Self-hosted runtimes depend on the installed Appwrite image and `_APP_FUNCTIONS_RUNTIMES`.
 
 | Language | Cold Start | Use When |
 |----------|-----------|----------|

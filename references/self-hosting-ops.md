@@ -31,8 +31,10 @@ Each adapter needs access key, secret, region, bucket env vars. Local = single n
 Enable only runtimes needed:
 
 ```bash
-_APP_FUNCTIONS_RUNTIMES=dart-3.5,node-22.0,python-3.12
+_APP_FUNCTIONS_RUNTIMES=dart-3.12,node-22.0,python-3.12
 ```
+
+Use only runtimes available in your installed Appwrite image. Appwrite Cloud supports Dart `3.12` for Functions; self-hosted availability can lag Cloud.
 
 ### Resource Limits
 
@@ -106,15 +108,17 @@ Key volumes: `appwrite-uploads`, `appwrite-functions`, `appwrite-builds`, `appwr
 
 ### Upgrade Path
 
-Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1`. Pin version — never `latest`.
+Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1` → `1.9.0`. Pin version — never `latest`.
 
 ```bash
 docker run -it --rm \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
     --entrypoint="upgrade" \
-    appwrite/appwrite:1.8.1
+    appwrite/appwrite:1.9.0
 ```
+
+Appwrite `1.9.0` can use MongoDB or MariaDB. Test database-engine choice and migrations in non-prod before upgrading prod.
 
 ### Run Migration
 

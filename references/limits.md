@@ -26,7 +26,7 @@
 
 >100 values in `Query.equal()` throws. Chunk to 100, fetch parallel.
 
-**Full patterns:** See [bulk-operations.md](bulk-operations.md#chunked-id-queries).
+**Full patterns:** See [chunked-queries.md](chunked-queries.md).
 
 ---
 

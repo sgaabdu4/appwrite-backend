@@ -3,7 +3,7 @@
 > Patterns + best practices for Appwrite BaaS. Dart, Python, TypeScript.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Appwrite 1.8+](https://img.shields.io/badge/Appwrite-1.8+-F02E65.svg)](https://appwrite.io)
+[![Appwrite 1.9+](https://img.shields.io/badge/Appwrite-1.9+-F02E65.svg)](https://appwrite.io)
 
 > **Disclaimer:** Unofficial community resource. Not affiliated/endorsed/sponsored by [Appwrite](https://appwrite.io). "Appwrite" trademark of Appwrite Ltd.
 
@@ -37,6 +37,8 @@ Skill gives AI agents Appwrite dev guidance:
 - Cursor pagination, perf
 - Query.select() relationship expansion
 - Type-safe SDK gen `appwrite generate`
+- Official SDK packages only; raw Appwrite HTTP is a violation
+- Self-hosted Appwrite 1.9.0 SDK pins: `dart_appwrite: 21.1.0`, Flutter `appwrite: 23.0.0`
 
 ## Reference Files
 
@@ -88,7 +90,7 @@ PRs welcome:
 - SKILL.md <500 lines
 - Detail patterns → `references/`
 - Code examples: Dart, Python, TypeScript
-- Test Appwrite 1.8+
+- Test Appwrite 1.9+
 
 ## License
 

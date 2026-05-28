@@ -1,10 +1,11 @@
 ---
 name: appwrite-backend
 description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TS. Use for Appwrite SDK, DB, auth, storage, fn, cli. Patterns+rules only.
+user-invocable: false
 license: MIT
 metadata:
   author: sgaabdu4
-  version: "1.8.0"
+  version: "1.9.0"
   tags: appwrite, backend, baas, dart, python, typescript
 ---
 
@@ -12,19 +13,22 @@ metadata:
 
 ## Critical Rules
 
-1. **Use TablesDB API** — Collections API deprecated 1.8.0
-2. **Use `ID.unique()` for all IDs** — Row IDs (`rowId:`) + entity IDs in columns. Custom gen w/ names/timestamps overflow column limits, leak data. ~20-char hex client-side.
-3. **Use Query.select()** — Relationships return IDs only without
-4. **Use cursor pagination** — Offset degrades on large tables
-5. **Use Operator for counters** — Avoids race conditions
-6. **Create indexes** — Queries without scan entire tables
-7. **Init outside handler** — SDK/connections persist between warm invocations
-8. **Group functions by domain** — One per domain, not per op
-9. **Event triggers over polling** — One trigger replaces thousands of requests
-10. **Use explicit string types** — `string` deprecated; use `varchar` or `text`/`mediumtext`/`longtext`
-11. **Use `appwrite generate`** — Type-safe SDK from schema
-12. **Use Channel helpers** — Type-safe realtime subs, not raw strings
-13. **Use Realtime queries** — Server-side event filtering, not client-side
+1. **Use official SDK packages only** — Dart/Flutter/TypeScript/Python must use Appwrite SDK packages (`dart_appwrite`, `appwrite`, `node-appwrite`, Python `appwrite`). Raw REST/GraphQL HTTP via `fetch`, `requests`, `dio`, `package:http`, `curl`, etc. is a violation unless the official SDK has no supported API and user explicitly approves.
+2. **Pin SDKs by target** — Appwrite Cloud: use latest stable SDK. Self-hosted Appwrite `1.9.0`: use `dart_appwrite: 21.1.0` for Dart Functions/server code and Flutter `appwrite: 23.0.0` for client apps.
+3. **Use TablesDB API** — Collections API deprecated 1.8.0
+4. **Use `ID.unique()` for all unique IDs** — Row IDs (`rowId:`), file IDs, user IDs, team IDs, webhook IDs, message IDs, subscriber IDs, and entity IDs in columns. No hardcoded unique IDs, custom generators, names, timestamps, or slugs-as-IDs; they overflow column limits and leak data. Use stable natural keys only as indexed columns.
+5. **Use Query.select()** — Relationships return IDs only without explicit selection.
+6. **Use cursor pagination** — Offset degrades on large tables
+7. **Use Operator for counters** — Avoids race conditions
+8. **Create indexes** — Queries without scan entire tables
+9. **Init outside handler** — SDK/connections persist between warm invocations
+10. **Group functions by domain** — One per domain, not per op
+11. **Event triggers over polling** — One trigger replaces thousands of requests
+12. **Use explicit string types** — `string` deprecated; use `varchar` or `text`/`mediumtext`/`longtext`
+13. **Use `appwrite generate`** — Type-safe SDK from schema
+14. **Use Channel helpers** — Type-safe realtime subs, not raw strings
+15. **Use Realtime queries** — Server-side event filtering, not client-side
+16. **Async-start long-running Functions** — Client `createExecution` calls for delete/sync/import/export/migrate/generate flows use async execution, then reconcile source-of-truth state with bounded polling/realtime/fetch. Do not block on backend completion; report destructive failures only after reconciliation proves the entity/account still exists.
 
 ## CLI Quick Check (Top)
 
@@ -56,6 +60,11 @@ Details: [appwrite-cli](./references/appwrite-cli.md)
 ---
 
 ## Setup
+
+Package policy:
+- Cloud: latest stable official SDK.
+- Self-hosted Appwrite `1.9.0`: Dart Functions/server `dart_appwrite: 21.1.0`; Flutter app `appwrite: 23.0.0`.
+- TypeScript/Node/Python: official SDK package only, pinned to the Appwrite server line; no hand-written HTTP.
 
 ```dart
 import 'package:dart_appwrite/dart_appwrite.dart';
@@ -196,6 +205,7 @@ CLI flow: `login -> init project -> pull -> generate -> push`. Details: [appwrit
 
 Email/password, OAuth (50+ providers), phone, magic link, anon, email OTP, custom token. MFA: TOTP/email/phone/recovery. SSR sessions. JWT for functions.
 SSR cookie: `a_session_<PROJECT_ID>`. Admin client creates session. Per-request session client reads user context.
+Email policies can block free, aliased, or disposable emails at signup/update.
 
 Details: [authentication.md](references/authentication.md) | [auth-methods.md](references/auth-methods.md)
 
@@ -204,6 +214,7 @@ Details: [authentication.md](references/authentication.md) | [auth-methods.md](r
 ## Storage
 
 Upload/download/preview w/ transforms (resize, format conversion). File tokens for shareable URLs. HEIC, AVIF, WebP supported.
+SDKs handle chunking/parallel chunk uploads; do not hand-roll upload HTTP.
 
 Details: [storage-files.md](references/storage-files.md)
 
@@ -216,7 +227,7 @@ final sub = realtime.subscribe(['databases.db.tables.posts.rows']);
 sub.stream.listen((e) => print(e.events));
 ```
 
-**Channels:** `account` | `databases.<DB>.tables.<TABLE>.rows` | `buckets.<BUCKET>.files`
+**Channels:** `account` | `databases.<DB>.tables.<TABLE>.rows` | `buckets.<BUCKET>.files` | `presences`
 
 **Channel helpers (preferred):** `Channel` class for type-safe subs w/ IDE autocomplete:
 
@@ -229,6 +240,8 @@ const sub = await realtime.subscribe(
 );
 ```
 
+Use Presences API for online/typing/active state when supported; avoid durable DB rows + cleanup cron for ephemeral status.
+
 Details: [realtime.md](references/realtime.md)
 
 ---
@@ -236,6 +249,7 @@ Details: [realtime.md](references/realtime.md)
 ## Functions
 
 Init SDK outside handler. Group by domain. Event triggers, not polling.
+Dart Functions on self-hosted Appwrite `1.9.0`: pin `dart_appwrite: 21.1.0`. On Appwrite Cloud, use latest stable SDK and runtime.
 
 Details: [functions.md](references/functions.md) | [functions-advanced.md](references/functions-advanced.md)
 
@@ -316,7 +330,8 @@ Details: [error-handling.md](references/error-handling.md)
 | `ColumnString` | `ColumnVarchar` or `ColumnText` | `string` deprecated |
 | Hand-writing types | `appwrite generate` | Schema drift, no autocomplete |
 | `databases.listDocuments()` | `tablesDB.listRows()` | Deprecated API |
-| Custom ID generators | `ID.unique()` | Overflow risk, info leakage |
+| Raw Appwrite HTTP (`fetch`, `requests`, `dio`, `package:http`, `curl`) | Official SDK package | Version drift, auth mistakes, lost typed APIs |
+| Custom/hardcoded unique IDs | `ID.unique()` | Overflow risk, info leakage, collisions |
 | Full re-fetch every sync | `Query.updatedAfter()` + per-table timestamps | Wastes bandwidth, slow |
 | Loop w/ `createRow()` | `createRows()` bulk | N requests vs 1 |
 

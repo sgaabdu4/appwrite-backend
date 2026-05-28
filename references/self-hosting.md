@@ -34,7 +34,7 @@ docker run -it --rm \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
     --entrypoint="install" \
-    appwrite/appwrite:1.8.1
+    appwrite/appwrite:1.9.0
 ```
 
 ### Manual Install
@@ -44,6 +44,17 @@ docker run -it --rm \
 3. Run: `docker compose up -d --remove-orphans`
 
 After `.env` change: `docker compose up -d` then `docker compose exec appwrite vars` to verify.
+
+Appwrite `1.9.0` self-hosted supports MariaDB or MongoDB during setup. Pin image + SDK versions; never use `latest` tags in prod.
+
+### SDK Pins for Appwrite 1.9.0
+
+| Target | Package | Version |
+|--------|---------|---------|
+| Dart Functions/server | `dart_appwrite` | `21.1.0` |
+| Flutter client app | `appwrite` | `23.0.0` |
+
+TypeScript/Node/Python must use official Appwrite SDK packages pinned to the self-hosted server line. Raw HTTP to Appwrite APIs is a violation.
 
 ---
 

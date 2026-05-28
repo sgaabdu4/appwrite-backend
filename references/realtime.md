@@ -6,6 +6,7 @@
 - Channel Patterns
 - Channel Helpers (Type-Safe)
 - Realtime Queries (Server-Side Filtering)
+- Presences API
 - Event Types
 - Multiple Channels
 - Unsubscribe
@@ -93,6 +94,13 @@ account                                  # Current user changes
 functions.[FUNCTION_ID].executions       # Function executions
 ```
 
+### Presences
+
+```
+presences                               # All readable presences
+presences.[PRESENCE_ID]                 # Specific presence
+```
+
 ---
 
 ## Channel Helpers (Type-Safe)
@@ -122,6 +130,9 @@ Channel.account()
 
 // Storage files
 Channel.files()
+
+// Presences, when SDK supports it
+Channel.presences()
 ```
 
 ```dart
@@ -199,6 +210,18 @@ const excluded = await realtime.subscribe(
 
 ---
 
+## Presences API
+
+Use Presences for ephemeral online/typing/active state. Presences have status, optional metadata, permissions, Realtime events, and `expiresAt` auto-expiry. Prefer this over durable table rows + cleanup cron for short-lived user status.
+
+Patterns:
+- Upsert on focus, route change, heartbeat, or typing state.
+- Set short `expiresAt`; max is 30 days.
+- Subscribe with `Channel.presences()` / `presences` and Realtime queries when supported.
+- Scope permissions so only intended users can read presence state.
+
+---
+
 ## Event Types
 
 | Event | Description |
@@ -206,6 +229,7 @@ const excluded = await realtime.subscribe(
 | `*.create` | Row/file/resource created |
 | `*.update` | Row/file/resource updated |
 | `*.delete` | Row/file/resource deleted |
+| `*.upsert` | Presence created or refreshed |
 
 ### Filter by Event
 
