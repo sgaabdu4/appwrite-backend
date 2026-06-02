@@ -32,20 +32,61 @@ metadata:
 
 ## CLI Quick Check (Top)
 
+Use a repo-local ignored `.env.appwrite.local` to choose the correct CLI line per
+project. Do not rely on whatever global Appwrite CLI config was last used.
+
 ```shell
-appwrite -v
+# .env.appwrite.local (gitignored)
+APPWRITE_ENDPOINT=https://<endpoint>/v1
+APPWRITE_PROJECT_ID=<project_id>
+APPWRITE_API_KEY=standard_...
+# Use "cloud" for Appwrite Cloud, or the exact self-hosted server line.
+APPWRITE_SERVER_VERSION=cloud
+```
+
+CLI version policy:
+- Appwrite Cloud: latest `appwrite-cli`.
+- Self-hosted Appwrite `1.9.0`: `appwrite-cli@17.4.0`.
+
+Before Appwrite CLI work:
+
+```shell
+set -a
+[ -f .env.appwrite.local ] && . ./.env.appwrite.local
+set +a
+
+case "$APPWRITE_SERVER_VERSION" in
+  cloud|"")
+    npm install -g appwrite-cli@latest
+    ;;
+  1.9.0)
+    npm install -g appwrite-cli@17.4.0
+    ;;
+  *)
+    echo "Unsupported APPWRITE_SERVER_VERSION=$APPWRITE_SERVER_VERSION; choose a matching CLI before continuing."
+    exit 1
+    ;;
+esac
+
+appwrite --version
+appwrite client \
+  --endpoint "$APPWRITE_ENDPOINT" \
+  --project-id "$APPWRITE_PROJECT_ID" \
+  --key "$APPWRITE_API_KEY"
+
 appwrite client --debug
-appwrite projects get --project-id "<PROJECT_ID>"
 ```
 
-If not set:
+`appwrite client --debug` must show the expected endpoint/project and a masked
+key before proceeding. If `.env.appwrite.local` is missing, ask for this repo's
+Appwrite endpoint, project ID, API key, and server version.
 
-```shell
-appwrite login --endpoint "https://<ENDPOINT>/v1"
-appwrite init project
-```
-
-Rules: `appwrite.config.json` = local project config. `appwrite client ...` = global override (non-interactive). Clear override: `appwrite client --reset`.
+Rules: `appwrite.config.json` = local project config. `appwrite client ...` =
+global override (non-interactive). Clear override: `appwrite client --reset`.
+The 17.4.0 CLI does not support newer helper flags such as `--limit`,
+`--sort-desc`, or `--filter`; use raw `--queries` where needed, or parse the
+plain table output for quick status checks. The latest Cloud CLI can use newer
+helper flags.
 Details: [appwrite-cli](./references/appwrite-cli.md)
 
 ## Terminology (1.8.0+)
