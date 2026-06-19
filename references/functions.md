@@ -5,6 +5,7 @@
 - Architecture
 - Cold Start Optimization
 - Handler Pattern
+- Request/Response API
 - Input Validation & Responses
 - Security
 - Environment Variables
@@ -171,6 +172,28 @@ export default async ({ req, res }: any) => {
     return res.json({ items: rows.rows });
 };
 ```
+
+---
+
+## Request/Response API
+
+Appwrite Function handlers expose the same concepts across Dart, Python, and
+TypeScript:
+
+| Concept | Dart | Python | TypeScript |
+|---------|------|--------|------------|
+| Raw body | `context.req.body` | `context.req.body` | `req.body` |
+| JSON body | `context.req.bodyJson` | `context.req.body_json` | `req.bodyJson` |
+| Headers | `context.req.headers` | `context.req.headers` | `req.headers` |
+| Method | `context.req.method` | `context.req.method` | `req.method` |
+| Path | `context.req.path` | `context.req.path` | `req.path` |
+| Query | `context.req.query` | `context.req.query` | `req.query` |
+| JSON response | `context.res.json(...)` | `context.res.json(...)` | `res.json(...)` |
+| Text response | `context.res.text(...)` | `context.res.text(...)` | `res.text(...)` |
+| Empty response | `context.res.empty()` | `context.res.empty()` | `res.empty()` |
+| Redirect | `context.res.redirect(...)` | `context.res.redirect(...)` | `res.redirect(...)` |
+
+Validate every body/query/header value before using it.
 
 ---
 

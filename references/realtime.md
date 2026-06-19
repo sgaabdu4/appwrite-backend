@@ -28,7 +28,7 @@ Subscribe changes via WebSocket.
 final realtime = Realtime(client);
 
 final subscription = realtime.subscribe([
-    'databases.products.tables.items.rows',
+    'tablesdb.products.tables.items.rows',
 ]);
 
 subscription.stream.listen((event) {
@@ -45,7 +45,7 @@ import asyncio
 realtime = Realtime(client)
 
 async def listen():
-    async for event in realtime.subscribe(['databases.products.tables.items.rows']):
+    async for event in realtime.subscribe(['tablesdb.products.tables.items.rows']):
         print(f'Event: {event.events}')
         print(f'Payload: {event.payload}')
 
@@ -58,7 +58,7 @@ import { Client, Realtime } from 'node-appwrite';
 
 const realtime = new Realtime(client);
 
-realtime.subscribe(['databases.products.tables.items.rows'], (event) => {
+realtime.subscribe(['tablesdb.products.tables.items.rows'], (event) => {
     console.log('Event:', event.events);
     console.log('Payload:', event.payload);
 });
@@ -71,8 +71,8 @@ realtime.subscribe(['databases.products.tables.items.rows'], (event) => {
 ### TablesDB
 
 ```
-databases.[DATABASE_ID].tables.[TABLE_ID].rows                # All rows
-databases.[DATABASE_ID].tables.[TABLE_ID].rows.[ROW_ID]       # Specific row
+tablesdb.[DATABASE_ID].tables.[TABLE_ID].rows                # All rows
+tablesdb.[DATABASE_ID].tables.[TABLE_ID].rows.[ROW_ID]       # Specific row
 ```
 
 ### Storage
@@ -251,8 +251,8 @@ Subscribe many channels at once.
 ```dart
 // Dart
 final subscription = realtime.subscribe([
-    'databases.main.tables.orders.rows',
-    'databases.main.tables.products.rows',
+    'tablesdb.main.tables.orders.rows',
+    'tablesdb.main.tables.products.rows',
     'account',
 ]);
 ```
@@ -342,7 +342,7 @@ await tablesdb.createRow(
 
 // 2. Subscribe to the version row
 final subscription = realtime.subscribe([
-    'databases.main.tables.versions.rows.products-version',
+    'tablesdb.main.tables.versions.rows.products-version',
 ]);
 
 // 3. Re-fetch products only when version changes
@@ -384,7 +384,7 @@ Realtime needs WebSocket. For SSR:
 ```typescript
 // TypeScript - Check for browser
 if (typeof window !== 'undefined') {
-    const subscription = realtime.subscribe(['databases.main.tables.data.rows']);
+    const subscription = realtime.subscribe(['tablesdb.main.tables.data.rows']);
 }
 ```
 

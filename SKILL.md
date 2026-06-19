@@ -1,11 +1,11 @@
 ---
 name: appwrite-backend
-description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TS. Use for Appwrite SDK, DB, auth, storage, fn, cli. Patterns+rules only.
+description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TypeScript only. Use for Appwrite SDK, DB, auth, storage, fn, cli. Patterns+rules only.
 user-invocable: false
 license: MIT
 metadata:
   author: sgaabdu4
-  version: "1.9.0"
+  version: "1.9.1"
   tags: appwrite, backend, baas, dart, python, typescript
 ---
 
@@ -13,7 +13,7 @@ metadata:
 
 ## Critical Rules
 
-1. **Use official SDK packages only** — Dart/Flutter/TypeScript/Python must use Appwrite SDK packages (`dart_appwrite`, `appwrite`, `node-appwrite`, Python `appwrite`). Raw REST/GraphQL HTTP via `fetch`, `requests`, `dio`, `package:http`, `curl`, etc. is a violation unless the official SDK has no supported API and user explicitly approves.
+1. **Use official SDK packages only** — Dart/Flutter/TypeScript/Python must use the runtime-specific package in [sdk-routing](references/sdk-routing.md). Raw REST/GraphQL HTTP via `fetch`, `requests`, `dio`, `package:http`, `curl`, etc. is a violation unless the official SDK has no supported API and user explicitly approves.
 2. **Pin SDKs by target** — Appwrite Cloud: use latest stable SDK. Self-hosted Appwrite `1.9.0`: use `dart_appwrite: 21.1.0` for Dart Functions/server code and Flutter `appwrite: 23.0.0` for client apps.
 3. **Use TablesDB API** — Collections API deprecated 1.8.0
 4. **Use `ID.unique()` for all unique IDs** — Row IDs (`rowId:`), file IDs, user IDs, team IDs, webhook IDs, message IDs, subscriber IDs, and entity IDs in columns. No hardcoded unique IDs, custom generators, names, timestamps, or slugs-as-IDs; they overflow column limits and leak data. Use stable natural keys only as indexed columns.
@@ -105,7 +105,9 @@ Details: [appwrite-cli](./references/appwrite-cli.md)
 Package policy:
 - Cloud: latest stable official SDK.
 - Self-hosted Appwrite `1.9.0`: Dart Functions/server `dart_appwrite: 21.1.0`; Flutter app `appwrite: 23.0.0`.
-- TypeScript/Node/Python: official SDK package only, pinned to the Appwrite server line; no hand-written HTTP.
+- TypeScript/React browser: `appwrite`; TypeScript server/SSR/Functions: `node-appwrite`.
+- Python: `appwrite`; prefer keyword arguments for SDK calls.
+- Dart: `appwrite` for Flutter/client apps, `dart_appwrite` for server/Functions; prefer named parameters.
 
 ```dart
 import 'package:dart_appwrite/dart_appwrite.dart';
@@ -161,6 +163,11 @@ await tablesDB.upsertRow(databaseId: 'db', tableId: 'settings', rowId: 'prefs',
 // Delete
 await tablesDB.deleteRow(databaseId: 'db', tableId: 'users', rowId: 'user_123');
 ```
+
+Use SDK idioms:
+- TypeScript uses object parameters: `tablesDB.createRow({ databaseId, tableId, rowId, data })`.
+- Python uses keyword arguments: `tables_db.create_row(database_id='db', table_id='users', row_id=ID.unique(), data={...})`.
+- Dart uses named parameters as shown above.
 
 **Bulk:** [bulk-operations.md](references/bulk-operations.md) | **Chunked ID queries:** [chunked-queries.md](references/chunked-queries.md)
 
@@ -264,11 +271,11 @@ Details: [storage-files.md](references/storage-files.md)
 ## Realtime
 
 ```dart
-final sub = realtime.subscribe(['databases.db.tables.posts.rows']);
+final sub = realtime.subscribe(['tablesdb.db.tables.posts.rows']);
 sub.stream.listen((e) => print(e.events));
 ```
 
-**Channels:** `account` | `databases.<DB>.tables.<TABLE>.rows` | `buckets.<BUCKET>.files` | `presences`
+**Channels:** `account` | `tablesdb.<DB>.tables.<TABLE>.rows` | `buckets.<BUCKET>.files` | `presences`
 
 **Channel helpers (preferred):** `Channel` class for type-safe subs w/ IDE autocomplete:
 
@@ -398,7 +405,7 @@ Details: [cost-optimization.md](references/cost-optimization.md)
 **Performance:** [performance](references/performance.md) · [pagination-performance](references/pagination-performance.md) · [cost-optimization](references/cost-optimization.md)
 **Auth:** [authentication](references/authentication.md) · [auth-methods](references/auth-methods.md) · [permissions](./references/permissions.md) · [teams](references/teams.md)
 **Services:** [storage-files](references/storage-files.md) · [functions](references/functions.md) · [functions-advanced](references/functions-advanced.md) · [realtime](references/realtime.md) · [messaging](references/messaging.md) · [webhooks](references/webhooks.md) · [avatars](references/avatars.md) · [graphql](references/graphql.md) · [locale](references/locale.md)
-**Tooling:** [appwrite-cli](./references/appwrite-cli.md)
+**Tooling:** [sdk-routing](references/sdk-routing.md) · [appwrite-cli](./references/appwrite-cli.md)
 **Platform:** [error-handling](references/error-handling.md) · [limits](references/limits.md) · [health](references/health.md) · [self-hosting](references/self-hosting.md) · [self-hosting-ops](references/self-hosting-ops.md)
 
 ---

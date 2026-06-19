@@ -6,6 +6,7 @@
 - Default Deny + Inheritance
 - Actions
 - Common Patterns
+- Resource-Level Examples
 - Common Mistakes
 - Storage Note
 - Related
@@ -68,6 +69,40 @@ permissions: [
     Permission.read(Role.label('premium')),
 ]
 ```
+
+---
+
+## Resource-Level Examples
+
+Set row/file-level permissions only when ACL differs per resource.
+
+```typescript
+await tablesDB.createRow({
+    databaseId: 'db',
+    tableId: 'posts',
+    rowId: ID.unique(),
+    data: {title: 'Hello'},
+    permissions: [
+        Permission.read(Role.user(userId)),
+        Permission.update(Role.user(userId)),
+        Permission.read(Role.team(teamId)),
+    ],
+});
+
+await storage.createFile({
+    bucketId: 'docs',
+    fileId: ID.unique(),
+    file,
+    permissions: [
+        Permission.read(Role.any()),
+        Permission.update(Role.user(userId)),
+        Permission.delete(Role.user(userId)),
+    ],
+});
+```
+
+If every row/file shares the same rules, set table/bucket permissions and leave
+row/file permissions empty.
 
 ---
 

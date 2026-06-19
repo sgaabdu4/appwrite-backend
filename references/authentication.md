@@ -3,8 +3,10 @@
 ## Contents
 
 - MFA/2FA
+- Client Account Basics
 - SSR Authentication
 - SSR Hardening
+- Server Users Service
 - User Labels
 - JWT for Functions
 - Security Settings
@@ -59,6 +61,43 @@ final newCodes = await account.updateMfaRecoveryCodes();
 
 ---
 
+## Client Account Basics
+
+Use client SDKs for user-owned account flows.
+
+```dart
+final account = Account(client);
+
+await account.create(
+    userId: ID.unique(),
+    email: 'user@example.com',
+    password: 'password',
+    name: 'User',
+);
+
+await account.createEmailPasswordSession(
+    email: 'user@example.com',
+    password: 'password',
+);
+
+final user = await account.get();
+await account.deleteSession(sessionId: 'current');
+```
+
+```typescript
+await account.create({
+    userId: ID.unique(),
+    email: 'user@example.com',
+    password: 'password',
+});
+
+await account.createEmailPasswordSession({ email, password });
+const user = await account.get();
+await account.deleteSession({ sessionId: 'current' });
+```
+
+---
+
 ## SSR Authentication
 
 Server-side session for Next.js, SvelteKit, Nuxt, etc.
@@ -78,7 +117,7 @@ export async function POST({ request }) {
     
     return new Response(JSON.stringify({ success: true }), {
         headers: {
-            'Set-Cookie': `session=${session.secret}; Path=/; HttpOnly; Secure; SameSite=Strict`,
+            'Set-Cookie': `a_session_[PROJECT_ID]=${session.secret}; Path=/; HttpOnly; Secure; SameSite=Strict`,
         },
     });
 }
@@ -88,10 +127,11 @@ export async function POST({ request }) {
 
 ```typescript
 export async function GET({ cookies }) {
+    const session = cookies.get('a_session_[PROJECT_ID]');
     const client = new Client()
         .setEndpoint('https://cloud.appwrite.io/v1')
         .setProject('PROJECT_ID')
-        .setSession(cookies.get('session'));
+        .setSession(session);
     
     const account = new Account(client);
     
@@ -103,6 +143,59 @@ export async function GET({ cookies }) {
     }
 }
 ```
+
+---
+
+### Python SSR Flow
+
+```python
+admin_client = (
+    Client()
+    .set_endpoint('https://cloud.appwrite.io/v1')
+    .set_project('PROJECT_ID')
+    .set_key('API_KEY')
+)
+
+@app.post('/login')
+def login():
+    account = Account(admin_client)
+    session = account.create_email_password_session(
+        email=request.json['email'],
+        password=request.json['password'],
+    )
+
+    resp = make_response({'success': True})
+    resp.set_cookie(
+        'a_session_[PROJECT_ID]',
+        session['secret'],
+        httponly=True,
+        secure=True,
+        samesite='Strict',
+        expires=session['expire'],
+        path='/',
+    )
+    return resp
+
+@app.get('/user')
+def get_user():
+    session = request.cookies.get('a_session_[PROJECT_ID]')
+    if not session:
+        return {'error': 'Unauthorized'}, 401
+
+    session_client = (
+        Client()
+        .set_endpoint('https://cloud.appwrite.io/v1')
+        .set_project('PROJECT_ID')
+        .set_session(session)
+        .set_forwarded_user_agent(request.headers.get('user-agent'))
+    )
+
+    return Account(session_client).get()
+```
+
+For Python OAuth SSR, redirect with `create_o_auth2_token(...)`, then exchange
+callback `userId` + `secret` with `create_session(...)` and set the same
+`a_session_<PROJECT_ID>` cookie.
 
 ---
 
@@ -157,6 +250,28 @@ if (session) {
     sessionClient.setSession(session);
     sessionClient.setForwardedUserAgent(req.headers['user-agent']);
 }
+```
+
+---
+
+## Server Users Service
+
+Use server SDK `Users` for admin user management only.
+
+```dart
+final users = Users(client);
+await users.create(userId: ID.unique(), email: 'user@example.com', password: 'password');
+final list = await users.list(queries: [Query.limit(25)]);
+final user = await users.get(userId: 'user_123');
+await users.delete(userId: 'user_123');
+```
+
+```python
+users = Users(client)
+users.create(user_id=ID.unique(), email='user@example.com', password='password')
+users.list(queries=[Query.limit(25)])
+users.get(user_id='user_123')
+users.delete(user_id='user_123')
 ```
 
 ---

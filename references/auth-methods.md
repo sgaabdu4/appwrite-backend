@@ -29,6 +29,16 @@ await account.createOAuth2Session(
 );
 ```
 
+```typescript
+// React/browser
+await account.createOAuth2Session({
+    provider: OAuthProvider.Google,
+    success: `${window.location.origin}/auth/callback`,
+    failure: `${window.location.origin}/auth/failure`,
+});
+```
+
+
 ### Server-Side (SSR)
 
 ```dart

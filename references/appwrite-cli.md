@@ -8,6 +8,9 @@
 - Scope + Precedence
 - Pull
 - Push
+- Function Deployments + Variables
+- Cloud / Latest CLI Helpers
+- Webhooks, Topics, and Project Ops
 - Generate
 - CI
 - Debug
@@ -17,8 +20,11 @@
 
 ```shell
 npm install -g appwrite-cli
+brew tap appwrite/appwrite && brew install appwrite/appwrite/appwrite
+curl -sL https://appwrite.io/cli/install.sh | bash
 appwrite login
 appwrite login --endpoint "https://your-instance.com/v1"
+appwrite login --switch
 ```
 
 Check project access:
@@ -52,6 +58,7 @@ Root file: `appwrite.config.json`.
 {
     "projectId": "<PROJECT_ID>",
     "endpoint": "https://<REGION>.cloud.appwrite.io/v1",
+    "includes": ["appwrite/*.json"],
     "functions": [],
     "tablesDB": [],
     "tables": [],
@@ -62,6 +69,10 @@ Root file: `appwrite.config.json`.
 ```
 
 Commit file. Treat as deploy manifest.
+
+Use `includes` to split large resource manifests by domain or environment, for
+example `appwrite/functions.json`, `appwrite/webhooks.json`, and
+`appwrite/topics.json`.
 
 ---
 
@@ -114,6 +125,65 @@ appwrite push topics
 ```
 
 Push changed resource type only.
+
+---
+
+## Function Deployments + Variables
+
+```shell
+appwrite functions create-deployment --function-id "<FUNCTION_ID>"
+appwrite functions list-deployments --function-id "<FUNCTION_ID>"
+appwrite functions update-deployment \
+    --function-id "<FUNCTION_ID>" \
+    --deployment-id "<DEPLOYMENT_ID>"
+
+# Stage without activating when supported.
+appwrite push functions --all --activate=false
+
+# Sync function variables from local env/config when supported.
+appwrite push functions --all --with-variables
+```
+
+Keep secrets in the environment or secret manager. Do not commit secret values
+inside `appwrite.config.json` or included files.
+
+---
+
+## Cloud / Latest CLI Helpers
+
+Some helpers require Appwrite Cloud or the latest CLI. Check `appwrite --version`
+before documenting them as self-hosted-compatible.
+
+```shell
+appwrite tables-db list-rows --database-id "<DB>" --table-id "<TABLE>"
+appwrite storage list-files --bucket-id "<BUCKET>"
+appwrite functions list-executions --function-id "<FUNCTION_ID>"
+appwrite functions get-execution \
+    --function-id "<FUNCTION_ID>" \
+    --execution-id "<EXECUTION_ID>"
+```
+
+Use `--json` for scripts and `--verbose` for triage.
+
+---
+
+## Webhooks, Topics, and Project Ops
+
+```shell
+appwrite pull webhooks
+appwrite push webhooks
+appwrite webhooks list
+
+appwrite pull topics
+appwrite push topics
+appwrite topics list
+
+appwrite projects list-services --project-id "<PROJECT_ID>"
+appwrite projects list-platforms --project-id "<PROJECT_ID>"
+```
+
+Use CLI-managed resources when they belong in the deploy manifest. Keep OAuth
+secrets, mock phone numbers, and ephemeral keys out of tracked files.
 
 ---
 

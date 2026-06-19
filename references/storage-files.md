@@ -4,6 +4,7 @@
 
 - File Tokens
 - Chunked Uploads
+- InputFile Factories
 - File Previews
 - Bucket Configuration
 - Permissions
@@ -84,6 +85,33 @@ const result = await storage.createFile({
     file: InputFile.fromPath('/path/to/large-file.zip', 'large-file.zip'),
 });
 ```
+
+---
+
+## InputFile Factories
+
+Use SDK factories. Do not custom-build multipart Appwrite requests.
+
+```dart
+InputFile.fromPath(path: '/path/to/file.png', filename: 'file.png')
+InputFile.fromBytes(bytes: uint8List, filename: 'file.png')
+```
+
+```python
+InputFile.from_path('/path/to/file.png')
+InputFile.from_bytes(b'hello', filename='file.txt')
+InputFile.from_string('hello', filename='file.txt')
+```
+
+```typescript
+import { InputFile } from 'node-appwrite';
+
+InputFile.fromPath('/path/to/file.png', 'file.png')
+InputFile.fromBuffer(buffer, 'file.png')
+```
+
+For browser uploads, pass the selected `File` object from the client SDK rather
+than a server `InputFile`.
 
 ---
 

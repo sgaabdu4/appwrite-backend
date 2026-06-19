@@ -134,6 +134,18 @@ final client = Client()
 
 ## Typed Error Handling
 
+`AppwriteException` exposes structured fields. Log enough for debugging without
+leaking secrets:
+
+| SDK | Fields |
+|-----|--------|
+| Dart | `message`, `code`, `type`, `response` |
+| Python | `message`, `code`, `type`, `response` |
+| TypeScript | `message`, `code`, `type`, `response` |
+
+Python fields are available as `e.message`, `e.code`, `e.type`, and
+`e.response`.
+
 ```dart
 // Dart
 try {

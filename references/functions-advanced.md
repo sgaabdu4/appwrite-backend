@@ -201,7 +201,24 @@ await functions.createExecution(
 
 **Git (recommended):** Console → Functions → Settings → Connect Git Repository. Push branch → auto deploy.
 
-**CLI:** `appwrite deploy function --function-id my-function`
+**CLI:** deploy, optionally stage, then activate:
+
+```shell
+appwrite functions create-deployment --function-id "my-function"
+
+# Stage without switching live traffic when supported by the Cloud/latest CLI.
+appwrite push functions --all --activate=false
+
+appwrite functions update-deployment \
+    --function-id "my-function" \
+    --deployment-id "<DEPLOYMENT_ID>"
+```
+
+Function config fields worth preserving in `appwrite.config.json`:
+`buildSpecification`, `runtimeSpecification`, `deploymentRetention`, `scopes`,
+and `ignore`.
+
+Function variables and execution-log commands: [appwrite-cli.md](appwrite-cli.md).
 
 ---
 

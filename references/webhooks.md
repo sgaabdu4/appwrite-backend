@@ -14,6 +14,7 @@
 - Best Practices
 - Retry Behavior
 - Webhook Logs
+- CLI Management
 - Related
 
 ## Overview
@@ -243,6 +244,27 @@ Shows:
 - Response status
 - Response time
 - Payload sent
+
+---
+
+## CLI Management
+
+When using `appwrite.config.json`, manage webhooks alongside other project
+resources:
+
+```shell
+appwrite pull webhooks
+appwrite push webhooks
+
+appwrite webhooks list
+appwrite webhooks create
+appwrite webhooks get --webhook-id "<WEBHOOK_ID>"
+appwrite webhooks update --webhook-id "<WEBHOOK_ID>"
+appwrite webhooks delete --webhook-id "<WEBHOOK_ID>"
+```
+
+Keep webhook secrets out of tracked config. Store them in the deployment
+environment or secret manager.
 
 ---
 

@@ -6,6 +6,7 @@
 - Inversion Queries
 - Time Helper Queries
 - Spatial Queries
+- SDK Query Method Names
 - Logical Operators
 - Query Limits
 - Index Requirements
@@ -206,6 +207,36 @@ const violations = await tablesDB.listRows({
 **Requirements:**
 - Column type: `point`, `line`, or `polygon`
 - Geo queries need spatial index for perf
+
+---
+
+## SDK Query Method Names
+
+The concepts are shared, but method casing differs by SDK.
+
+| Concept | Dart / TypeScript | Python |
+|---------|-------------------|--------|
+| Not equal | `Query.notEqual()` | `Query.not_equal()` |
+| Less than/equal | `Query.lessThanEqual()` | `Query.less_than_equal()` |
+| Greater than/equal | `Query.greaterThanEqual()` | `Query.greater_than_equal()` |
+| Cursor after | `Query.cursorAfter()` | `Query.cursor_after()` |
+| Cursor before | `Query.cursorBefore()` | `Query.cursor_before()` |
+| OR | `Query.or()` | `Query.or_queries()` |
+| AND | `Query.and()` | `Query.and_queries()` |
+
+Python SDK calls should use keyword arguments:
+
+```python
+rows = tables_db.list_rows(
+    database_id='db',
+    table_id='orders',
+    queries=[
+        Query.not_equal('status', 'archived'),
+        Query.cursor_after(last_id),
+    ],
+    total=False,
+)
+```
 
 ---
 
