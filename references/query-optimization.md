@@ -54,6 +54,7 @@ final posts = await tablesDB.listRows(
 ## Inversion Queries
 
 Filter by exclusion. No client-side fetch+filter.
+Use `contains/notContains` only on real string/array/spatial fields. For JSON/text identity/dedupe, query indexed scalars. Dart Row: avoid user column `data`; legacy schemas need scalar selects or isolated SDK `Client.call`.
 
 | Query | Description |
 |-------|-------------|

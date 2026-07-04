@@ -5,7 +5,7 @@ user-invocable: false
 license: MIT
 metadata:
   author: sgaabdu4
-  version: "1.9.1"
+  version: "1.9.5"
   tags: appwrite, backend, baas, dart, python, typescript
 ---
 
@@ -13,8 +13,8 @@ metadata:
 
 ## Critical Rules
 
-1. **Use official SDK packages only** — Dart/Flutter/TypeScript/Python must use the runtime-specific package in [sdk-routing](references/sdk-routing.md). Raw REST/GraphQL HTTP via `fetch`, `requests`, `dio`, `package:http`, `curl`, etc. is a violation unless the official SDK has no supported API and user explicitly approves.
-2. **Pin SDKs by target** — Appwrite Cloud: use latest stable SDK. Self-hosted Appwrite `1.9.0`: use `dart_appwrite: 21.1.0` for Dart Functions/server code and Flutter `appwrite: 23.0.0` for client apps.
+1. **Use official SDK packages only** — Dart/Flutter/TypeScript/Python must use [sdk-routing](references/sdk-routing.md). Raw REST/GraphQL HTTP via `fetch`, `requests`, `dio`, `package:http`, `curl`, etc. is a violation unless the SDK lacks the endpoint or an isolated, tested `Client.call` works around SDK model parsing.
+2. **Pin SDKs by target** — Cloud: latest stable SDK. Self-hosted `1.9.x`: `dart_appwrite` 25.1.0, Flutter `appwrite` 25.2.0, `node-appwrite` 26.2.0, web `appwrite` 26.1.0, Python `appwrite` 21.0.0, CLI 22.4.0.
 3. **Use TablesDB API** — Collections API deprecated 1.8.0
 4. **Use `ID.unique()` for all unique IDs** — Row IDs (`rowId:`), file IDs, user IDs, team IDs, webhook IDs, message IDs, subscriber IDs, and entity IDs in columns. No hardcoded unique IDs, custom generators, names, timestamps, or slugs-as-IDs; they overflow column limits and leak data. Use stable natural keys only as indexed columns.
 5. **Use Query.select()** — Relationships return IDs only without explicit selection.
@@ -32,21 +32,21 @@ metadata:
 
 ## CLI Quick Check (Top)
 
-Use a repo-local ignored `.env.appwrite.local` to choose the correct CLI line per
-project. Do not rely on whatever global Appwrite CLI config was last used.
+Use a repo-local ignored `.env.appwrite.local` per project; do not trust global
+CLI config.
 
 ```shell
 # .env.appwrite.local (gitignored)
 APPWRITE_ENDPOINT=https://<endpoint>/v1
 APPWRITE_PROJECT_ID=<project_id>
 APPWRITE_API_KEY=standard_...
-# Use "cloud" for Appwrite Cloud, or the exact self-hosted server line.
+# Use "cloud" or the self-hosted server line.
 APPWRITE_SERVER_VERSION=cloud
 ```
 
 CLI version policy:
 - Appwrite Cloud: latest `appwrite-cli`.
-- Self-hosted Appwrite `1.9.0`: `appwrite-cli@17.4.0`.
+- Self-hosted Appwrite `1.9.x`: `appwrite-cli@22.4.0`.
 
 Before Appwrite CLI work:
 
@@ -59,8 +59,8 @@ case "$APPWRITE_SERVER_VERSION" in
   cloud|"")
     npm install -g appwrite-cli@latest
     ;;
-  1.9.0)
-    npm install -g appwrite-cli@17.4.0
+  1.9|1.9.*)
+    npm install -g appwrite-cli@22.4.0
     ;;
   *)
     echo "Unsupported APPWRITE_SERVER_VERSION=$APPWRITE_SERVER_VERSION; choose a matching CLI before continuing."
@@ -78,15 +78,13 @@ appwrite client --debug
 ```
 
 `appwrite client --debug` must show the expected endpoint/project and a masked
-key before proceeding. If `.env.appwrite.local` is missing, ask for this repo's
-Appwrite endpoint, project ID, API key, and server version.
+key before proceeding. If missing, ask for endpoint, project ID, API key, and
+server version.
 
 Rules: `appwrite.config.json` = local project config. `appwrite client ...` =
 global override (non-interactive). Clear override: `appwrite client --reset`.
-The 17.4.0 CLI does not support newer helper flags such as `--limit`,
-`--sort-desc`, or `--filter`; use raw `--queries` where needed, or parse the
-plain table output for quick status checks. The latest Cloud CLI can use newer
-helper flags.
+CLI helper flags vary by version; if unavailable, use raw `--queries` or parse
+plain table output for quick status checks.
 Details: [appwrite-cli](./references/appwrite-cli.md)
 
 ## Terminology (1.8.0+)
@@ -104,7 +102,7 @@ Details: [appwrite-cli](./references/appwrite-cli.md)
 
 Package policy:
 - Cloud: latest stable official SDK.
-- Self-hosted Appwrite `1.9.0`: Dart Functions/server `dart_appwrite: 21.1.0`; Flutter app `appwrite: 23.0.0`.
+- Self-hosted `1.9.x`: use Critical Rule 2 pins.
 - TypeScript/React browser: `appwrite`; TypeScript server/SSR/Functions: `node-appwrite`.
 - Python: `appwrite`; prefer keyword arguments for SDK calls.
 - Dart: `appwrite` for Flutter/client apps, `dart_appwrite` for server/Functions; prefer named parameters.
@@ -297,7 +295,7 @@ Details: [realtime.md](references/realtime.md)
 ## Functions
 
 Init SDK outside handler. Group by domain. Event triggers, not polling.
-Dart Functions on self-hosted Appwrite `1.9.0`: pin `dart_appwrite: 21.1.0`. On Appwrite Cloud, use latest stable SDK and runtime.
+Functions: self-hosted uses Rule 2 Dart pin; Cloud uses latest SDK/runtime.
 
 Details: [functions.md](references/functions.md) | [functions-advanced.md](references/functions-advanced.md)
 

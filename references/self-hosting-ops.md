@@ -108,17 +108,17 @@ Key volumes: `appwrite-uploads`, `appwrite-functions`, `appwrite-builds`, `appwr
 
 ### Upgrade Path
 
-Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1` → `1.9.0`. Pin version — never `latest`.
+Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1` → `1.9.0` → `1.9.5`. Pin version — never `latest`.
 
 ```bash
 docker run -it --rm \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
     --entrypoint="upgrade" \
-    appwrite/appwrite:1.9.0
+    appwrite/appwrite:1.9.5
 ```
 
-Appwrite `1.9.0` can use MongoDB or MariaDB. Test database-engine choice and migrations in non-prod before upgrading prod.
+Appwrite `1.9.x` can use MongoDB or MariaDB. Test database-engine choice and migrations in non-prod before upgrading prod.
 
 ### Run Migration
 
@@ -126,6 +126,8 @@ Appwrite `1.9.0` can use MongoDB or MariaDB. Test database-engine choice and mig
 cd appwrite/
 docker compose exec appwrite migrate
 ```
+
+Run migration for `1.9.0` → `1.9.5`; review generated compose before restoring custom Caddy/proxy edits.
 
 **Before every upgrade:** back up, review changelog, test non-prod first.
 

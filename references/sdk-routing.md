@@ -1,7 +1,8 @@
 # SDK Routing
 
 Use only the official Appwrite SDK for the runtime. Do not hand-roll Appwrite
-REST calls unless the SDK lacks the endpoint and the user explicitly approves.
+REST calls unless the SDK lacks the endpoint, or an isolated tested
+`Client.call` works around SDK model parsing.
 
 ## Packages
 
