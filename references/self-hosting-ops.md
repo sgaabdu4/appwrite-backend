@@ -108,7 +108,7 @@ Key volumes: `appwrite-uploads`, `appwrite-functions`, `appwrite-builds`, `appwr
 
 ### Upgrade Path
 
-Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1` → `1.9.0` → `1.9.5`. Pin version — never `latest`.
+Upgrade through each minor version's latest patch: `1.5.1` → `1.5.11` → `1.6.2` → `1.7.4` → `1.8.1` → `1.9.5`. Pin version — never `latest`.
 
 ```bash
 docker run -it --rm \

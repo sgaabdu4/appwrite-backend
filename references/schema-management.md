@@ -110,13 +110,13 @@ Same max, different storage:
 Encrypt at rest via AES-128-GCM. Non-queryable.
 
 ```dart
-// Dart - Encrypted column (Pro/Scale/Self-hosted)
-await tablesDB.createColumnString(
+// Dart - Encrypted varchar column (Pro/Scale/Self-hosted)
+await tablesDB.createVarcharColumn(
     databaseId: 'db',
     tableId: 'users',
     key: 'ssn',
     size: 20,
-    encrypted: true,  // AES-128-GCM encryption
+    encrypt: true,  // AES-128-GCM encryption
 );
 ```
 

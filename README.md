@@ -38,7 +38,7 @@ Skill gives AI agents Appwrite dev guidance:
 - Query.select() relationship expansion
 - Type-safe SDK gen `appwrite generate`
 - Official SDK packages only; raw Appwrite HTTP is a violation
-- Self-hosted Appwrite 1.9.0 SDK pins: `dart_appwrite: 21.1.0`, Flutter `appwrite: 23.0.0`
+- Self-hosted Appwrite 1.9.x SDK pins: `dart_appwrite: 25.1.0`, Flutter `appwrite: 25.2.0`, `node-appwrite: 26.2.0`, web `appwrite: 26.1.0`, Python `appwrite: 21.0.0`, CLI `22.4.0`
 
 ## Reference Files
 

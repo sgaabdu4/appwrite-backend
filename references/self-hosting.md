@@ -34,7 +34,7 @@ docker run -it --rm \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
     --entrypoint="install" \
-    appwrite/appwrite:1.9.0
+    appwrite/appwrite:1.9.5
 ```
 
 ### Manual Install
@@ -45,16 +45,20 @@ docker run -it --rm \
 
 After `.env` change: `docker compose up -d` then `docker compose exec appwrite vars` to verify.
 
-Appwrite `1.9.0` self-hosted supports MariaDB or MongoDB during setup. Pin image + SDK versions; never use `latest` tags in prod.
+Appwrite `1.9.x` self-hosted supports MariaDB or MongoDB during setup. Pin image + SDK versions; never use `latest` tags in prod.
 
-### SDK Pins for Appwrite 1.9.0
+### SDK Pins for Appwrite 1.9.x
 
 | Target | Package | Version |
 |--------|---------|---------|
-| Dart Functions/server | `dart_appwrite` | `21.1.0` |
-| Flutter client app | `appwrite` | `23.0.0` |
+| Dart Functions/server | `dart_appwrite` | `25.1.0` |
+| Flutter client app | `appwrite` | `25.2.0` |
+| Node.js Functions/server | `node-appwrite` | `26.2.0` |
+| Browser/Web client | `appwrite` | `26.1.0` |
+| Python Functions/server | `appwrite` | `21.0.0` |
+| CLI | `appwrite-cli` | `22.4.0` |
 
-TypeScript/Node/Python must use official Appwrite SDK packages pinned to the self-hosted server line. Raw HTTP to Appwrite APIs is a violation.
+All targets must use official Appwrite SDK packages pinned to the self-hosted server line. Raw HTTP to Appwrite APIs is a violation.
 
 ---
 

@@ -14,7 +14,7 @@
 ## Architecture
 
 **Group functions by domain.** Each function own one domain — not one operation, not everything.
-Use official SDK packages only. For self-hosted Appwrite `1.9.0`, pin Dart Functions/server code to `dart_appwrite: 21.1.0`; for Appwrite Cloud, use the latest stable SDK supported by the runtime.
+Use official SDK packages only. For self-hosted Appwrite `1.9.x`, pin Dart Functions/server code to `dart_appwrite: 25.1.0`; for Appwrite Cloud, use the latest stable SDK supported by the runtime.
 
 ```
 ✅ api-users          — all user endpoints (CRUD, profile, settings)
