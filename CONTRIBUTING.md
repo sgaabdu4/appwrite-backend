@@ -25,7 +25,7 @@ Thanks for contributing! Guidelines below.
 - Clear, concise language
 - Code examples in **Dart**, **Python**, **TypeScript** where applicable
 - Follow existing formatting
-- SKILL.md under 500 lines; detailed content → `references/`
+- `skills/appwrite-backend/SKILL.md` under 500 lines; detailed content → sibling `references/`
 
 ### Code Examples
 
@@ -37,8 +37,8 @@ Thanks for contributing! Guidelines below.
 
 ### File Structure
 
-- `SKILL.md` - Main skill file (overview, critical rules, quick ref)
-- `references/` - Detailed topic docs
+- `skills/appwrite-backend/SKILL.md` - Main skill file (overview, critical rules, quick ref)
+- `skills/appwrite-backend/references/` - Detailed topic docs
 - `README.md` - GitHub-facing docs
 
 ### Commit Messages

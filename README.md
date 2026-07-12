@@ -10,13 +10,7 @@
 ## Installation
 
 ```bash
-npx skills add sgaabdu4/appwrite-backend
-```
-
-Or clone into `~/.claude/skills/`:
-
-```bash
-git clone https://github.com/sgaabdu4/appwrite-backend ~/.claude/skills/appwrite-backend
+npx skills add https://github.com/sgaabdu4/appwrite-backend --skill appwrite-backend
 ```
 
 ## What's Included
@@ -44,19 +38,19 @@ Skill gives AI agents Appwrite dev guidance:
 
 | Topic | File |
 |-------|------|
-| Schema & Columns | [schema-management.md](references/schema-management.md) |
-| Query Optimization | [query-optimization.md](references/query-optimization.md) |
-| Atomic Operators | [atomic-operators.md](references/atomic-operators.md) |
-| Relationships | [relationships.md](references/relationships.md) |
-| Transactions | [transactions.md](references/transactions.md) |
-| Bulk Operations | [bulk-operations.md](references/bulk-operations.md) |
-| Authentication | [authentication.md](references/authentication.md) |
-| Functions | [functions.md](references/functions.md) |
-| Realtime | [realtime.md](references/realtime.md) |
-| Performance | [performance.md](references/performance.md) |
-| Error Handling | [error-handling.md](references/error-handling.md) |
+| Schema & Columns | [schema-management.md](skills/appwrite-backend/references/schema-management.md) |
+| Query Optimization | [query-optimization.md](skills/appwrite-backend/references/query-optimization.md) |
+| Atomic Operators | [atomic-operators.md](skills/appwrite-backend/references/atomic-operators.md) |
+| Relationships | [relationships.md](skills/appwrite-backend/references/relationships.md) |
+| Transactions | [transactions.md](skills/appwrite-backend/references/transactions.md) |
+| Bulk Operations | [bulk-operations.md](skills/appwrite-backend/references/bulk-operations.md) |
+| Authentication | [authentication.md](skills/appwrite-backend/references/authentication.md) |
+| Functions | [functions.md](skills/appwrite-backend/references/functions.md) |
+| Realtime | [realtime.md](skills/appwrite-backend/references/realtime.md) |
+| Performance | [performance.md](skills/appwrite-backend/references/performance.md) |
+| Error Handling | [error-handling.md](skills/appwrite-backend/references/error-handling.md) |
 
-Full list → [SKILL.md](SKILL.md).
+Full list → [SKILL.md](skills/appwrite-backend/SKILL.md).
 
 ## Compatible Agents
 
@@ -72,9 +66,10 @@ Auto-activates when:
 - Work Appwrite auth/storage/functions
 - Ask BaaS patterns
 
-Direct invoke:
-```
-/appwrite-backend
+Codex explicit invocation:
+
+```text
+$appwrite-backend
 ```
 
 ## Contributing
@@ -87,8 +82,8 @@ PRs welcome:
 4. Submit PR
 
 ### Guidelines
-- SKILL.md <500 lines
-- Detail patterns → `references/`
+- `skills/appwrite-backend/SKILL.md` <500 lines
+- Detail patterns → `skills/appwrite-backend/references/`
 - Code examples: Dart, Python, TypeScript
 - Test Appwrite 1.9+
 

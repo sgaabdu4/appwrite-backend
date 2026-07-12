@@ -1,7 +1,6 @@
 ---
 name: appwrite-backend
 description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TypeScript only. Use for Appwrite SDK, DB, auth, storage, fn, cli. Patterns+rules only.
-user-invocable: false
 license: MIT
 metadata:
   author: sgaabdu4
