@@ -1,16 +1,5 @@
 # Transactions
 
-## Contents
-
-- Overview
-- Transaction Patterns
-- Operation Types
-- Limits
-- Common Patterns
-- Error Handling
-- When NOT to Use Transactions
-- Related
-
 ## Overview
 
 Transactions execute multiple database operations atomically. All succeed or all fail.

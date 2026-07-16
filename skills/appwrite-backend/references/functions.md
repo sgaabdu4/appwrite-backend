@@ -1,16 +1,5 @@
 # Functions Best Practices
 
-## Contents
-
-- Architecture
-- Cold Start Optimization
-- Handler Pattern
-- Request/Response API
-- Input Validation & Responses
-- Security
-- Environment Variables
-- Related
-
 ## Architecture
 
 **Group functions by domain.** Each function own one domain — not one operation, not everything.

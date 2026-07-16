@@ -1,16 +1,5 @@
 # Permissions and Roles
 
-## Contents
-
-- Overview
-- Default Deny + Inheritance
-- Actions
-- Common Patterns
-- Resource-Level Examples
-- Common Mistakes
-- Storage Note
-- Related
-
 ## Overview
 
 Use `Permission` + `Role` helpers. `write` grants `create + update + delete`.

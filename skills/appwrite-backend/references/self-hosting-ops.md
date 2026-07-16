@@ -1,14 +1,5 @@
 # Self-Hosting Operations
 
-## Contents
-
-- Storage Adapters
-- Function Runtimes
-- Backups
-- Updates
-- Maintenance
-- Related
-
 ## Storage Adapters
 
 Default local disk. External storage for multi-node.

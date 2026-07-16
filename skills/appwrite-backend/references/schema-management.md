@@ -1,16 +1,5 @@
 # Schema Management
 
-## Contents
-
-- Full Schema Creation
-- Column Types
-- Index Types
-- Auto-Increment
-- Timestamp Overrides
-- Upsert
-- CSV Import/Export
-- Related
-
 ## Full Schema Creation
 
 Create tables + columns + indexes one atomic call. Read/write immediate. Fail → rollback all.
