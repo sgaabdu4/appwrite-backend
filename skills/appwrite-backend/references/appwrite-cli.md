@@ -1,12 +1,17 @@
 # Appwrite CLI
 
+Load this reference before any Appwrite CLI/wrapper command, deployment, schema
+sync, function-variable operation, or CLI troubleshooting. Do not probe first.
+
 ## Route
 
 - Read/query only → bind target → exact command
 - Function code deployment → function-only command
 - Schema/resource reconciliation → Safety Gate → scoped push
+- Data/ACL migration → [production-migrations.md](production-migrations.md) → SDK-first bounded runner
 - Production schema push → inventory + backup/recovery + approval
 - Destructive intent → dedicated delete command + exact resource approval
+- CLI/wrapper failure → version + help/source + sanitized response shape → owner diagnosis
 
 ## Binding
 
@@ -28,6 +33,20 @@ Required:
 - mismatch/unknown → stop
 - global reset → `appwrite client --reset`
 
+Before command construction:
+
+- repository-pinned binary/wrapper + version = authority; generic skill pin never overrides it
+- inspect exact pinned command help: `appwrite <service> <command> --help`
+- repository wrapper help is allowed only when its dispatcher explicitly owns help; unknown flags can execute a default deployment path
+- classify command as read-only, additive, reconcile, data mutation, or delete
+- no troubleshooting/mutation until target + version + command shape are known
+
+Secret safety:
+
+- `set -x`, shell trace, process-list diagnostics, verbose credential commands = forbidden
+- bind with short-lived least-scope key + protected environment; capture only masked debug output
+- unexpected secret in output/process evidence → stop command → revoke/rotate → replace every consumer → resume from read-back
+
 ## Config
 
 `appwrite.config.json` = complete desired-state manifest for every pushed type.
@@ -46,6 +65,24 @@ Required:
 
 Include value = one relative JSON file containing one array. Glob/array/URL,
 missing file, parent path, or inline + included duplicate owner → invalid.
+
+## Command Shapes
+
+- CLI option shapes vary by version → command help + official source before automation.
+- Array options = variadic arguments, not one JSON-encoded array.
+
+```shell
+appwrite tables-db update-row \
+  --database-id "<DATABASE_ID>" \
+  --table-id "<TABLE_ID>" \
+  --row-id "<ROW_ID>" \
+  --permissions 'read("user:<USER_ID>")' 'update("user:<USER_ID>")'
+```
+
+- Omitted `--permissions` = inherit/preserve; explicit empty ACL = revoke all resource ACLs.
+- Pinned CLI cannot encode `[]` → official Server SDK `permissions: []`; omission/skipping = forbidden.
+- `ID.unique()` = SDK helper. CLI sentinel handling differs → verify pinned help/source; unsupported sentinel → create through official SDK and use returned ID.
+- Required nullable-column contraction may need explicit JSON `null`; boolean/string stand-ins = forbidden.
 
 ## Init
 
@@ -111,6 +148,10 @@ PASS requires:
 
 Any omitted/mismatched resource → FAIL; do not push.
 
+Guard output proves binding/inventory/manifest completeness only. Backup,
+recovery-test, command, environment, revision, and approval = separate operator
+receipts; script PASS alone ≠ production gate PASS.
+
 Backup evidence when server supports Appwrite Backups:
 
 ```shell
@@ -174,6 +215,25 @@ appwrite functions update-deployment \
 Function config/variables change → review full functions manifest before
 `push functions`. Secrets = environment/secret manager; never tracked config.
 
+### Function Variables
+
+1. Validate candidate values locally from secret/config owners; no value logging.
+2. List active variables; normalize array or `{total, variables}` response.
+3. Upsert exact manifest keys + secret flags before deployment.
+4. Secret → non-secret = delete + recreate; secret status is one-way.
+5. Read back exact key/ID/count + `secret` metadata; secret values are intentionally unrecoverable.
+6. Deploy after variable mutation; variables take effect only on the next deployment.
+7. Runtime smoke proves value availability; metadata read-back alone does not.
+
+Commands:
+
+```shell
+appwrite --json functions list-variables --function-id "<FUNCTION_ID>"
+appwrite functions create-variable --function-id "<FUNCTION_ID>" ...
+appwrite functions update-variable --function-id "<FUNCTION_ID>" ...
+appwrite functions delete-variable --function-id "<FUNCTION_ID>" --variable-id "<VARIABLE_ID>"
+```
+
 ## Read-Only Inventory + Diagnosis
 
 ```shell
@@ -191,8 +251,26 @@ appwrite --json functions list-executions --function-id "<FUNCTION_ID>"
 
 - pagination = bounded `--limit` + `--offset` until complete
 - `--json` = filtered JSON; `--raw` only when exact response required
-- `--verbose` = error triage
+- `--verbose` = sanitized error triage only; credential-bearing invocation/output = forbidden
 - row/file output may contain PII → bounded destination + redact before sharing
+- missing `$permissions` in list/bulk rows = unknown; ACL proof → exact `get-row`/`get-file`
+- row writes do not invalidate cached list responses; verification → `ttl: 0`, exact GET, or explicit table purge
+
+## Diagnosis
+
+1. Capture pinned binary/wrapper version + exact help without secrets.
+2. Reproduce with smallest read-only or disposable command shape.
+3. Separate wrapper dispatch, CLI serialization, server validation, transport, and application failure.
+4. Inspect official CLI/SDK source for that exact tag; generic latest behavior = insufficient.
+5. Add command-shape regression → use official SDK for an unsupported CLI shape.
+6. Mutation may have started → inventory current state; never rerun from assumption.
+
+Bounded transport route:
+
+- `429|502|503|504` + idempotent operation → exponential backoff + jitter + one absolute deadline
+- empty/non-JSON response = transport failure, never proof of missing resource
+- unknown status after write → exact resource read-back before retry
+- per-row CLI process in migration = N+1 failure mode → SDK/client pool + bounded chunks
 
 ## Explicit Deletes
 
@@ -227,6 +305,7 @@ Generate after accepted schema change/pull.
 - Non-interactive flags: <https://appwrite.io/docs/tooling/command-line/non-interactive>
 - CLI source (`push.ts`, `database-sync.ts`, `change-approval.ts`):
   <https://github.com/appwrite/sdk-for-cli/tree/master/lib/commands>
+- Exact pinned CLI tag/source = command-shape owner; reverify after version change.
 
 ## Related
 

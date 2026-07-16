@@ -72,8 +72,14 @@ Same max, different storage:
 
 | Type | Range | Parameters |
 |------|-------|------------|
-| `integer` | ±2^63 | `min`, `max`, `default` |
+| `integer` | signed 32-bit | `min`, `max`, `default` |
+| `bigint` | signed 64-bit | `min`, `max`, `default` |
 | `float` | 64-bit | `min`, `max`, `default` |
+
+JavaScript cannot represent every 64-bit `bigint` exactly. For JS/TS schema
+automation, any supplied integer `min`, `max`, or `default` must satisfy
+`Number.isSafeInteger`. Optional full-range bounds → omit; rounded bounds →
+forbidden. Use a different exact SDK representation only after target proof.
 
 ### Other
 
@@ -272,3 +278,4 @@ Export filtered data → CSV from Console.
 - Transactions — atomic multi-table ops
 - Bulk ops — batch inserts
 - Relationships — table connections
+- [Production migrations](production-migrations.md) — expand/backfill/deploy/contract + readiness polling
