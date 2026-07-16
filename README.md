@@ -32,6 +32,7 @@ Skill gives AI agents Appwrite dev guidance:
 - Query.select() relationship expansion
 - Type-safe SDK gen `appwrite generate`
 - Official SDK packages only; raw Appwrite HTTP is a violation
+- Production schema guard: live inventory + baseline completeness before push
 - Self-hosted Appwrite 1.9.x SDK pins: `dart_appwrite: 25.1.0`, Flutter `appwrite: 25.2.0`, `node-appwrite: 26.2.0`, web `appwrite: 26.1.0`, Python `appwrite: 21.0.0`, CLI `22.4.0`
 
 ## Reference Files
@@ -49,6 +50,7 @@ Skill gives AI agents Appwrite dev guidance:
 | Realtime | [realtime.md](skills/appwrite-backend/references/realtime.md) |
 | Performance | [performance.md](skills/appwrite-backend/references/performance.md) |
 | Error Handling | [error-handling.md](skills/appwrite-backend/references/error-handling.md) |
+| CLI + Schema Safety | [appwrite-cli.md](skills/appwrite-backend/references/appwrite-cli.md) |
 
 Full list → [SKILL.md](skills/appwrite-backend/SKILL.md).
 

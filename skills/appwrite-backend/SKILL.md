@@ -1,6 +1,6 @@
 ---
 name: appwrite-backend
-description: Appwrite BaaS. TablesDB/Auth/Storage/Functions/Realtime. Dart/Python/TypeScript only. Use for Appwrite SDK, DB, auth, storage, fn, cli. Patterns+rules only.
+description: Implement or operate Appwrite backends through official SDKs and safe CLI workflows.
 license: MIT
 metadata:
   author: sgaabdu4
@@ -28,6 +28,7 @@ metadata:
 14. **Use Channel helpers** — Type-safe realtime subs, not raw strings
 15. **Use Realtime queries** — Server-side event filtering, not client-side
 16. **Async-start long-running Functions** — Client `createExecution` calls for delete/sync/import/export/migrate/generate flows use async execution, then reconcile source-of-truth state with bounded polling/realtime/fetch. Do not block on backend completion; report destructive failures only after reconciliation proves the entity/account still exists.
+17. **Guard schema pushes** — `appwrite push tables` reconciles remote TablesDB resources against the complete local manifest; omission means deletion. Production push requires [appwrite-cli](references/appwrite-cli.md) inventory + manifest guard PASS. `push all`, `--all`, or `--force` never substitutes for this gate.
 
 ## CLI Quick Check (Top)
 
@@ -74,17 +75,17 @@ appwrite client \
   --key "$APPWRITE_API_KEY"
 
 appwrite client --debug
+appwrite --json project get
 ```
 
-`appwrite client --debug` must show the expected endpoint/project and a masked
-key before proceeding. If missing, ask for endpoint, project ID, API key, and
-server version.
+`appwrite client --debug` must show the expected endpoint and masked key;
+`appwrite --json project get` must return the expected project ID. Mismatch →
+stop. Missing binding → ask for endpoint, project ID, API key, server version.
 
-Rules: `appwrite.config.json` = local project config. `appwrite client ...` =
-global override (non-interactive). Clear override: `appwrite client --reset`.
-CLI helper flags vary by version; if unavailable, use raw `--queries` or parse
-plain table output for quick status checks.
-Details: [appwrite-cli](./references/appwrite-cli.md)
+Rules: `appwrite.config.json` = complete deploy manifest. `appwrite client ...`
+= global override. Clear override: `appwrite client --reset`. Schema push →
+load [appwrite-cli](./references/appwrite-cli.md) first. CLI helper flags vary
+by version; unavailable helper → raw `--queries` or bounded plain-output parse.
 
 ## Terminology (1.8.0+)
 
