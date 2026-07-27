@@ -28,6 +28,10 @@ Skill gives AI agents Appwrite dev guidance:
 ### Key Patterns
 - TablesDB API (Collections API deprecated 1.8.0)
 - Atomic operators, race-free updates
+- Atomic server-side bulk rows with deployment-bound limits + per-row event fan-out
+- Bulk-in-transaction budgeting: one bulk call = one transaction operation; rows retain a separate request cap
+- Deployment-bound ID chunks with durable checkpoints + fixed-point completion proof
+- Resumable fixed-point workflows when work cannot fit one atomic request/transaction
 - Cursor pagination, perf
 - Query.select() relationship expansion
 - Type-safe SDK gen `appwrite generate`
