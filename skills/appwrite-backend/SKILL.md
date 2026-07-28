@@ -59,6 +59,7 @@ Load the owner before acting. Unlisted detail = read the owner, never infer.
 8. **Guard schema pushes** — `appwrite push tables` reconciles remote TablesDB against the complete local manifest; omission means deletion. Production push requires [appwrite-cli](references/appwrite-cli.md) inventory + manifest guard PASS. `push all`, `--all`, and `--force` never substitute for that gate.
 9. **Stage production migrations** — additive expand → type-aware resumable backfill → compatible deployment → contract/read-back → consumer activation. Partial data/schema never activates downstream code. Use [production-migrations](references/production-migrations.md).
 10. **Preserve write intent before optimizing** — update-only work never routes through `upsertRow`/`upsertRows`; a pre-read, existence check, or full payload does not remove create-on-missing semantics. Same patch across rows → `updateRows`; heterogeneous per-row updates → `createOperations` with `action: update` inside the verified transaction budget, or redesign. Transaction pressure never authorizes upsert. Use [bulk-operations](references/bulk-operations.md).
+11. **Preserve failure causality** — cleanup, compensation, or rollback failure never replaces the primary exception. Retain both errors + stack traces + execution/transaction IDs, report the operation failed, then reconcile the exact postcondition. Use [transactions](references/transactions.md).
 
 ## SDK Routing
 

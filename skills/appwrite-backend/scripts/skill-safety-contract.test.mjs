@@ -67,6 +67,9 @@ test("transaction and recovery owners cover recurring production failures", asyn
   assert.match(transactions, /schema \+ Auth \+ Storage \+ Functions/u);
   assert.match(transactions, /One bulk row call with `transactionId` = one operation/u);
   assert.match(transactions, /Multiple committed chunks are not globally atomic/u);
+  assert.match(transactions, /secondary failure replaces, rethrows over, or erases the primary failure/u);
+  assert.match(transactions, /`primaryError` \+ `recoveryError` \+ their stack traces/u);
+  assert.match(transactions, /preserves the primary as the top-level operation failure/u);
   assert.match(recovery, /isolated Appwrite\/database clone/u);
   assert.match(recovery, /metadata\/registry \+ database \+ Storage \+ config \+ cache/u);
   assert.match(recovery, /SQL counts alone = incomplete/u);
