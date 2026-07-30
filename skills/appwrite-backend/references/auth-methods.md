@@ -50,7 +50,7 @@ Self-hosted `1.9.6` exception:
 
 Before declaring Apple login fixed:
 
-1. Appwrite provider = enabled + Services ID + Team ID + Key ID + P8 private key.
+1. Appwrite provider = enabled + Services ID + Team ID + Key ID + P8 private key whose trusted provenance binds it to that exact Key ID.
 2. Apple Services ID = associated with the app's primary App ID.
 3. Services ID website entry = Appwrite domain + exact Appwrite Console callback URL; complete `Done → Continue → Save`.
 4. Apple key = Sign in with Apple enabled + associated with the same primary App ID.
@@ -64,11 +64,11 @@ P8 values are write-only. Upload through a trusted Console or secret-safe API pa
 
 1. Capture only callback field names + sanitized Appwrite error type/code in an isolated local diagnostic build; remove the probe before commit.
 2. Verify every Apple/Appwrite association in the gate above.
-3. Probe Apple's token endpoint with the candidate client assertion + a dummy authorization code:
-   - `invalid_client` → identifier/assertion/key configuration is rejected.
-   - `invalid_grant` → client credentials were accepted for that probe; the dummy code is invalid as expected.
-4. If a real authorization code still fails after a passing dummy-code credential probe, check Apple service status/recent official reports and allow configuration propagation; do not rotate credentials blindly.
-5. Re-run the actual device flow. A candidate probe alone is never a fixed receipt.
+3. Bind the P8 to its exact Apple Key ID through trusted provenance: original `AuthKey_<KEY_ID>.p8` download record, or a pre-recorded secret-manager fingerprint/label. Key syntax, filename guess, timestamp proximity, and Appwrite write-only metadata are insufficient.
+4. Never use a dummy authorization code to validate Apple client credentials. Apple can return `invalid_grant` for distinct unrelated P8 candidates, so that response does not prove the assertion/key was accepted.
+5. Discriminate with a fresh real single-use authorization code + exact Services ID/redirect URI, or the actual Appwrite device flow. Credential candidate writes/tests are serial external mutations.
+6. Real-code `invalid_client` + proven key provenance → check Apple service status/recent official reports and allow configuration propagation.
+7. Re-run the actual device flow. PASS = Appwrite callback returns + `account.get()` succeeds + provider identity/session readback exists.
 
 ### Server-Side (SSR)
 
