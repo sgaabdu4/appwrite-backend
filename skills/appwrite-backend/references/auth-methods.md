@@ -39,6 +39,13 @@ await account.createOAuth2Session({
 - Android = register `com.linusu.flutter_web_auth_2.CallbackActivity` with the same scheme.
 - Console platform identifier = exact iOS bundle ID or Android package name.
 
+Self-hosted `1.9.6` exception:
+
+- Provider failure + `Missing redirect URL` = server failure-relay bug masking the real OAuth error; Appwrite fixed this after `1.9.6` in `appwrite/appwrite@ef0acd54bdc5`.
+- Preferred repair = upgrade to a release containing that fix.
+- Compatibility path = keep mobile `success` null + set only `failure` to `appwrite-callback-<PROJECT_ID>://callback`.
+- Never set a custom mobile `success` URL on `1.9.6`; the default success relay adds the callback session `key` + `secret` required by the Flutter SDK.
+
 ### Apple Provider Gate
 
 Before declaring Apple login fixed:
