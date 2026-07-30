@@ -7,6 +7,14 @@ Redirect user to 3rd-party provider.
 ### Client-Side
 
 ```dart
+// Flutter mobile: let the SDK own the callback and session cookie.
+await account.createOAuth2Session(
+    provider: OAuthProvider.google,
+);
+```
+
+```dart
+// Flutter web: success/failure URLs are optional navigation targets.
 await account.createOAuth2Session(
     provider: OAuthProvider.google,
     success: 'https://yourapp.com/auth/callback',
@@ -23,6 +31,37 @@ await account.createOAuth2Session({
 });
 ```
 
+### Flutter Mobile
+
+- Use `Account.createOAuth2Session`; do not hand-roll `/account/tokens/oauth2`, parse callback credentials, or create the session yourself.
+- Omit `success` and `failure` on mobile. The Flutter SDK returns through `appwrite-callback-<PROJECT_ID>` and persists the Appwrite session cookie.
+- iOS = add `appwrite-callback-<PROJECT_ID>` to `CFBundleURLSchemes`; no other OAuth callback configuration is required.
+- Android = register `com.linusu.flutter_web_auth_2.CallbackActivity` with the same scheme.
+- Console platform identifier = exact iOS bundle ID or Android package name.
+
+### Apple Provider Gate
+
+Before declaring Apple login fixed:
+
+1. Appwrite provider = enabled + Services ID + Team ID + Key ID + P8 private key.
+2. Apple Services ID = associated with the app's primary App ID.
+3. Services ID website entry = Appwrite domain + exact Appwrite Console callback URL; complete `Done → Continue → Save`.
+4. Apple key = Sign in with Apple enabled + associated with the same primary App ID.
+5. Actual device flow = `createOAuth2Session` returns + `account.get()` succeeds + provider identity/session readback exists.
+
+P8 values are write-only. Upload through a trusted Console or secret-safe API path; never place the P8, authorization code, callback `key`, callback `secret`, or session value in logs, shell arguments, commits, or receipts.
+
+### Apple Failure Diagnosis
+
+`Invalid OAuth2 Response. Key and Secret not available` = the SDK received a callback without a successful Appwrite session payload. Diagnose the provider exchange before changing client parsing:
+
+1. Capture only callback field names + sanitized Appwrite error type/code in an isolated local diagnostic build; remove the probe before commit.
+2. Verify every Apple/Appwrite association in the gate above.
+3. Probe Apple's token endpoint with the candidate client assertion + a dummy authorization code:
+   - `invalid_client` → identifier/assertion/key configuration is rejected.
+   - `invalid_grant` → client credentials were accepted for that probe; the dummy code is invalid as expected.
+4. If a real authorization code still fails after a passing dummy-code credential probe, check Apple service status/recent official reports and allow configuration propagation; do not rotate credentials blindly.
+5. Re-run the actual device flow. A candidate probe alone is never a fixed receipt.
 
 ### Server-Side (SSR)
 
