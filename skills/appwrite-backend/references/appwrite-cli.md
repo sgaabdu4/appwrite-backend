@@ -168,7 +168,7 @@ Official CLI behavior:
 - `push tables` → remote database absent from `tablesDB` = delete database
 - database deletion → all contained tables/data deleted
 - remote table absent from `tables` = delete table
-- `--force` → confirmation auto-accept
+- `--force` → auto-accepts the settings-diff confirmation only
 - `--all` → select every available resource
 - `push settings` omission semantics vary by CLI version. Inspect pinned source
   before a partial settings push. CLI `24.1.0` submits only defined settings,
@@ -264,7 +264,7 @@ Rules:
 
 - push one resource type only
 - production tables → Schema Safety Gate PASS first
-- `--force` only after the same gate; it suppresses all confirmations
+- `--force` only after the same gate; it answers the settings-diff confirm, never the activation prompt
 - CI must run the gate before any non-interactive push
 - failure after mutation → stop; inventory + recovery evidence; no blind retry
 
@@ -288,7 +288,7 @@ appwrite --json tables-db list-rows \
   `--cursor-before` apply to list commands; repeated `--select` applies to
   row/document list + get.
 - Cursor flags over `--offset` for large tables; same O(1) vs O(n) rule as the SDK.
-- `--queries` remains for shapes flags cannot express; verify against pinned help.
+- `--queries` remains for shapes flags cannot express; verify against pinned help. It takes a single non-array JSON object — a JSON array such as `'[{"method":"limit","values":[6]}]'` is rejected with `Invalid query: Invalid query method:`.
 
 ## Local Run
 
@@ -321,25 +321,47 @@ Staged rollout — build without switching live traffic, activate as a separate
 approved step:
 
 ```shell
-appwrite push functions --function-id "<FUNCTION_ID>" --activate=false
-appwrite push functions --function-id "<FUNCTION_ID>" --activate
+appwrite push function --function-id "<FUNCTION_ID>" --activate false
+appwrite push function --function-id "<FUNCTION_ID>" --activate true
 ```
 
-Default push activates. Any cutover requiring backfill, contract, or consumer
-ordering uses `--activate=false` first — see
+`function|functions`, `site|sites`, `table|tables` = command aliases.
+
+Any cutover requiring backfill, contract, or consumer ordering uses
+`--activate false` first — see
 [production-migrations.md](production-migrations.md).
 
 Function config/variables change → review full functions manifest before
-`push functions`. Secrets = environment/secret manager; never tracked config.
+`push function`. Secrets = environment/secret manager; never tracked config.
+
+### Non-Interactive Push
+
+`push function` is interactive. CLI `24.1.0` raises two independent prompts and
+each needs its own flag:
+
+- settings-diff confirm (`Are you sure you want to apply these changes?`) = `--force`
+- activation confirm (`Do you want to activate the deployment after it is ready?`) = `--activate <true|false>`
+- prompt reached under closed stdin → `Error [ERR_USE_AFTER_CLOSE]: readline was closed` in `PromptUI.onForceClose`, exit `1`, nothing deployed
+- `--with-variables` adds a further prompt → forbidden in scripts; mutate variables through the explicit variable commands
+
+```shell
+appwrite push function --function-id "<FUNCTION_ID>" --force --activate true
+```
+
+`--force` writes the local `appwrite.config.json` function settings over the
+live ones, including `execute` permissions and `scopes`. The printed
+remote-vs-local diff is the only checkpoint against a silent widening (live
+`label:patients` → local `any`) → read it in one interactive run before
+scripting the forced push.
 
 ### Function + Site Variables
 
 1. Validate candidate values locally from secret/config owners; no value logging.
 2. List active variables; normalize array or `{total, variables}` response.
 3. Upsert exact manifest keys + secret flags before deployment.
-4. Secret → non-secret = delete + recreate; secret status is one-way.
-5. Read back exact key/ID/count + `secret` metadata; secret values are intentionally unrecoverable.
-6. Deploy after variable mutation; variables take effect only on the next deployment.
+4. Secret → non-secret = delete + recreate; secret status is one-way. `update-variable --secret false` fails with `Secret variables cannot be marked as non-secret. Please re-create the variable if this is your intention.` → omit `--secret` on every update.
+5. Read back exact key/ID/count + `secret` metadata; values are unrecoverable — `functions get-variable --show-secrets` emits no `value` field at all.
+6. Value change on an existing key takes effect on the next execution (Cloud `1.9.5`, no redeploy); key add/remove = deploy before any consumer relies on it.
 7. Runtime smoke proves value availability; metadata read-back alone does not.
 
 Variables are never declared in `appwrite.config.json`. They live in a `.env`
@@ -359,10 +381,17 @@ Commands:
 
 ```shell
 appwrite --json functions list-variables --function-id "<FUNCTION_ID>"
-appwrite functions create-variable --function-id "<FUNCTION_ID>" ...
-appwrite functions update-variable --function-id "<FUNCTION_ID>" ...
+appwrite functions create-variable --function-id "<FUNCTION_ID>" \
+  --variable-id "<VARIABLE_ID>" --key "<KEY>" --value "<VALUE>"
+appwrite functions update-variable --function-id "<FUNCTION_ID>" \
+  --variable-id "<VARIABLE_ID>" --key "<KEY>" --value "<VALUE>"
 appwrite functions delete-variable --function-id "<FUNCTION_ID>" --variable-id "<VARIABLE_ID>"
 ```
+
+- `--variable-id` = required on create (`required option '--variable-id <variable-id>' not specified`)
+- create persists an EMPTY value even when `--value` is supplied → every create is followed by `update-variable` carrying `--key` + `--value`; there is no create-only path to a populated variable
+- variable IDs are project-global, not per-function → reuse fails with `Variable with the same ID already exists in this project`; prefix the ID per function (`RECONCILE_APPWRITE_DATABASE_ID`) while `--key` stays the runtime name (`APPWRITE_DATABASE_ID`)
+- empty-value symptom = function returns its missing-configuration branch (`503`) in ~0.2 s on every execution while `list-variables` still shows the key → prove the fix by execution read-back, never by value read-back
 
 ## Project Settings
 
@@ -435,6 +464,20 @@ appwrite --raw users list --limit 100 --offset 0
 - row/file output may contain PII → bounded destination + redact before sharing
 - missing `$permissions` in list/bulk rows = unknown; ACL proof → exact `get-row`/`get-file`
 - row writes do not invalidate cached list responses; verification → `ttl: 0`, exact GET, or explicit table purge
+
+### Function Execution Triage
+
+First stop for any failing function — cheaper and more exact than redeploying.
+
+```shell
+appwrite --json functions list --limit 100
+appwrite functions list-executions --function-id "<FUNCTION_ID>" \
+  --limit 3 --sort-desc '$createdAt'
+```
+
+- `--function-id` = the function `$id`, frequently an opaque hex string unequal to the display name; `functions list` prints both
+- output carries `status` + `responseStatusCode` + full `logs` + `errors` + `duration`
+- sub-second `duration` + 5xx = early configuration-guard return, not failing work → inspect variables/scopes before reading the handler
 
 ## Diagnosis
 
