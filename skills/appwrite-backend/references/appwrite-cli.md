@@ -5,7 +5,10 @@ sync, function-variable operation, or CLI troubleshooting. Do not probe first.
 
 ## Route
 
-- Read/query only → bind target → exact command
+- Init/pull/push/deploy/generate or interactive operator task → pinned CLI/wrapper
+- One bounded read whose exact tested CLI output is sufficient → pinned CLI/wrapper
+- Durable automation, exact response fields, pagination/retry, or multiple service calls → installed official Server SDK
+- CLI presentation omits/transforms a required field or cannot express the request → official Server SDK; raw HTTP forbidden
 - Function code deployment → function-only command
 - Schema/resource reconciliation → Safety Gate → scoped push
 - Data/ACL migration → [production-migrations.md](production-migrations.md) → SDK-first bounded runner
@@ -13,17 +16,28 @@ sync, function-variable operation, or CLI troubleshooting. Do not probe first.
 - Destructive intent → dedicated delete command + exact resource approval
 - CLI/wrapper failure → version + help/source + sanitized response shape → owner diagnosis
 
+Choose once from the required outcome. Do not alternate CLI/SDK variants after a
+failure. Recheck the original violation, diagnose the failed owner, then use a
+materially different mechanism only when evidence proves the first owner cannot
+meet the contract. Reuse an installed compatible official SDK; adding a package
+when the pinned CLI already provides the exact proven operation is YAGNI.
+
 ## Install + Maintain
 
 ```shell
-npm install -g appwrite-cli            # pinned line
-brew install appwrite/appwrite/appwrite  # macOS tap
-appwrite update                        # in-place, detected install method
-appwrite update --manual               # print instructions only
+npm view appwrite-cli version
+npm install -g appwrite-cli@25.0.0
+appwrite --version
 appwrite completion install
 ```
 
-Repository-pinned wrapper/version wins over any install shown here. `appwrite update` changes command shapes → reverify pinned help before the next mutation.
+Repository-pinned wrapper/version wins. Registry latest on 2026-07-31 = CLI
+`25.0.0`; its official README declares server `1.9.x` compatibility. Appwrite
+`1.9.6` release-match = CLI `23.0.0`; [self-hosting.md](self-hosting.md) owns that
+matrix. Releases `23.0.0` and `25.0.0` both remove or change commands/output.
+Never float automation via `appwrite update` or unpinned install. Adopt a newer
+CLI only after exact-tag help/source audit + read-only target probe + command-shape
+contract update.
 
 ## Binding
 
@@ -64,6 +78,37 @@ Secret safety:
 - bind with short-lived least-scope key + protected environment; capture only masked debug output
 - `--show-secrets` = forbidden in an observable shell; an operation that must consume its own short-lived secret may use it only inside one non-logging process that parses the whole response, never emits the value, and discards it after the bounded operation
 - unexpected secret in output/process evidence → stop command → revoke/rotate → replace every consumer → resume from read-back
+
+## API Keys
+
+- API keys = server/CLI credentials controlled by scopes, not resource ACL permissions.
+- normal runtime/deploy key = only scopes required by the exact commands; full-scope default forbidden.
+- key-management caller = `keys.read` + `keys.write`; `keys.write` can mint any scope → bootstrap/rotation boundary only.
+- no trusted key-management caller → create the first key in the Appwrite Console; never weaken auth or invent a raw-REST bypass.
+- `project create-key|get-key|list-keys|update-key|delete-key` = CLI `23.0.0`; later versions may add `--project-id` but the bound project still requires read-back.
+- short-lived work ≤1 hour → prefer `project create-ephemeral-key --scopes ... --duration ...` when the consumer accepts it.
+
+Metadata inventory:
+
+```shell
+appwrite --raw project list-keys --limit 100 --offset 0
+appwrite --raw project get-key --key-id "<KEY_ID>"
+```
+
+Create/rotate:
+
+1. Bind + prove endpoint/project + pinned help + intended least scopes.
+2. Run `appwrite --raw --show-secrets project create-key --key-id ... --name ... --expire ... --scopes ...` only inside one bounded non-logging process; stdout/stderr never reach terminal, CI log, artifact, or command trace.
+3. Parse the whole response → require exact key ID/name/scopes/expiry + secret → write the secret directly to the approved consumer secret owner → clear the buffer.
+4. Probe the actual consumer with the candidate key → fixed claim forbidden before PASS.
+5. Read key metadata back with `--raw` without `--show-secrets` → cut over → delete the old key only after explicit destructive approval → prove old key rejected + new key accepted.
+
+Failure handling:
+
+- `401` = endpoint/project/key mismatch or revoked/invalid secret; do not add scopes first.
+- `403` + `missing scopes ([...])` = compare the exact reported scope with intended operations → update/recreate only the missing required scope → consumer probe.
+- key exists/listed ≠ usable; metadata output never proves the actual consumer received the secret.
+- observable `--show-secrets`, shell command substitution, temp plaintext files, clipboard/log echo, or secret in argv/env diagnostics = forbidden.
 
 ## Config
 
@@ -460,10 +505,11 @@ appwrite --raw users list --limit 100 --offset 0
 
 - pagination = bounded `--limit` + `--offset` until complete
 - global output flags precede the service command: `appwrite --json ...` or `appwrite --raw ...`
-- `--json`/`-j` = filtered presentation; omitted field ≠ empty/missing server value
+- short flags are case-sensitive: filtered JSON = `-j`; full redacted response = `-R`; `-J` is unsupported
+- `--json`/`-j` = filtered presentation; CLI `23.0.0` + `25.0.0` source drops null/blank values and nested object/array fields → omitted field ≠ empty/missing server value
 - `--json`/`--raw` stdout is not parseable as-is: human notices precede the payload (CLI `24.1.0`: `ℹ Warning: This CLI is using a legacy cookie session.`), so `json.loads(stdout)` fails. Slice from the first `{`, or capture to a file and parse that; a fixed line-count offset is forbidden.
 - exact field evidence (`labels`, `$permissions`, preferences, status, nested arrays) = `--raw`/`-R` + whole-response parse + required-field presence assertion
-- pinned CLI `22.4.0` proof: `users list -j` can omit non-empty `labels`; user-label inventory therefore requires `users list -R`
+- proven failure shape: `users list -j` can omit non-empty `labels`; user-label inventory therefore requires `users list -R`
 - `--raw` remains secret-redacted unless `--show-secrets` is explicitly supplied; never combine them in an observable command
 - `--verbose` = sanitized error triage only; credential-bearing invocation/output = forbidden
 - row/file output may contain PII → bounded destination + redact before sharing
@@ -490,8 +536,9 @@ appwrite functions list-executions --function-id "<FUNCTION_ID>" \
 2. Reproduce with smallest read-only or disposable command shape.
 3. Separate wrapper dispatch, CLI serialization, server validation, transport, and application failure.
 4. Inspect official CLI/SDK source for that exact tag; generic latest behavior = insufficient.
-5. Add command-shape regression → use official SDK for an unsupported CLI shape.
-6. Mutation may have started → inventory current state; never rerun from assumption.
+5. Recheck the original observable violation; a filtered `--json` omission never proves server state.
+6. Add command-shape regression → use official SDK for an unsupported CLI shape.
+7. Mutation may have started → inventory current state; never rerun from assumption.
 
 Bounded transport route:
 
@@ -550,6 +597,22 @@ contract as `createRows` — see [bulk-operations.md](bulk-operations.md).
 - Installation/config includes: <https://appwrite.io/docs/tooling/command-line/installation>
 - Tables CLI: <https://appwrite.io/docs/tooling/command-line/tables>
 - Non-interactive flags: <https://appwrite.io/docs/tooling/command-line/non-interactive>
+- API-key scopes + rotation: <https://appwrite.io/docs/advanced/platform/api-keys>
+- Appwrite 1.9.6 release-compatible CLI matrix:
+  <https://github.com/appwrite/website/blob/0c28c9a3f7a3b866c38d7762904981de45760c07/src/routes/docs/advanced/self-hosting/installation/%2Bpage.markdoc>
+- CLI 23.0.0 + 25.0.0 filtered/raw output implementation:
+  <https://github.com/appwrite/sdk-for-cli/blob/23.0.0/lib/parser.ts>
+  <https://github.com/appwrite/sdk-for-cli/blob/25.0.0/lib/parser.ts>
+- CLI 25.0.0 global output flags:
+  <https://github.com/appwrite/sdk-for-cli/blob/25.0.0/cli.ts>
+- CLI 23.0.0 + 25.0.0 project/API-key commands:
+  <https://github.com/appwrite/sdk-for-cli/blob/23.0.0/lib/commands/services/project.ts>
+  <https://github.com/appwrite/sdk-for-cli/blob/25.0.0/lib/commands/services/project.ts>
+- CLI 25.0.0 server-line declaration + breaking release:
+  <https://github.com/appwrite/sdk-for-cli/blob/25.0.0/README.md>
+  <https://github.com/appwrite/sdk-for-cli/releases/tag/25.0.0>
+- CLI 23.0.0 breaking release:
+  <https://github.com/appwrite/sdk-for-cli/releases/tag/23.0.0>
 - CLI source (`push.ts`, `database-sync.ts`, `change-approval.ts`):
   <https://github.com/appwrite/sdk-for-cli/tree/master/lib/commands>
 - CLI 22.4.0 schema push/pull write-back:
