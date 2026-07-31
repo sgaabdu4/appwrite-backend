@@ -288,7 +288,9 @@ appwrite --json tables-db list-rows \
   `--cursor-before` apply to list commands; repeated `--select` applies to
   row/document list + get.
 - Cursor flags over `--offset` for large tables; same O(1) vs O(n) rule as the SDK.
+- Row list command = `appwrite tablesdb list-rows` (alias `tables-db`). `appwrite databases list-rows` does not exist in CLI `24.x`; `databases` is the legacy documents API.
 - `--queries` remains for shapes flags cannot express; verify against pinned help. It takes a single non-array JSON object — a JSON array such as `'[{"method":"limit","values":[6]}]'` is rejected with `Invalid query: Invalid query method:`.
+- `--queries` value = Appwrite query JSON, never the SDK string form. CLI `24.1.0`: `'equal("userId",["abc"])'` → `Invalid query: Syntax error`; working shape = `'{"method":"equal","attribute":"userId","values":["abc"]}'`.
 
 ## Local Run
 
@@ -447,6 +449,8 @@ appwrite --json tables-db list-tables \
   --database-id "<DATABASE_ID>" --limit 100 --offset 0
 appwrite --json tables-db get-table \
   --database-id "<DATABASE_ID>" --table-id "<TABLE_ID>"
+appwrite --json tables-db list-indexes \
+  --database-id "<DATABASE_ID>" --table-id "<TABLE_ID>"
 appwrite --json tables-db list-rows \
   --database-id "<DATABASE_ID>" --table-id "<TABLE_ID>"
 appwrite --json storage list-files --bucket-id "<BUCKET_ID>"
@@ -457,6 +461,7 @@ appwrite --raw users list --limit 100 --offset 0
 - pagination = bounded `--limit` + `--offset` until complete
 - global output flags precede the service command: `appwrite --json ...` or `appwrite --raw ...`
 - `--json`/`-j` = filtered presentation; omitted field ≠ empty/missing server value
+- `--json`/`--raw` stdout is not parseable as-is: human notices precede the payload (CLI `24.1.0`: `ℹ Warning: This CLI is using a legacy cookie session.`), so `json.loads(stdout)` fails. Slice from the first `{`, or capture to a file and parse that; a fixed line-count offset is forbidden.
 - exact field evidence (`labels`, `$permissions`, preferences, status, nested arrays) = `--raw`/`-R` + whole-response parse + required-field presence assertion
 - pinned CLI `22.4.0` proof: `users list -j` can omit non-empty `labels`; user-label inventory therefore requires `users list -R`
 - `--raw` remains secret-redacted unless `--show-secrets` is explicitly supplied; never combine them in an observable command
