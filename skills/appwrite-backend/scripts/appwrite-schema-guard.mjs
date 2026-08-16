@@ -375,6 +375,7 @@ export function checkManifest(config, inventory, baseline, now = Date.now()) {
   const candidateSchema = normalizedSchema(config, "candidate");
   const candidate = maps(candidateSchema);
   const additions = new Set();
+  /** @type {Array<[ReturnType<typeof maps>, string]>} */
   const required = [[maps(normalizedSchema(inventory, "inventory")), "inventory"]];
   if (baseline) {
     if (baseline.projectId !== config.projectId) fail("baseline project mismatch");
@@ -423,33 +424,38 @@ function stopProcessGroup(pid) {
   try {
     process.kill(-pid, "SIGKILL");
   } catch (error) {
-    if (error.code !== "ESRCH") throw error;
+    if (errorCode(error) !== "ESRCH") throw error;
   }
 }
 
+function errorCode(error) {
+  return /** @type {{code?: string} | undefined} */ (error)?.code;
+}
+
 function spawnBounded(executable, args, options) {
-  const result = spawnSync(executable, args, {
+  const spawnOptions = {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
     timeout: options.timeoutMs ?? CLI_TIMEOUT_MS,
     maxBuffer: MAX_OUTPUT_BYTES,
     killSignal: "SIGKILL",
     detached: process.platform !== "win32",
-  });
+  };
+  const result = spawnSync(executable, args, /** @type {any} */ (spawnOptions));
   stopProcessGroup(result.pid);
   return result;
 }
 
 function runCli(executable, args, options = {}) {
   const result = spawnBounded(executable, args, options);
-  if (result.error?.code === "ETIMEDOUT" || result.signal) {
+  if (errorCode(result.error) === "ETIMEDOUT" || result.signal) {
     fail(`Appwrite CLI timed out: ${args.slice(0, 3).join(" ")}`);
   }
-  if (result.error) fail(`Appwrite CLI could not start: ${result.error.code ?? "unknown"}`);
+  if (result.error) fail(`Appwrite CLI could not start: ${errorCode(result.error) ?? "unknown"}`);
   if (result.status !== 0) {
     fail(`Appwrite CLI failed: ${args.slice(0, 3).join(" ")} exit=${String(result.status)}`);
   }
-  const output = result.stdout;
+  const output = String(result.stdout);
   for (let index = 0; index < output.length; index += 1) {
     if (output[index] !== "{" && output[index] !== "[") continue;
     try {
@@ -463,9 +469,9 @@ function runCli(executable, args, options = {}) {
 
 function debugEndpoint(executable, options = {}) {
   const result = spawnBounded(executable, ["client", "--debug"], options);
-  if (result.error?.code === "ETIMEDOUT" || result.signal) fail("Appwrite CLI timed out: client --debug");
+  if (errorCode(result.error) === "ETIMEDOUT" || result.signal) fail("Appwrite CLI timed out: client --debug");
   if (result.error || result.status !== 0) fail("Appwrite CLI failed: client --debug");
-  return result.stdout.match(/^endpoint\s+(.+)$/m)?.[1]?.trim();
+  return String(result.stdout).match(/^endpoint\s+(.+)$/m)?.[1]?.trim();
 }
 
 function paged(executable, command, key, options = {}) {

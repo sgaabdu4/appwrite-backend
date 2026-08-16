@@ -101,7 +101,7 @@ test("float declarations match Appwrite's raw double model", () => {
 
 test("conflicting permission aliases fail with a stable validation error", () => {
   const candidate = manifest();
-  candidate.tables[0].permissions = "not-an-array";
+  /** @type {any} */ (candidate.tables[0]).permissions = "not-an-array";
   assert.throws(() => checkManifest(candidate, manifest(), undefined, now), /permissions must be an array/);
 });
 
@@ -149,7 +149,8 @@ test("new table access and relationship state fail closed", () => {
   assert.throws(() => checkManifest(relatedTable, prior, undefined, now), /relationship on new table/);
 });
 
-for (const [name, mutate, expected] of [
+/** @type {Array<[string, (value: any) => void, RegExp]>} */
+const incompatibleCases = [
   ["column deletion", (value) => { value.tables[0].columns = []; }, /destructive removal.*column/],
   ["column type", (value) => { value.tables[0].columns[0].type = "integer"; }, /incompatible column change/],
   ["required constraint", (value) => { value.tables[0].columns[0].required = true; }, /incompatible column change/],
@@ -159,7 +160,8 @@ for (const [name, mutate, expected] of [
   ["row security", (value) => { value.tables[0].rowSecurity = true; }, /permission\/access row-security change/],
   ["permission broadening", (value) => { value.tables[0].$permissions = ['read("any")']; }, /permission\/access table permission change/],
   ["permission narrowing", (value) => { value.tables[0].$permissions = []; }, /permission\/access table permission change/],
-]) {
+];
+for (const [name, mutate, expected] of incompatibleCases) {
   test(`${name} fails closed`, () => {
     const prior = manifest({
       columns: [column()],
@@ -190,7 +192,7 @@ test("relationship metadata change fails closed", () => {
 
 test("unknown material schema field fails closed", () => {
   const candidate = manifest();
-  candidate.tables[0].unknownSetting = true;
+  /** @type {any} */ (candidate.tables[0]).unknownSetting = true;
   assert.throws(() => checkManifest(candidate, manifest(), undefined, now), /unknown material field/);
 });
 
