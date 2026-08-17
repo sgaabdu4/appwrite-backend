@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "families": {
+    "tests": [
+      "node",
+      "--test",
+      "skills/appwrite-backend/scripts/appwrite-query-contract.test.mjs",
+      "skills/appwrite-backend/scripts/appwrite-schema-guard.test.mjs",
+      "skills/appwrite-backend/scripts/skill-safety-contract.test.mjs"
+    ]
+  }
+}
