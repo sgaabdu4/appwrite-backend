@@ -1,0 +1,28 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+      - name: Use Node.js 26
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          package-manager-cache: false
+      - name: Run skill contracts
+        run: >-
+          node --test
+          skills/appwrite-backend/scripts/appwrite-query-contract.test.mjs
+          skills/appwrite-backend/scripts/appwrite-schema-guard.test.mjs
+          skills/appwrite-backend/scripts/skill-safety-contract.test.mjs
+          .github/workflows/quality-contract.test.mjs
