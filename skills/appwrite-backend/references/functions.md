@@ -79,7 +79,9 @@ Init SDK + services **outside handler** (warm-start). Refresh dynamic API key ea
 
 ### Dart
 
-Open Runtimes constructs `RuntimeContext` in its generated server; the user function package cannot import that server's private package. Keep `dynamic context` only at `main`, return `Future<Object?>`, receive runtime values as `Object?`, and validate them before calling typed handlers. Strict linting: adjacent, per-line exceptions are appropriate for the injected parameter and unavoidable direct `context.req/res/log/error` calls; keep the rules enabled elsewhere. Do not add an adapter package solely to avoid these exceptions. Verify against the actual [runtime context](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/function_types.dart) and [server invocation](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/server.dart), plus the function's real input/output tests.
+Open Runtimes constructs `RuntimeContext` in its generated server; the user function package cannot import that server's private package. Accept `Object rawContext` at `main`, return `Future<Object?>`, and adapt once to the project's typed request/response contract. Preserve an existing compatible adapter or package and the project's no-suppression policy; do not replace it with lint ignores. A nominal interface cast alone does not adapt the runtime object. Verify the adapter against the actual [runtime context](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/function_types.dart) and [server invocation](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/server.dart), including response serialization and error propagation; matching mocks alone are insufficient.
+
+Below, `adaptFunctionContext` is the project's verified boundary, not an Appwrite SDK export. `FunctionContext` exposes typed headers and JSON responses; its adapter maps response status to Open Runtimes' positional argument. Reuse that owner rather than introducing another wrapper.
 
 ```dart
 Client? _client;
@@ -98,21 +100,16 @@ void _ensureInit(String apiKey) {
   _tablesDB = TablesDB(_client!);
 }
 
-// Open Runtimes injects a context type private to its generated server.
-// ignore: avoid_annotating_with_dynamic
-Future<Object?> main(dynamic context) async {
-    // Direct Open Runtimes boundary; validate before entering typed code.
-    // ignore: avoid_dynamic_calls
-    final Object? apiKey = context.req.headers['x-appwrite-key'];
-    if (apiKey is! String || apiKey.isEmpty) {
+Future<Object?> main(Object rawContext) async {
+    final FunctionContext context = adaptFunctionContext(rawContext);
+    final String? apiKey = context.req.headers['x-appwrite-key'];
+    if (apiKey == null || apiKey.isEmpty) {
         throw StateError('Missing execution API key');
     }
     _ensureInit(apiKey);
     final rows = await _tablesDB!.listRows(
         databaseId: 'db', tableId: 'items',
         queries: [Query.limit(10)], total: false);
-    // Open Runtimes owns the response transport.
-    // ignore: avoid_dynamic_calls
     return context.res.json({'items': rows.rows.map((row) => row.toMap()).toList()});
 }
 ```
@@ -204,21 +201,25 @@ Validate every body/query/header value before using it.
 > **Security:** All user input from `context.req.bodyJson` untrusted. Always validate types, sanitize strings, enforce length limits before processing.
 
 ```dart
-Future<dynamic> main(final context) async {
+Future<Object?> main(Object rawContext) async {
+    final FunctionContext context = adaptFunctionContext(rawContext);
     if (context.req.method != 'POST') {
-        return context.res.json({'error': 'Method not allowed'}, statusCode: 405);
+        return context.res.json({'error': 'Method not allowed'}, status: 405);
     }
 
     // ⚠️ UNTRUSTED INPUT — validate before use
-    final body = context.req.bodyJson;
+    final Object? body = context.req.bodyJson;
+    if (body is! Map<String, Object?>) {
+        return context.res.json({'error': 'Invalid body'}, status: 400);
+    }
     final email = _sanitizeString(body['email']);
     if (email == null || !_isValidEmail(email)) {
-        return context.res.json({'error': 'Invalid email'}, statusCode: 400);
+        return context.res.json({'error': 'Invalid email'}, status: 400);
     }
 
-    final password = _sanitizeString(body['password']);
-    if (password == null || password.length < 8 || password.length > 128) {
-        return context.res.json({'error': 'Invalid password'}, statusCode: 400);
+    final password = body['password'];
+    if (password is! String || password.length < 8 || password.length > 128) {
+        return context.res.json({'error': 'Invalid password'}, status: 400);
     }
 
     try {
@@ -226,14 +227,15 @@ Future<dynamic> main(final context) async {
             userId: ID.unique(), email: email, password: password);
         return context.res.json({'userId': user.$id});
     } on AppwriteException catch (e) {
-        return context.res.json({'error': e.message}, statusCode: e.code ?? 500);
+        return context.res.json({'error': e.message}, status: e.code ?? 500);
     }
 }
 
 // Sanitization helpers
-String? _sanitizeString(dynamic value) {
+String? _sanitizeString(Object? value) {
     if (value is! String) return null;
-    return value.trim().substring(0, value.length.clamp(0, 1000));
+    final trimmed = value.trim();
+    return trimmed.length <= 1000 ? trimmed : null;
 }
 
 bool _isValidEmail(String email) {
@@ -267,16 +269,17 @@ Appwrite auto-generates short-lived API key per execution from function's **scop
 ### Enforce Authorization Server-Side
 
 ```dart
-Future<dynamic> main(final context) async {
+Future<Object?> main(Object rawContext) async {
+    final FunctionContext context = adaptFunctionContext(rawContext);
     final userId = context.req.headers['x-appwrite-user-id'];
     if (userId == null || userId.isEmpty) {
-        return context.res.json({'error': 'Unauthorized'}, statusCode: 401);
+        return context.res.json({'error': 'Unauthorized'}, status: 401);
     }
 
     final row = await tablesDB.getRow(
         databaseId: 'db', tableId: 'orders', rowId: orderId);
     if (row.data['userId'] != userId) {
-        return context.res.json({'error': 'Forbidden'}, statusCode: 403);
+        return context.res.json({'error': 'Forbidden'}, status: 403);
     }
 }
 ```
