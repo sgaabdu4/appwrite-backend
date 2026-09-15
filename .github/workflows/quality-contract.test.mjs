@@ -19,6 +19,27 @@ test("quality workflow runs every configured test", async () => {
   assert.match(workflow, /node-version: 26/u);
   assert.match(workflow, /package-manager-cache: false/u);
 
+  const formattingCheck = [
+    "npx --yes @biomejs/biome@2.5.11 check",
+    "--vcs-enabled=false",
+    "--linter-enabled=false",
+    "--assist-enabled=false",
+    "--indent-style=space",
+    "--line-width=140",
+    "--javascript-formatter-quote-style=single",
+    "skills/appwrite-backend/scripts",
+  ].join("\n          ");
+  const formattingIndex = workflow.indexOf(formattingCheck);
+  const contractsIndex = workflow.indexOf("node --test");
+  assert.ok(
+    formattingIndex >= 0,
+    "quality workflow must check JavaScript skill formatting with Biome",
+  );
+  assert.ok(
+    formattingIndex < contractsIndex,
+    "quality workflow must check formatting before skill contracts",
+  );
+
   let previous = -1;
   for (const path of gates.families.tests) {
     const current = workflow.indexOf(path);
