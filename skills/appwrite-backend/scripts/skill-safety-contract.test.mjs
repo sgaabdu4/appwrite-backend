@@ -115,30 +115,41 @@ test('function execution parsing drift routes to a target-proven response-format
 });
 
 test('Dart Function references preserve typed runtime boundaries without suppressions', async () => {
-  const [functions, functionsAdvanced] = await Promise.all([
-    text('references/functions.md'),
-    text('references/functions-advanced.md'),
-  ]);
-  const dartFunctionReferences = `${functions}\n${functionsAdvanced}`;
-  const typedEntrypoints = (content) => [
-    ...content.matchAll(
-      /Future<Object\?> main\(Object rawContext\) async \{\s+final FunctionContext context = adaptFunctionContext\(rawContext\);/gu,
-    ),
-  ].length;
-
-  assert.ok(typedEntrypoints(functions) > 0, 'functions.md must show the typed runtime boundary');
-  assert.equal(typedEntrypoints(functionsAdvanced), 3, 'every advanced Dart handler must adapt once');
-  assert.equal(
-    [...functionsAdvanced.matchAll(/adaptFunctionContext\(rawContext\)/gu)].length,
-    3,
-    'each advanced Dart handler must adapt its raw runtime context exactly once',
+  const referenceFiles = (await readdir(new URL('references/', root))).filter((file) => file.endsWith('.md')).sort();
+  const references = await Promise.all(
+    referenceFiles.map(async (file) => ({
+      file,
+      content: await text(`references/${file}`),
+    })),
   );
-  assert.doesNotMatch(dartFunctionReferences, /Future\s*<\s*dynamic\s*>\s+main\(\s*final\s+context\s*\)/u);
-  assert.doesNotMatch(dartFunctionReferences, /main\(\s*dynamic\s+context\s*\)/u);
-  assert.doesNotMatch(dartFunctionReferences, /^\s*\/\/\s*ignore(?:_for_file)?:/mu);
-  assert.doesNotMatch(dartFunctionReferences, /\bstatusCode\s*:/u);
-  assert.match(functionsAdvanced, /context\.res\.json\([^\n]+status: 400\)/u);
-  assert.match(functionsAdvanced, /context\.res\.json\([^\n]+status: 500\)/u);
+  const dartFunctionExamples = references.flatMap(({ file, content }) =>
+    [...content.matchAll(/```dart\n([\s\S]*?)\n```/gu)]
+      .map((match) => ({ file, code: match[1] }))
+      .filter(({ code }) => /\bmain\s*\(|\bcontext\.res\./u.test(code)),
+  );
+  const typedEntrypoint =
+    /Future<Object\?> main\(Object rawContext\) async \{\s+final FunctionContext context = adaptFunctionContext\(rawContext\);/u;
+
+  for (const expected of ['authentication.md', 'functions-advanced.md', 'functions.md']) {
+    assert.ok(
+      dartFunctionExamples.some(({ file }) => file === expected),
+      `${expected} must be scanned as a Dart Function reference`,
+    );
+  }
+  for (const { file, code } of dartFunctionExamples) {
+    assert.doesNotMatch(code, /Future\s*<\s*dynamic\s*>\s+main\(\s*final\s+context\s*\)/u, file);
+    assert.doesNotMatch(code, /main\(\s*dynamic\s+context\s*\)/u, file);
+    assert.doesNotMatch(code, /^\s*\/\/\s*ignore(?:_for_file)?:/mu, file);
+    assert.doesNotMatch(code, /\bstatusCode\s*:/u, file);
+    if (/\bmain\s*\(/u.test(code)) {
+      assert.match(code, typedEntrypoint, `${file} must adapt raw runtime context once`);
+      assert.equal(
+        [...code.matchAll(/adaptFunctionContext\(rawContext\)/gu)].length,
+        1,
+        `${file} must adapt its raw runtime context exactly once`,
+      );
+    }
+  }
 });
 
 test('numeric schema distinguishes 32-bit integer from 64-bit bigint', async () => {
