@@ -114,6 +114,33 @@ test('function execution parsing drift routes to a target-proven response-format
   assert.match(functionsAdvanced, /client configuration regression[\s\S]*real deployed target/u);
 });
 
+test('Dart Function references preserve typed runtime boundaries without suppressions', async () => {
+  const [functions, functionsAdvanced] = await Promise.all([
+    text('references/functions.md'),
+    text('references/functions-advanced.md'),
+  ]);
+  const dartFunctionReferences = `${functions}\n${functionsAdvanced}`;
+  const typedEntrypoints = (content) => [
+    ...content.matchAll(
+      /Future<Object\?> main\(Object rawContext\) async \{\s+final FunctionContext context = adaptFunctionContext\(rawContext\);/gu,
+    ),
+  ].length;
+
+  assert.ok(typedEntrypoints(functions) > 0, 'functions.md must show the typed runtime boundary');
+  assert.equal(typedEntrypoints(functionsAdvanced), 3, 'every advanced Dart handler must adapt once');
+  assert.equal(
+    [...functionsAdvanced.matchAll(/adaptFunctionContext\(rawContext\)/gu)].length,
+    3,
+    'each advanced Dart handler must adapt its raw runtime context exactly once',
+  );
+  assert.doesNotMatch(dartFunctionReferences, /Future\s*<\s*dynamic\s*>\s+main\(\s*final\s+context\s*\)/u);
+  assert.doesNotMatch(dartFunctionReferences, /main\(\s*dynamic\s+context\s*\)/u);
+  assert.doesNotMatch(dartFunctionReferences, /^\s*\/\/\s*ignore(?:_for_file)?:/mu);
+  assert.doesNotMatch(dartFunctionReferences, /\bstatusCode\s*:/u);
+  assert.match(functionsAdvanced, /context\.res\.json\([^\n]+status: 400\)/u);
+  assert.match(functionsAdvanced, /context\.res\.json\([^\n]+status: 500\)/u);
+});
+
 test('numeric schema distinguishes 32-bit integer from 64-bit bigint', async () => {
   const schema = await text('references/schema-management.md');
   assert.match(schema, /`integer` \| signed 32-bit/u);
