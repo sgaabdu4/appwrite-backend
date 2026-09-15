@@ -19,18 +19,13 @@ Use official SDK packages only. For self-hosted Appwrite `1.9.x`, pin Dart Funct
 
 ### Route Handling Inside Domain Functions
 
+Extract request values at the runtime entrypoint; pass typed inputs to domain handlers.
+
 ```dart
-Future<dynamic> main(final context) async {
-    final path = context.req.path;
-    final method = context.req.method;
-
-    if (method == 'GET' && path == '/users') return listUsers(context);
-    if (method == 'POST' && path == '/users') return createUser(context);
-    if (method == 'GET' && path.startsWith('/users/')) return getUser(context);
-    if (method == 'PUT' && path.startsWith('/users/')) return updateUser(context);
-    if (method == 'DELETE' && path.startsWith('/users/')) return deleteUser(context);
-
-    return context.res.json({'error': 'Not found'}, statusCode: 404);
+Future<Object?> routeRead(String method, String path) async {
+    if (method == 'GET' && path == '/users') return listUsers();
+    if (method == 'GET' && path.startsWith('/users/')) return getUser(path);
+    return {'error': 'Not found'};
 }
 ```
 
@@ -84,13 +79,13 @@ Init SDK + services **outside handler** (warm-start). Refresh dynamic API key ea
 
 ### Dart
 
+Open Runtimes constructs `RuntimeContext` in its generated server; the user function package cannot import that server's private package. Keep `dynamic context` only at `main`, return `Future<Object?>`, receive runtime values as `Object?`, and validate them before calling typed handlers. Strict linting: adjacent, per-line exceptions are appropriate for the injected parameter and unavoidable direct `context.req/res/log/error` calls; keep the rules enabled elsewhere. Do not add an adapter package solely to avoid these exceptions. Verify against the actual [runtime context](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/function_types.dart) and [server invocation](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/server.dart), plus the function's real input/output tests.
+
 ```dart
 Client? _client;
 TablesDB? _tablesDB;
 
-void _ensureInit(dynamic context) {
-  final apiKey = (context.req.headers['x-appwrite-key'] ?? '') as String;
-
+void _ensureInit(String apiKey) {
   if (_client != null) {
     _client!.setKey(apiKey);
     return;
@@ -103,12 +98,22 @@ void _ensureInit(dynamic context) {
   _tablesDB = TablesDB(_client!);
 }
 
-Future<dynamic> main(final context) async {
-    _ensureInit(context);
+// Open Runtimes injects a context type private to its generated server.
+// ignore: avoid_annotating_with_dynamic
+Future<Object?> main(dynamic context) async {
+    // Direct Open Runtimes boundary; validate before entering typed code.
+    // ignore: avoid_dynamic_calls
+    final Object? apiKey = context.req.headers['x-appwrite-key'];
+    if (apiKey is! String || apiKey.isEmpty) {
+        throw StateError('Missing execution API key');
+    }
+    _ensureInit(apiKey);
     final rows = await _tablesDB!.listRows(
         databaseId: 'db', tableId: 'items',
         queries: [Query.limit(10)], total: false);
-    return context.res.json({'items': rows.rows});
+    // Open Runtimes owns the response transport.
+    // ignore: avoid_dynamic_calls
+    return context.res.json({'items': rows.rows.map((row) => row.toMap()).toList()});
 }
 ```
 
