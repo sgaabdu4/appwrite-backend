@@ -79,40 +79,9 @@ Init SDK + services **outside handler** (warm-start). Refresh dynamic API key ea
 
 ### Dart
 
-Open Runtimes constructs `RuntimeContext` in its generated server; the user function package cannot import that server's private package. Accept `Object rawContext` at `main`, return `Future<Object?>`, and adapt once to the project's typed request/response contract. Preserve an existing compatible adapter or package and the project's no-suppression policy; do not replace it with lint ignores. A nominal interface cast alone does not adapt the runtime object. Verify the adapter against the actual [runtime context](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/function_types.dart) and [server invocation](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/server.dart), including response serialization and error propagation; matching mocks alone are insufficient.
+Open Runtimes constructs `RuntimeContext` in its generated server; the user function package cannot import that private type. Use `Future<Object?> main(Object rawContext)`. Reuse an existing verified bridge when one exists. Otherwise, one local ABI boundary may perform only the dynamic operations necessary to read the private request, write logs, and serialize the private response. Document each operation-specific lint exception; file-wide ignores, nominal interface casts, and application-data casts through `dynamic` are invalid.
 
-Below, `adaptFunctionContext` is the project's verified boundary, not an Appwrite SDK export. `FunctionContext` exposes typed headers and JSON responses; its adapter maps response status to Open Runtimes' positional argument. Reuse that owner rather than introducing another wrapper.
-
-```dart
-Client? _client;
-TablesDB? _tablesDB;
-
-void _ensureInit(String apiKey) {
-  if (_client != null) {
-    _client!.setKey(apiKey);
-    return;
-  }
-
-  _client = Client()
-      .setEndpoint(Platform.environment['APPWRITE_FUNCTION_API_ENDPOINT']!)
-      .setProject(Platform.environment['APPWRITE_FUNCTION_PROJECT_ID']!)
-      .setKey(apiKey);
-  _tablesDB = TablesDB(_client!);
-}
-
-Future<Object?> main(Object rawContext) async {
-    final FunctionContext context = adaptFunctionContext(rawContext);
-    final String? apiKey = context.req.headers['x-appwrite-key'];
-    if (apiKey == null || apiKey.isEmpty) {
-        throw StateError('Missing execution API key');
-    }
-    _ensureInit(apiKey);
-    final rows = await _tablesDB!.listRows(
-        databaseId: 'db', tableId: 'items',
-        queries: [Query.limit(10)], total: false);
-    return context.res.json({'items': rows.rows.map((row) => row.toMap()).toList()});
-}
-```
+Convert request values immediately to typed application data, return typed application results to that boundary, and keep SDK, authorization, validation, and error handling free of runtime dynamic dispatch. Verify the boundary against the actual [runtime context](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/function_types.dart) and [server invocation](https://github.com/open-runtimes/open-runtimes/blob/main/runtimes/dart/versions/latest/src/server.dart) with real runtime HTTP requests: success, authorization rejection, missing/malformed input, upstream failure, response status/body/headers, and error/log secrecy. Matching mocks alone are insufficient.
 
 ### Python
 

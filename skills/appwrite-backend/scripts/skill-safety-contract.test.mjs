@@ -114,7 +114,7 @@ test('function execution parsing drift routes to a target-proven response-format
   assert.match(functionsAdvanced, /client configuration regression[\s\S]*real deployed target/u);
 });
 
-test('Dart Function references preserve typed runtime boundaries without suppressions', async () => {
+test('Dart Function references preserve an honest typed runtime boundary', async () => {
   const referenceFiles = (await readdir(new URL('references/', root))).filter((file) => file.endsWith('.md')).sort();
   const references = await Promise.all(
     referenceFiles.map(async (file) => ({
@@ -127,8 +127,7 @@ test('Dart Function references preserve typed runtime boundaries without suppres
       .map((match) => ({ file, code: match[1] }))
       .filter(({ code }) => /\bmain\s*\(|\bcontext\.res\./u.test(code)),
   );
-  const typedEntrypoint =
-    /Future<Object\?> main\(Object rawContext\) async \{\s+final FunctionContext context = adaptFunctionContext\(rawContext\);/u;
+  const functions = await text('references/functions.md');
 
   for (const expected of ['authentication.md', 'functions-advanced.md', 'functions.md']) {
     assert.ok(
@@ -142,14 +141,14 @@ test('Dart Function references preserve typed runtime boundaries without suppres
     assert.doesNotMatch(code, /^\s*\/\/\s*ignore(?:_for_file)?:/mu, file);
     assert.doesNotMatch(code, /\bstatusCode\s*:/u, file);
     if (/\bmain\s*\(/u.test(code)) {
-      assert.match(code, typedEntrypoint, `${file} must adapt raw runtime context once`);
-      assert.equal(
-        [...code.matchAll(/adaptFunctionContext\(rawContext\)/gu)].length,
-        1,
-        `${file} must adapt its raw runtime context exactly once`,
-      );
+      assert.match(code, /Future<Object\?> main\(Object rawContext\)/u, `${file} must accept the runtime as Object`);
     }
   }
+  assert.match(functions, /private type[\s\S]*`Future<Object\?> main\(Object rawContext\)`/u);
+  assert.match(functions, /operation-specific lint exception/u);
+  assert.match(functions, /file-wide ignores[\s\S]*nominal interface casts[\s\S]*application-data casts through `dynamic` are invalid/u);
+  assert.match(functions, /typed application data[\s\S]*typed application results/u);
+  assert.match(functions, /real runtime HTTP requests:[\s\S]*response status\/body\/headers[\s\S]*error\/log secrecy/u);
 });
 
 test('numeric schema distinguishes 32-bit integer from 64-bit bigint', async () => {
