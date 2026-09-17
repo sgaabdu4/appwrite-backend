@@ -39,7 +39,7 @@ Skill gives AI agents Appwrite dev guidance:
 - Direct CLI safety routing before every Appwrite CLI command or failure
 - Production schema guard: live inventory + baseline completeness before push
 - Production migration sequence: expand → resumable data/ACL backfill → compatible function → contract → exact read-back
-- Self-hosted Appwrite 1.9.x SDK pins: `dart_appwrite: 25.1.0`, Flutter `appwrite: 25.2.0`, `node-appwrite: 26.2.0`, web `appwrite: 26.1.0`, Python `appwrite: 21.0.0`, CLI `22.4.0`
+- Self-hosted Appwrite 1.9.x SDK pins: the release-matched [compatibility table](skills/appwrite-backend/references/self-hosting.md#release-matched-pins-for-appwrite-196)
 
 ## Reference Files
 

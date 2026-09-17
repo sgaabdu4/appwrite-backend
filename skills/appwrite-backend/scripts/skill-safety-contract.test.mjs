@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { readdir, readFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { copyFile, mkdtemp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import test from 'node:test';
 
 const root = new URL('../', import.meta.url);
@@ -75,7 +77,7 @@ test('CLI version, exact output, and API-key safety contracts stay explicit', as
   const [cli, selfHosting] = await Promise.all([text('references/appwrite-cli.md'), text('references/self-hosting.md')]);
   assert.match(selfHosting, /Appwrite 1\.9\.6[\s\S]*`appwrite-cli` \| `23\.0\.0`/u);
   assert.match(cli, /npm install -g appwrite-cli@25\.0\.0/u);
-  assert.match(cli, /Registry latest on 2026-07-31 = CLI\s+`25\.0\.0`/u);
+  assert.match(cli, /Registry latest observed on 2026-07-31 =\s+CLI `25\.0\.0`/u);
   assert.match(cli, /Never float automation/u);
   assert.match(cli, /`--json`\/`-j` = filtered presentation[\s\S]*drops null\/blank values and nested object\/array fields/u);
   assert.match(cli, /omitted field ≠ empty\/missing server value/u);
@@ -90,6 +92,60 @@ test('CLI version, exact output, and API-key safety contracts stay explicit', as
   assert.match(cli, /one bounded non-logging process/u);
   assert.match(cli, /Probe the actual consumer with the candidate key/u);
   assert.match(cli, /metadata output never proves the actual consumer received the secret/u);
+});
+
+test('Schema Safety Gate accepts the loaded skill directory in canonical and Hard Eng layouts', async (t) => {
+  const cli = await text('references/appwrite-cli.md');
+  const guard = new URL('appwrite-schema-guard.mjs', import.meta.url);
+  const documented = cli.match(
+    /node "\$APPWRITE_SKILL_DIR\/scripts\/appwrite-schema-guard\.mjs" check[\s\S]*?--baseline <BASELINE_APPWRITE_CONFIG>/u,
+  );
+  assert.ok(documented, 'Schema Safety Gate must document the variable-based check command');
+  const command = `${documented[0].replace(/\\\n\s*/gu, ' ').replace('<BASELINE_APPWRITE_CONFIG>', '"$3"')} --config "$1" --inventory "$2" --baseline "$3"`;
+
+  const inventory = {
+    capturedAt: new Date().toISOString(),
+    endpoint: 'https://example.invalid/v1',
+    projectId: 'project',
+    tablesDB: [{ $id: 'primary', enabled: true }],
+    tables: [{ $id: 'users', databaseId: 'primary', enabled: true, rowSecurity: false, $permissions: [], columns: [], indexes: [] }],
+  };
+  const valid = { ...inventory, tablesDB: [{ $id: 'primary' }], tables: [{ $id: 'users', databaseId: 'primary' }] };
+  const invalid = { ...valid, tables: [] };
+
+  for (const layout of ['skills/appwrite-backend', '.agents/skills/appwrite-backend']) {
+    const project = await mkdtemp(join(process.cwd(), '.appwrite skill path '));
+    t.after(() => rm(project, { recursive: true, force: true }));
+    const directory = join(project, layout);
+    const script = join(directory, 'scripts', 'appwrite-schema-guard.mjs');
+    await mkdir(join(directory, 'scripts'), { recursive: true });
+    await copyFile(guard, script);
+    const config = join(project, `${layout.replaceAll('/', '-')}.json`);
+    const broken = join(project, `${layout.replaceAll('/', '-')}-broken.json`);
+    const live = join(project, `${layout.replaceAll('/', '-')}-inventory.json`);
+    const baseline = join(project, `${layout.replaceAll('/', '-')}-baseline.json`);
+    await Promise.all([
+      writeFile(config, JSON.stringify(valid)),
+      writeFile(broken, JSON.stringify(invalid)),
+      writeFile(live, JSON.stringify(inventory)),
+      writeFile(baseline, JSON.stringify(valid)),
+    ]);
+    const environment = { ...process.env, APPWRITE_SKILL_DIR: directory };
+    const pass = spawnSync('sh', ['-c', command, 'schema-guard', config, live, baseline], { cwd: project, encoding: 'utf8', env: environment });
+    assert.equal(pass.status, 0, pass.stderr);
+    assert.match(pass.stdout, /"result":"PASS"/u);
+    const fail = spawnSync('sh', ['-c', command, 'schema-guard', broken, live, baseline], { cwd: project, encoding: 'utf8', env: environment });
+    assert.notEqual(fail.status, 0);
+    assert.match(fail.stderr, /destructive removal/u);
+    if (layout.startsWith('.agents/')) {
+      const oldPath = spawnSync(
+        'sh',
+        ['-c', 'node skills/appwrite-backend/scripts/appwrite-schema-guard.mjs check --config "$1" --inventory "$2" --baseline "$3"', 'schema-guard', config, live, baseline],
+        { cwd: project, encoding: 'utf8', env: environment },
+      );
+      assert.notEqual(oldPath.status, 0);
+    }
+  }
 });
 
 test('release-matched SDK pins require call-shape migration proof', async () => {
