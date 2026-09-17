@@ -131,16 +131,31 @@ test('Schema Safety Gate accepts the loaded skill directory in canonical and Har
       writeFile(baseline, JSON.stringify(valid)),
     ]);
     const environment = { ...process.env, APPWRITE_SKILL_DIR: directory };
-    const pass = spawnSync('sh', ['-c', command, 'schema-guard', config, live, baseline], { cwd: project, encoding: 'utf8', env: environment });
+    const pass = spawnSync('sh', ['-c', command, 'schema-guard', config, live, baseline], {
+      cwd: project,
+      encoding: 'utf8',
+      env: environment,
+    });
     assert.equal(pass.status, 0, pass.stderr);
     assert.match(pass.stdout, /"result":"PASS"/u);
-    const fail = spawnSync('sh', ['-c', command, 'schema-guard', broken, live, baseline], { cwd: project, encoding: 'utf8', env: environment });
+    const fail = spawnSync('sh', ['-c', command, 'schema-guard', broken, live, baseline], {
+      cwd: project,
+      encoding: 'utf8',
+      env: environment,
+    });
     assert.notEqual(fail.status, 0);
     assert.match(fail.stderr, /destructive removal/u);
     if (layout.startsWith('.agents/')) {
       const oldPath = spawnSync(
         'sh',
-        ['-c', 'node skills/appwrite-backend/scripts/appwrite-schema-guard.mjs check --config "$1" --inventory "$2" --baseline "$3"', 'schema-guard', config, live, baseline],
+        [
+          '-c',
+          'node skills/appwrite-backend/scripts/appwrite-schema-guard.mjs check --config "$1" --inventory "$2" --baseline "$3"',
+          'schema-guard',
+          config,
+          live,
+          baseline,
+        ],
         { cwd: project, encoding: 'utf8', env: environment },
       );
       assert.notEqual(oldPath.status, 0);
