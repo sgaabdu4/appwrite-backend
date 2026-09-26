@@ -13,7 +13,7 @@ const MAX_PAGES = 100;
 const MAX_ITEMS = 10_000;
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
 
-const DATABASE_FIELDS = new Set(['$id', '$createdAt', '$updatedAt', 'name', 'enabled', 'type', 'policies', 'archives']);
+const DATABASE_FIELDS = new Set(['$id', '$createdAt', '$updatedAt', 'name', 'enabled', 'type', 'policies', 'archives', 'status']);
 const TABLE_FIELDS = new Set([
   '$id',
   '$createdAt',
@@ -209,7 +209,13 @@ function lengths(value, label) {
   if (!Array.isArray(actual) || actual.some((item) => item !== null && (!Number.isSafeInteger(item) || item < 0))) {
     fail(`${label} must be an array of non-negative integers or null`);
   }
-  return [...actual];
+  return actual.every((item) => !item) ? [] : [...actual];
+}
+
+function bound(value) {
+  if (value === undefined || value === null) return null;
+  const number = Number(value);
+  return Math.abs(number) === 2 ** 63 ? null : number;
 }
 
 function ready(value, label) {
@@ -250,9 +256,9 @@ function normalizeColumn(raw, label) {
     size: nullable(value.size),
     format: nullable(value.format),
     default: nullable(value.default),
-    min: nullable(value.min),
-    max: nullable(value.max),
-    elements: value.elements === undefined ? null : stringArray(value.elements, [], `${label}.elements`, { sort: true }),
+    min: bound(value.min),
+    max: bound(value.max),
+    elements: value.elements == null ? null : stringArray(value.elements, [], `${label}.elements`, { sort: true }),
     encrypt: boolean(value.encrypt, false, `${label}.encrypt`),
     relatedTable: nullable(value.relatedTable ?? value.relatedTableId),
     relationType: nullable(value.relationType),
@@ -268,9 +274,6 @@ function normalizeIndex(raw, label) {
   knownFields(value, INDEX_FIELDS, label);
   ready(value, label);
   const key = value.key ?? value.$id;
-  if (value.key !== undefined && value.$id !== undefined && value.key !== value.$id) {
-    fail(`${label} has conflicting key and $id`);
-  }
   if (value.attributes !== undefined && value.columns !== undefined) {
     fail(`${label} has both attributes and columns`);
   }
@@ -557,7 +560,7 @@ function debugEndpoint(executable, options = {}) {
     failWithCleanup(`Appwrite CLI failed: client --debug exit=${String(result.status)}`, undefined, cleanupError);
   }
   const endpoint = String(result.stdout)
-    .match(/^endpoint\s+(.+)$/m)?.[1]
+    .match(/^endpoint\s*:?\s*(.+)$/m)?.[1]
     ?.trim();
   if (!endpoint) failWithCleanup('Appwrite CLI failed: client --debug missing endpoint', undefined, cleanupError);
   if (cleanupError) failCleanup(cleanupError);

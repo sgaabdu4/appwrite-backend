@@ -385,6 +385,59 @@ test('capture uses complete raw project, database, table, column, and index data
   assert.equal(inventory.tables[0].indexes[0].key, 'status_idx');
 });
 
+const appwrite22Fake = `
+if (joined === "client --debug") process.stdout.write("endpoint    : ${endpoint}\\n");
+else if (joined === "--raw project get") emit({$id:"${projectId}"});
+else if (joined.startsWith("--raw tables-db list --limit")) emit({total:1,databases:[{$id:"primary"}]});
+else if (joined === "--raw tables-db get --database-id primary") emit({$id:"primary",enabled:true,type:"tablesdb",status:"ready"});
+else if (joined.startsWith("--raw tables-db list-tables")) emit({total:1,tables:[{$id:"users"}]});
+else if (joined === "--raw tables-db get-table --database-id primary --table-id users") emit({
+  $id:"users",databaseId:"primary",enabled:true,rowSecurity:false,$permissions:[],
+  columns:[
+    {key:"status",type:"varchar",status:"available",error:"",required:false,array:false,size:64,default:null,encrypt:false},
+    {key:"rank",type:"integer",status:"available",error:"",required:false,array:false,min:"-9223372036854775808",max:"9223372036854775807",default:null}
+  ],
+  indexes:[{$id:"1_1_status_idx",key:"status_idx",type:"key",status:"available",error:"",attributes:["status"],lengths:[0],orders:[]}]
+});
+else process.exit(2);
+`;
+
+function pulledConfig() {
+  return JSON.parse(`{
+    "projectId": "${projectId}",
+    "endpoint": "${endpoint}",
+    "tablesDB": [{"$id": "primary", "name": "primary", "enabled": true}],
+    "tables": [{
+      "$id": "users", "$permissions": [], "databaseId": "primary", "name": "users", "enabled": true, "rowSecurity": false,
+      "columns": [
+        {"key": "status", "type": "varchar", "required": false, "array": false, "size": 64, "default": null, "encrypt": false},
+        {"key": "rank", "type": "integer", "required": false, "array": false, "default": null,
+          "min": -9223372036854775808, "max": 9223372036854775807}
+      ],
+      "indexes": [{"key": "status_idx", "type": "key", "status": "available", "columns": ["status"], "orders": []}]
+    }]
+  }`);
+}
+
+test('Appwrite 2.2 capture round-trips against its pulled config', () => {
+  const directory = root();
+  const inventory = captureInventory(pulledConfig(), fakeCli(directory, appwrite22Fake));
+  const saved = JSON.parse(JSON.stringify(inventory));
+  assert.deepEqual(checkManifest(pulledConfig(), saved).additiveChanges, []);
+  const retyped = changed(pulledConfig(), (config) => {
+    config.tables[0].columns[0].type = 'text';
+  });
+  assert.throws(() => checkManifest(retyped, saved), /incompatible column change/);
+  const bounded = changed(pulledConfig(), (config) => {
+    config.tables[0].columns[1].min = 0;
+  });
+  assert.throws(() => checkManifest(bounded, saved), /incompatible column change/);
+  const prefixed = changed(pulledConfig(), (config) => {
+    config.tables[0].indexes[0].lengths = [16];
+  });
+  assert.throws(() => checkManifest(prefixed, saved), /incompatible index change/);
+});
+
 test('CLI deadline fails closed', () => {
   const directory = root();
   const executable = fakeCli(directory, 'setTimeout(() => {}, 1000);');
