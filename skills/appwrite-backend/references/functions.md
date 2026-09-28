@@ -267,7 +267,7 @@ Use variables for configuration + secrets; never track values in source/manifest
 - deployment workflow = validate candidate → upsert metadata → deploy → smoke
 - multi-resource bootstrap → [dependency-aware bounded waves](performance.md#dependency-aware-bootstrap)
 
-CLI workflow → [appwrite-cli.md](appwrite-cli.md#function--site-variables).
+Agent variable operations → [mcp-servers.md](mcp-servers.md#capability--credential-boundaries).
 Production sequencing → [production-migrations.md](production-migrations.md#function--variable-cutover).
 
 ```dart
