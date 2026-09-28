@@ -10,7 +10,7 @@
 ## Installation
 
 ```bash
-npx skills add https://github.com/sgaabdu4/appwrite-backend --skill appwrite-backend
+pnpm dlx skills add https://github.com/sgaabdu4/appwrite-backend --agent claude-code codex --skill appwrite-backend
 ```
 
 ## What's Included
@@ -34,10 +34,9 @@ Skill gives AI agents Appwrite dev guidance:
 - Resumable fixed-point workflows when work cannot fit one atomic request/transaction
 - Cursor pagination, perf
 - Query.select() relationship expansion
-- Type-safe SDK gen `appwrite generate`
-- Official SDK packages only; raw Appwrite HTTP is a violation
-- Direct CLI safety routing before every Appwrite CLI command or failure
-- Production schema guard: live inventory + baseline completeness before push
+- Official SDK packages for application code; MCP for agent operations
+- MCP target binding, scoped authorization, and exact operation discovery
+- Production schema safety: complete live inventory + explicit destructive scope
 - Production migration sequence: expand → resumable data/ACL backfill → compatible function → contract → exact read-back
 - Self-hosted Appwrite 1.9.x SDK pins: the release-matched [compatibility table](skills/appwrite-backend/references/self-hosting.md#release-matched-pins-for-appwrite-196)
 
@@ -57,16 +56,14 @@ Skill gives AI agents Appwrite dev guidance:
 | Realtime | [realtime.md](skills/appwrite-backend/references/realtime.md) |
 | Performance | [performance.md](skills/appwrite-backend/references/performance.md) |
 | Error Handling | [error-handling.md](skills/appwrite-backend/references/error-handling.md) |
-| CLI + Schema Safety | [appwrite-cli.md](skills/appwrite-backend/references/appwrite-cli.md) |
+| MCP Operations + Setup | [mcp-servers.md](skills/appwrite-backend/references/mcp-servers.md) |
 
 Full list → [SKILL.md](skills/appwrite-backend/SKILL.md).
 
-## Compatible Agents
+## Supported Agents
 
 - [Claude Code](https://code.claude.com/)
-- [Cursor](https://cursor.sh/)
-- [Windsurf](https://windsurf.ai/)
-- Any agent on [Agent Skills](https://agentskills.io/) standard
+- [Codex](https://developers.openai.com/codex/)
 
 ## Usage
 

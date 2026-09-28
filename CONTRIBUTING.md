@@ -15,7 +15,7 @@ Thanks for contributing! Guidelines below.
 1. **Fork** repo
 2. **Create branch** (`git checkout -b feature/add-new-pattern`)
 3. **Make changes** per guidelines below
-4. **Test** with Claude Code, Cursor, or other agent
+4. **Test** with Claude Code or Codex
 5. **Submit PR** with clear desc
 
 ## Guidelines
