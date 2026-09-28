@@ -76,7 +76,7 @@ test('schema guard binds complete destructive and access state', async () => {
 test('CLI version, exact output, and API-key safety contracts stay explicit', async () => {
   const [cli, selfHosting] = await Promise.all([text('references/appwrite-cli.md'), text('references/self-hosting.md')]);
   assert.match(selfHosting, /Appwrite 1\.9\.6[\s\S]*`appwrite-cli` \| `23\.0\.0`/u);
-  assert.match(cli, /npm install -g appwrite-cli@25\.0\.0/u);
+  assert.match(cli, /pnpm add --global appwrite-cli@25\.0\.0/u);
   assert.match(cli, /Registry latest observed on 2026-07-31 =\s+CLI `25\.0\.0`/u);
   assert.match(cli, /Never float automation/u);
   assert.match(cli, /`--json`\/`-j` = filtered presentation[\s\S]*drops null\/blank values and nested object\/array fields/u);

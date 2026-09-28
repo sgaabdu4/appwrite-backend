@@ -15,12 +15,13 @@ test("quality workflow runs every configured test", async () => {
   assert.match(workflow, /\non:\n  push:\n  pull_request:/u);
   assert.match(workflow, /permissions:\n  contents: read/u);
   assert.match(workflow, /actions\/checkout@v6/u);
-  assert.match(workflow, /actions\/setup-node@v7/u);
-  assert.match(workflow, /node-version: 26/u);
-  assert.match(workflow, /package-manager-cache: false/u);
+  assert.match(workflow, /pnpm\/setup@703c52620218391530e48b9e8870d5c0082e1b9b/u);
+  assert.match(workflow, /version: latest/u);
+  assert.match(workflow, /runtime: node@26/u);
+  assert.match(workflow, /install: false/u);
 
   const formattingCheck = [
-    "npx --yes @biomejs/biome@2.5.11 check",
+    "pnpm dlx --package=@biomejs/biome@2.5.11 biome check",
     "--vcs-enabled=false",
     "--linter-enabled=false",
     "--assist-enabled=false",

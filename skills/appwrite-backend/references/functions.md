@@ -58,7 +58,7 @@ Runtime SDK floor binds the whole pubspec, dev dependencies included:
 **Bundle interpreted languages** to single file:
 
 ```bash
-npx esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js
+pnpm dlx esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js
 ```
 
 **Keep deps minimal.** Every dep adds cold start time.

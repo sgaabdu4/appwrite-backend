@@ -24,9 +24,12 @@ when the pinned CLI already provides the exact proven operation is YAGNI.
 
 ## Install + Maintain
 
+Prerequisite = pnpm installed; run `pnpm setup` once and reload the shell so
+`$PNPM_HOME/bin` is on `PATH`.
+
 ```shell
-npm view appwrite-cli version
-npm install -g appwrite-cli@25.0.0
+pnpm view appwrite-cli version
+pnpm add --global appwrite-cli@25.0.0
 appwrite --version
 appwrite completion install
 ```

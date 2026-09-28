@@ -10,7 +10,7 @@
 ## Installation
 
 ```bash
-npx skills add https://github.com/sgaabdu4/appwrite-backend --skill appwrite-backend
+pnpm dlx skills add https://github.com/sgaabdu4/appwrite-backend --agent claude-code codex --skill appwrite-backend
 ```
 
 ## What's Included
