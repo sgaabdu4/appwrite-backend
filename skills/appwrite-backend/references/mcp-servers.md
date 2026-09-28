@@ -43,16 +43,14 @@ exec uvx mcp-server-appwrite "$@"
 
 ## Harness Wiring
 
-No single config file serves every harness. One pointer per harness, each aimed at the launcher; on Cloud each carries the remote URL instead.
+Claude and Codex each point to the launcher; on Cloud each carries the remote URL instead.
 
 | Harness | Committed file | Shape |
 |---|---|---|
-| Claude Code + Copilot agent host/CLI | `.mcp.json` | `mcpServers.appwrite` = `"type": "stdio"` + `"command": "./scripts/appwrite-mcp"` |
-| Copilot chat in VS Code | `.vscode/mcp.json` | `servers.appwrite` = `"type": "stdio"` + `"command": "${workspaceFolder}/scripts/appwrite-mcp"` |
-| OpenCode | `opencode.json` | `mcp.appwrite` = `"type": "local"` + `"command": ["./scripts/appwrite-mcp"]`; Cloud = `"type": "remote"` + `url` |
+| Claude Code | `.mcp.json` | `mcpServers.appwrite` = `"type": "stdio"` + `"command": "./scripts/appwrite-mcp"` |
 | Codex | `.codex/config.toml` | `[mcp_servers.appwrite]` + `command = "./scripts/appwrite-mcp"`; loads only when the repository is trusted, and overrides a same-named global server |
 
-- Committed configs carry relative paths or `${workspaceFolder}` only; absolute home paths, emails, project IDs, and keys stay out.
+- Committed configs carry relative paths only; absolute home paths, emails, project IDs, and keys stay out.
 - Codex trust is per machine: the repository path needs `[projects."<absolute-repo>"] trust_level = "trusted"` in `~/.codex/config.toml`, written by answering yes on first run in that directory. Untrusted repository = project file silently ignored.
 - `codex mcp add` writes the global `~/.codex/config.toml` and leaks one repository's server into every other repository; prefer the project file and keep the global command only as a documented fallback.
 - `codex mcp list` and `codex doctor` read the merged view from the current directory; run them inside the repository, and treat a server missing there as untrusted rather than unconfigured.
@@ -63,7 +61,6 @@ No single config file serves every harness. One pointer per harness, each aimed 
 
 - Exposed tools = `appwrite_get_context` + `appwrite_search_tools` + `appwrite_call_tool`; the full service catalog is hidden behind search and call rather than registered individually.
 - Mutating calls require `confirm_write=true`; that flag is the only thing between an agent and live production data.
-- First connection prompts once per harness (Claude Code approval, VS Code trust, OpenCode OAuth on Cloud).
 
 ## Documentation Search
 

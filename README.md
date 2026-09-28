@@ -61,12 +61,10 @@ Skill gives AI agents Appwrite dev guidance:
 
 Full list → [SKILL.md](skills/appwrite-backend/SKILL.md).
 
-## Compatible Agents
+## Supported Agents
 
 - [Claude Code](https://code.claude.com/)
-- [Cursor](https://cursor.sh/)
-- [Windsurf](https://windsurf.ai/)
-- Any agent on [Agent Skills](https://agentskills.io/) standard
+- [Codex](https://developers.openai.com/codex/)
 
 ## Usage
 
