@@ -1,3 +1,8 @@
-.codebase/*
-.codebase-memory/*
 .DS_Store
+.git/
+__pycache__/
+.hard-eng/
+.claude/worktrees/
+coverage/
+.coverage
+.coverage.*

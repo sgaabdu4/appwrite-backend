@@ -1,12 +1,102 @@
 {
-  "schema_version": 1,
-  "families": {
-    "tests": [
-      "node",
-      "--test",
-      "skills/appwrite-backend/scripts/appwrite-query-contract.test.mjs",
-      "skills/appwrite-backend/scripts/skill-safety-contract.test.mjs",
-      ".github/workflows/quality-contract.test.mjs"
-    ]
+  "version": 1,
+  "packages": [],
+  "shared": [
+    {
+      "name": "skill-format",
+      "command": [
+        "biome",
+        "check",
+        "--vcs-enabled=false",
+        "--linter-enabled=false",
+        "--assist-enabled=false",
+        "--indent-style=space",
+        "--line-width=140",
+        "--javascript-formatter-quote-style=single",
+        "skills/appwrite-backend/scripts"
+      ]
+    },
+    {
+      "name": "skill-contracts",
+      "command": [
+        "node",
+        "--test",
+        "skills/appwrite-backend/scripts/appwrite-query-contract.test.mjs",
+        "skills/appwrite-backend/scripts/skill-safety-contract.test.mjs",
+        ".github/workflows/quality-contract.test.mjs"
+      ]
+    },
+    {
+      "name": "secrets-files",
+      "role": "secrets-files",
+      "parallel": true,
+      "command": [
+        "gitleaks",
+        "dir",
+        ".",
+        "--redact=100",
+        "--no-banner",
+        "--report-format",
+        "sarif",
+        "--report-path",
+        "coverage/gitleaks-files.sarif"
+      ],
+      "report": {
+        "type": "gitleaks",
+        "path": "coverage/gitleaks-files.sarif"
+      }
+    },
+    {
+      "name": "secrets-history",
+      "role": "secrets-history",
+      "parallel": true,
+      "command": [
+        "gitleaks",
+        "git",
+        ".",
+        "--redact=100",
+        "--no-banner",
+        "--log-opts=--all",
+        "--report-format",
+        "sarif",
+        "--report-path",
+        "coverage/gitleaks-history.sarif"
+      ],
+      "report": {
+        "type": "gitleaks",
+        "path": "coverage/gitleaks-history.sarif"
+      }
+    },
+    {
+      "name": "actionlint",
+      "role": "workflows",
+      "parallel": true,
+      "command": [
+        "actionlint",
+        "-no-color"
+      ]
+    },
+    {
+      "name": "zizmor",
+      "role": "ci-security",
+      "parallel": true,
+      "command": [
+        "zizmor",
+        "--strict-collection",
+        "--persona=auditor",
+        "--format=plain",
+        "."
+      ]
+    }
+  ],
+  "shipping": {
+    "base": "master",
+    "checks": [
+      "Tests"
+    ],
+    "ui_paths": [],
+    "ci_seconds": 180,
+    "pre_push_seconds": 180,
+    "delivery": []
   }
 }
