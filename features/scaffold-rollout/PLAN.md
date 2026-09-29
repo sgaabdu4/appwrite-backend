@@ -1,6 +1,6 @@
 # Hard Eng 7eebdaf3 scaffold rollout
 
-Status: Ready
+Status: Complete
 
 ## Outcome + scope
 
@@ -19,8 +19,8 @@ Authority: The user authorized scaffold adoption and a dependency refresh delive
 ## Acceptance + steps
 
 - [x] Hard Eng setup installs revision `7eebdaf3` → `.hooks/hard-eng-source.json` records it and setup validation reports no problems.
-- [ ] Dependencies are current where the repository owns them → Hard Eng-shipped skill manifests and Hard Eng-standardized workflow action pins stay at the scaffold's versions.
-- [ ] The full gate passes against `origin/master` with existing contracts, formatting, secret scans, actionlint and zizmor unchanged.
+- [x] Dependencies are current where the repository owns them → Hard Eng-shipped skill manifests and Hard Eng-standardized workflow action pins stay at the scaffold's versions.
+- [x] The full gate passes against `origin/master` with existing contracts, formatting, secret scans, actionlint and zizmor unchanged.
 
 ## Baseline + execution
 
@@ -38,8 +38,8 @@ N/A — this change affects repository tooling only; it has no rendered applicat
 
 ## Verification
 
-Result: Pending
-Evidence: Pending full gate.
+Result: Passed
+Evidence: `check --base origin/master --plan-stage Ready` passed in 12.3 seconds: all 27 Node contracts, three-file Biome formatting, current-file and branch-history secret scans, actionlint, and strict zizmor (longest check 3.3 seconds). The check list is unchanged at six shared checks; there is no `project-typecheck` wrapper or package `depends_on` to review. `pnpm/setup` stays at v2.1.0 although v3.0.0 exists, because Hard Eng 7eebdaf3 standardizes on v2.1.0; checkout v7.0.1 and cache v6.1.0 are current.
 E2E: N/A — no application runtime is deployed by this repository; native contract execution verifies the affected interface.
 
 Delivery target: Merge
