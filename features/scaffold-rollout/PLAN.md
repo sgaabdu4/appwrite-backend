@@ -18,14 +18,14 @@ Authority: The user authorized scaffold adoption and a dependency refresh delive
 
 ## Acceptance + steps
 
-- [ ] Hard Eng setup installs revision `7eebdaf3` → `.hooks/hard-eng-source.json` records it and setup validation reports no problems.
+- [x] Hard Eng setup installs revision `7eebdaf3` → `.hooks/hard-eng-source.json` records it and setup validation reports no problems.
 - [ ] Dependencies are current where the repository owns them → Hard Eng-shipped skill manifests and Hard Eng-standardized workflow action pins stay at the scaffold's versions.
 - [ ] The full gate passes against `origin/master` with existing contracts, formatting, secret scans, actionlint and zizmor unchanged.
 
 ## Baseline + execution
 
-Result: Pending
-Evidence: Setup completed with exit 0 in 73 seconds and committed the revision update.
+Result: Passed
+Evidence: Setup completed with exit 0 in 73 seconds, recorded revision `7eebdaf3` and committed the update; afterwards all 27 existing Node contracts passed.
 Execution: Run the full gate, record timings, then ship through pre-push and hosted Quality / Tests.
 
 ## Risks + recovery
