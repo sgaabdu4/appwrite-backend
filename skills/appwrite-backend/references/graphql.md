@@ -125,7 +125,7 @@ Appwrite API limits apply.
 
 ## SDK Usage
 
-Use official SDK service clients. Do not hand-roll Appwrite HTTP calls in TypeScript, Dart, Flutter, Python, or shell.
+Send GraphQL through the official SDK `Graphql` service. Raw Appwrite HTTP follows [SKILL.md](../SKILL.md) invariant 1.
 
 ---
 

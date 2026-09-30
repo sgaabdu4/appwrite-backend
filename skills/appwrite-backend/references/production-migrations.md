@@ -60,10 +60,7 @@
 
 ## Transaction Boundary
 
-- All staged reads/writes that must observe each other carry the same `transactionId` and client context.
-- Helper/store with an independent TablesDB client can read pre-transaction state → forbidden inside one invariant.
-- Commit conflict → re-read source state + rebuild operations; replaying stale decisions = forbidden.
-- Schema + Auth + Storage + Functions stay outside TablesDB transaction → name compensation and reconciliation owners.
+Shared `transactionId` + client context, commit-conflict rebuild, and the owners for schema/Auth/Storage/Functions outside the transaction = [transactions.md](transactions.md).
 
 ## Function + Variable Cutover
 

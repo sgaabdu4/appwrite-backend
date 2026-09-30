@@ -219,7 +219,7 @@ tables_db.create_row(
 
 ## Upsert
 
-Create or update one call. Exist → update. Else → create.
+Create or update one call. Exist → update. Else → create. Use only when create-on-missing is valid; update-only work never upserts ([bulk-operations.md](bulk-operations.md#update-only-guard)).
 
 ```dart
 // Dart - Upsert row
@@ -235,11 +235,6 @@ await tablesDB.upsertRow(
 ```
 
 Python `upsert_row()`, TypeScript `upsertRow()` — same params.
-
-**Benefits:**
-- One network call
-- No race
-- Cleaner (no if-exists)
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: appwrite-backend
-description: Appwrite SDK development and MCP-only agent operations, including production migrations, destructive account/data erasure, and MCP server wiring for Claude and Codex.
+description: Appwrite SDK development, self-hosting, and MCP-only agent operations, including production migrations, destructive account/data erasure, and MCP server wiring for Claude and Codex.
 license: MIT
 metadata:
   author: sgaabdu4
@@ -17,8 +17,8 @@ Load the owner before acting. Unlisted detail = read the owner, never infer.
 | Trigger | Owner |
 |---|---|
 | Any agent operation against Appwrite, MCP server setup, or Appwrite documentation lookup | [mcp-servers](references/mcp-servers.md) |
-| Production schema/data/ACL/function cutover | [production-migrations](references/production-migrations.md) |
-| TablesDB transaction or cross-service consistency | [transactions](references/transactions.md) + [permissions](references/permissions.md) |
+| Production schema/data/ACL/function cutover | [production-migrations](references/production-migrations.md) + [transactions](references/transactions.md) when writes share a transaction |
+| TablesDB transaction or cross-service consistency | [transactions](references/transactions.md) + [permissions](references/permissions.md) when ACLs change |
 | Permanent account/subject-data erasure across TablesDB, Auth, Storage, provider data, or retained audit evidence | [destructive-erasure](references/destructive-erasure.md) + [transactions](references/transactions.md) |
 | Mass row create/update/upsert/delete, transaction-limit pressure, per-row write loop | [bulk-operations](references/bulk-operations.md) + [transactions](references/transactions.md) when atomic scope spans requests/tables |
 | Filter by more IDs than the deployed `Query.equal()` value cap | [chunked-queries](references/chunked-queries.md) |
@@ -30,7 +30,7 @@ Load the owner before acting. Unlisted detail = read the owner, never infer.
 | Slow path, caching, delta sync, bootstrap ordering | [performance](references/performance.md) |
 | Bandwidth, execution, or storage cost | [cost-optimization](references/cost-optimization.md) |
 | Sessions, MFA, SSR auth, JWT, user labels, security settings | [authentication](references/authentication.md) |
-| OAuth, magic link, email OTP, phone, anonymous, custom token | [auth-methods](references/auth-methods.md) |
+| OAuth, magic link, email OTP, phone, anonymous, custom token, email verification, password recovery, session list/delete, user preferences | [auth-methods](references/auth-methods.md) |
 | ACL design, lockout, public-leak suspicion | [permissions](references/permissions.md) |
 | Team, membership, or multi-tenancy | [teams](references/teams.md) |
 | Upload, download, preview, transform, bucket config | [storage-files](references/storage-files.md) |
@@ -41,7 +41,7 @@ Load the owner before acting. Unlisted detail = read the owner, never infer.
 | Push, email, or SMS delivery | [messaging](references/messaging.md) |
 | Outbound event delivery to an external system | [webhooks](references/webhooks.md) |
 | Avatar, initials, QR, flag, favicon | [avatars](references/avatars.md) |
-| `429`, retry, typed error, timeout, code-zero transport failure, client request burst, partial-sync report | [error-handling](references/error-handling.md) + [performance](references/performance.md) |
+| `429`, retry, typed error, timeout, code-zero transport failure, client request burst, partial-sync report | [error-handling](references/error-handling.md) + [performance](references/performance.md) for startup/bootstrap request bursts |
 | Platform ceiling or limit error | [limits](references/limits.md) |
 | Country, currency, language, or geo lookup | [locale](references/locale.md) |
 | GraphQL endpoint | [graphql](references/graphql.md) |

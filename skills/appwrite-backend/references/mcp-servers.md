@@ -2,7 +2,7 @@
 
 ## Contract
 
-- MCP is the sole interface for agent operations against Appwrite. SDK examples elsewhere describe application implementation, not an alternate operational path.
+- Agent operations = MCP only ([SKILL.md](../SKILL.md) invariant 1). SDK examples elsewhere describe application implementation, not an alternate operational path.
 - Server choice = deployed endpoint, never preference; wrong choice authenticates against the wrong instance and reads nothing.
 - Cloud project (`cloud.appwrite.io` or `*.cloud.appwrite.io`) = hosted remote server `https://mcp.appwrite.io/`, HTTP transport + OAuth, no key stored.
 - Self-hosted instance (any other domain) = local stdio server `uvx mcp-server-appwrite` + API key. The hosted server authenticates against Appwrite Cloud only and can never reach a self-hosted instance.
@@ -35,7 +35,7 @@ flowchart TD
 ## Capability + Credential Boundaries
 
 - Hosted OAuth includes console/organization/project operations permitted by its grant. Self-hosted API-key stdio exposes project-key-compatible operations only; Projects/key management and other console administration are unavailable there.
-- Missing tool, unsupported field, insufficient scope, unavailable full result, or incompatible deployed API → report the exact blocker. No Appwrite command-line, direct SDK, or raw HTTP fallback for agent operations.
+- Missing tool, unsupported field, insufficient scope, unavailable full result, or incompatible deployed API → report the exact blocker; [SKILL.md](../SKILL.md) invariant 1 allows no fallback.
 - Hosted uploads cannot read local paths; use only a supported bounded inline input or already-authorized URL. Stdio can read local files. Never publish private source or secrets merely to obtain an upload URL; unavailable safe transfer = capability gap.
 - API-key scopes come from every real consumer call, never a full-scope default. `401` → verify endpoint/project/credential; `403` → compare required scopes with the authorized operation before widening access.
 - Self-hosted initial key creation requires the user's Appwrite Console action; do not bypass the missing MCP control-plane capability.

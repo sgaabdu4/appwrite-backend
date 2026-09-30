@@ -16,12 +16,12 @@ import 'package:appwrite/enums.dart';
 
 // Create TOTP authenticator
 final totp = await account.createMFAAuthenticator(type: AuthenticatorType.totp);
-// totp.secret - Base32 secret for authenticator app
-// totp.uri - OTP auth URI for QR code
 
 // Verify TOTP to activate
 await account.updateMFAAuthenticator(type: AuthenticatorType.totp, otp: '123456');
 ```
+
+`totp.secret` = Base32 secret for the authenticator app; `totp.uri` = OTP auth URI for the QR code.
 
 ### MFA Challenge Flow
 
@@ -304,14 +304,14 @@ client-SDK executions. Its payload carries exactly `userId` + `sessionId` +
 - payload claims alone = untrusted identity → validate the token with `Account(client).get()` and assert `user.$id == claims.userId` before authorizing anything
 - project with the JWT auth method disabled → `account.createJWT()` / `/account/jwts` returns `501`; the injected function JWT is unaffected
 
+`FunctionContext` + `adaptFunctionContext` below = the verified project boundary in [functions.md](functions.md#dart).
+
 ```dart
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_appwrite/dart_appwrite.dart';
 
-// `FunctionContext` and `adaptFunctionContext` are the verified project
-// boundary described in functions.md.
 final class UserJwtClaims {
   const UserJwtClaims({required this.userId, required this.sessionId});
 
@@ -381,6 +381,7 @@ Console → Auth → Security:
 | Personal data | Block name/email in password |
 | Session limits | Max sessions per user |
 | Session length | Default session duration |
+| Session alerts | Email the user when a new session is created |
 
 ---
 

@@ -140,7 +140,7 @@ final client = Client()
 | 404 | Not found | Verify resource exists |
 | 409 | Conflict | ID collision **or** unique-index violation — see below |
 | 429 | Rate limited | Backoff |
-| 500 | Server error | Retry, contact support |
+| 500 | Server error | Idempotent read → retry via [coordinator](#client-request-coordination); write → reconcile before any repeat |
 
 ### 409 `row_already_exists`
 

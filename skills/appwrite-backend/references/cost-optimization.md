@@ -50,13 +50,11 @@ functions.create_execution(
 
 ## Image Transformation Cache
 
-Appwrite caches transformed images. Identical URLs = cache hit.
+Appwrite caches transformed images. Identical URLs = cache hit: the first request computes the preview, repeats are served from cache at minimal cost.
 
 ```dart
 import 'package:dart_appwrite/enums.dart';
 
-// First request: computed
-// Second request: cached (minimal cost)
 storage.getFilePreview(bucketId: 'img', fileId: 'id', width: 400, output: ImageFormat.webp);
 ```
 

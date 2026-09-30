@@ -210,7 +210,7 @@ final sessions = await account.listSessions();
 // Delete specific session
 await account.deleteSession(sessionId: 'session-id');
 
-// Delete all except current
+// Delete every session, current included (signs this client out)
 await account.deleteSessions();
 
 // Get current
@@ -221,21 +221,11 @@ final current = await account.getSession(sessionId: 'current');
 
 ## User Preferences
 
-Store user settings (max 64KB).
+Store user settings (max 64KB). `updatePrefs` replaces the stored object → merge with `getPrefs()` before a partial change. Session alerts = project setting in [authentication.md](authentication.md#security-settings), not a preference.
 
 ```dart
 await account.updatePrefs(prefs: {'theme': 'dark', 'notifications': true});
 final prefs = await account.getPrefs();
-```
-
----
-
-## Session Alerts
-
-Notify user on new session from unknown device/location.
-
-```dart
-await account.updatePrefs(prefs: {'sessionAlerts': true});
 ```
 
 ---

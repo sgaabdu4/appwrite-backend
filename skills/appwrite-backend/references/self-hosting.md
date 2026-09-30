@@ -57,7 +57,7 @@ Database = PostgreSQL (new `2.x` default), MariaDB, or MongoDB; fixed at install
 - Repository pin wins only after server line + real call shapes are proven.
 - Pin change = every intervening changelog → service-call/result-access inventory → breaking signature/model migration → exact isolated dependency resolution → owned tests → read-only target probe.
 - Python `16.0.0+` = typed Pydantic models, not dictionaries; requirements-only upgrade leaves `result["total"]` + `result["$id"]` callers broken.
-- Raw HTTP to Appwrite APIs = violation.
+- Raw Appwrite HTTP instead of migrating SDK call shapes = violation unless [SKILL.md](../SKILL.md) invariant 1 allows it.
 
 Source: [installation + SDK version compatibility](https://appwrite.io/docs/advanced/self-hosting/installation) · [databases](https://appwrite.io/docs/advanced/self-hosting/configuration/databases)
 

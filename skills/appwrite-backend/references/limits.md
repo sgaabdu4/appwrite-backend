@@ -57,19 +57,7 @@ await tablesDB.updateRow(
 
 ### Session Limit Behavior
 
-Over limit → oldest session auto-deleted.
-
-```dart
-// Check active sessions
-final sessions = await account.listSessions();
-print('Active: ${sessions.sessions.length}');
-
-// Delete specific session
-await account.deleteSession(sessionId: 'session_id');
-
-// Delete every session, current included (signs this client out)
-await account.deleteSessions();
-```
+Over limit → oldest session auto-deleted. List/delete calls → [auth-methods.md](auth-methods.md#session-management).
 
 ---
 
@@ -97,13 +85,15 @@ await storage.createFile(
 
 ### Encryption/Compression Limits
 
-```dart
-// Files >20MB: Appwrite skips encryption even if the bucket enables it
-// Files >20MB: Appwrite skips compression even if the bucket enables it
+Files >20MB skip bucket encryption + compression even when the bucket enables them. Sensitive large file → encrypt before upload:
 
-// For sensitive large files, encrypt before upload
-final encrypted = await encryptLocally(largeFile);
-await storage.createFile(file: InputFile.fromBuffer(encrypted));
+```dart
+final List<int> encrypted = await encryptLocally(largeFile);
+await storage.createFile(
+    bucketId: 'uploads',
+    fileId: ID.unique(),
+    file: InputFile.fromBytes(bytes: encrypted, filename: 'archive.enc'),
+);
 ```
 
 ---

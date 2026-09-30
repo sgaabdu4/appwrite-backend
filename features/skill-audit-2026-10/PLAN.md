@@ -4,9 +4,9 @@ Status: Ready
 
 ## Outcome + scope
 
-The skill's code examples, versions, links and rules match the current SDKs/packages and agree with each other and with Hard Eng's shared rules. Fixes the findings of the 2026-10-01 multi-model skill audit, each re-verified against its primary source before editing.
+The skill's code examples, versions, links and rules match the current SDKs/packages and agree with each other and with Hard Eng's shared rules. Fixes the findings of the 2026-10-01 multi-model skill audit, each re-verified against its primary source before editing. The package also meets the `writing-great-skills` checklist: one owner per rule, every reference routed with a load condition.
 
-Non-goals: new features, restructuring the skill, or changing unrelated guidance.
+Non-goals: new features, restyling passing text, or changing unrelated guidance.
 
 ## Repository context
 
@@ -25,6 +25,8 @@ Authority: Autonomous. The user asked to make every recommended audit change, re
 - [ ] Error handling, chunking and pagination examples keep write intent, bound concurrency and return complete results → consistent with `error-handling.md` rules.
 - [ ] Agent operations stay MCP-only; no CLI/SDK fallback remains in agent guidance → grep.
 - [ ] Every appwrite.io link returns 200 → GET check.
+- [ ] ID chunk sizing respects both the `Query.equal()` value cap and the 4096-char query limit → 2.3.0 source.
+- [ ] Contradictory or duplicated rules have one owner (raw HTTP, session deletion, prefs replacement, 500 handling, upsert scope, transaction client, MCP-only) and every relative/`#anchor` link resolves → link check.
 - [ ] `python3 .hooks/hard-eng.py check` passes, including `skill-contracts`.
 
 ## Baseline + execution

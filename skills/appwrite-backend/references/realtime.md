@@ -260,7 +260,7 @@ Realtime fires for bulk ops too.
 
 ```dart
 // Bulk update triggers events for each affected row
-await tablesdb.updateRows(
+await tablesDB.updateRows(
     databaseId: 'main',
     tableId: 'products',
     queries: [Query.equal('category', 'electronics')],
@@ -273,13 +273,7 @@ await tablesdb.updateRows(
 
 ## Permissions
 
-Users get events only for resources they can read.
-
-```dart
-// User A subscribes to orders
-// User B creates order with permissions for User B only
-// User A receives nothing - no permission
-```
+Users get events only for resources they can read: when User B creates an order readable only by User B, User A's subscription to orders receives nothing.
 
 ---
 
@@ -314,7 +308,7 @@ Make version row, subscribe to it instead of poll. Re-fetch on version update.
 
 ```dart
 // 1. Create a version row (one per table/resource group)
-await tablesdb.createRow(
+await tablesDB.createRow(
     databaseId: 'main',
     tableId: 'versions',
     rowId: 'products-version',
@@ -335,7 +329,7 @@ subscription.stream.listen((event) {
 });
 
 // 4. Bump version when products change (server-side function)
-await tablesdb.updateRow(
+await tablesDB.updateRow(
     databaseId: 'main',
     tableId: 'versions',
     rowId: 'products-version',

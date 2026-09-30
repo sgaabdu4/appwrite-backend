@@ -38,7 +38,7 @@ Skill gives AI agents Appwrite dev guidance:
 - MCP target binding, scoped authorization, and exact operation discovery
 - Production schema safety: complete live inventory + explicit destructive scope
 - Production migration sequence: expand → resumable data/ACL backfill → compatible function → contract → exact read-back
-- Self-hosted Appwrite 1.9.x SDK pins: the release-matched [compatibility table](skills/appwrite-backend/references/self-hosting.md#release-matched-pins-for-appwrite-196)
+- Self-hosted Appwrite 2.x and 1.9.x SDK pins: the release-matched [compatibility table](skills/appwrite-backend/references/self-hosting.md#release-matched-sdk-pins)
 
 ## Reference Files
 

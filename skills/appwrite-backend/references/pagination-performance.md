@@ -236,8 +236,7 @@ mixin AppwritePaginationMixin {
 
   static const _pageSize = 100;
 
-  /// Fetches all rows from [tableId] matching [queries] via cursor pagination.
-  /// Do not include Query.cursorAfter or Query.limit in [queries].
+  /// [queries] must omit Query.cursorAfter and Query.limit; the mixin adds both.
   Future<List<T>> fetchAllRows<T>({
     required String tableId,
     required List<String> queries,

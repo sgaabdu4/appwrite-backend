@@ -6,7 +6,7 @@
 - Atomic scope = supported row/bulk/operator operations across tables/databases.
 - Excluded = schema + Auth + Storage + Functions + external providers.
 - Read-own-writes = every dependent read/write carries the same `transactionId`.
-- Client context = one authenticated client/transaction owner; independent helper client = stale-read risk.
+- Client context = one authenticated client/transaction owner; helper/store with an independent TablesDB client reads pre-transaction state → forbidden inside one invariant.
 - Operation cap = deployed server contract. Appwrite `1.9.0` self-hosted fallback = `100`; verify target source/config before transaction creation.
 - Budget unit = staged operation/log, not HTTP request count or affected-row count.
 - TTL unit = seconds. Appwrite `1.9.6` accepts `60..3600`; use `60` for one-row commit + `300` for multi-step commands.

@@ -284,8 +284,7 @@ final viewBytes = await storage.getFileView(
 1. **Use WebP** — Smaller than JPEG with better quality
 2. **Generate thumbnails** — Use previews, not full images
 3. **Enable compression** — gzip for text, zstd for binaries (Appwrite skips files >20 MB)
-4. **Batch uploads** — Upload multiple files per request
-5. **Put a CDN in front** — Cloudflare, Bunny, or CloudFront cache files at the edge and cut origin load
+4. **Put a CDN in front** — Cloudflare, Bunny, or CloudFront cache files at the edge and cut origin load
 
 ### CDN Setup (Self-Hosted)
 
