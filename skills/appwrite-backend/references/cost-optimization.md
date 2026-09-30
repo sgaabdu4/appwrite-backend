@@ -53,9 +53,11 @@ functions.create_execution(
 Appwrite caches transformed images. Identical URLs = cache hit.
 
 ```dart
+import 'package:dart_appwrite/enums.dart';
+
 // First request: computed
 // Second request: cached (minimal cost)
-storage.getFilePreview(bucketId: 'img', fileId: 'id', width: 400, output: 'webp');
+storage.getFilePreview(bucketId: 'img', fileId: 'id', width: 400, output: ImageFormat.webp);
 ```
 
 Consistent URLs maximize cache hits.

@@ -5,20 +5,22 @@
 ### List Available Factors
 
 ```dart
-final factors = await account.listMfaFactors();
+final factors = await account.listMFAFactors();
 // Returns: totp, email, phone, recoveryCode
 ```
 
 ### TOTP Setup
 
 ```dart
+import 'package:appwrite/enums.dart';
+
 // Create TOTP authenticator
-final totp = await account.createMfaAuthenticator(type: 'totp');
+final totp = await account.createMFAAuthenticator(type: AuthenticatorType.totp);
 // totp.secret - Base32 secret for authenticator app
 // totp.uri - OTP auth URI for QR code
 
 // Verify TOTP to activate
-await account.updateMfaAuthenticator(type: 'totp', otp: '123456');
+await account.updateMFAAuthenticator(type: AuthenticatorType.totp, otp: '123456');
 ```
 
 ### MFA Challenge Flow
@@ -28,8 +30,8 @@ try {
     await account.createEmailPasswordSession(email: email, password: password);
 } on AppwriteException catch (e) {
     if (e.type == 'user_more_factors_required') {
-        final challenge = await account.createMfaChallenge(factor: 'totp');
-        await account.updateMfaChallenge(
+        final challenge = await account.createMFAChallenge(factor: AuthenticationFactor.totp);
+        await account.updateMFAChallenge(
             challengeId: challenge.$id, otp: userEnteredCode);
     }
 }
@@ -38,11 +40,11 @@ try {
 ### Recovery Codes
 
 ```dart
-final codes = await account.createMfaRecoveryCodes();
+final codes = await account.createMFARecoveryCodes();
 // Store securely — one-time use
 
 // Regenerate (invalidates previous)
-final newCodes = await account.updateMfaRecoveryCodes();
+final newCodes = await account.updateMFARecoveryCodes();
 ```
 
 ---
@@ -95,7 +97,7 @@ export async function POST({ request }) {
     const { email, password } = await request.json();
 
     const client = new Client()
-        .setEndpoint('https://cloud.appwrite.io/v1')
+        .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
         .setProject('PROJECT_ID');
 
     const account = new Account(client);
@@ -115,7 +117,7 @@ export async function POST({ request }) {
 export async function GET({ cookies }) {
     const session = cookies.get('a_session_[PROJECT_ID]');
     const client = new Client()
-        .setEndpoint('https://cloud.appwrite.io/v1')
+        .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
         .setProject('PROJECT_ID')
         .setSession(session);
 
@@ -135,9 +137,11 @@ export async function GET({ cookies }) {
 ### Python SSR Flow
 
 ```python
+from datetime import datetime
+
 admin_client = (
     Client()
-    .set_endpoint('https://cloud.appwrite.io/v1')
+    .set_endpoint('https://<REGION>.cloud.appwrite.io/v1')
     .set_project('PROJECT_ID')
     .set_key('API_KEY')
 )
@@ -153,11 +157,11 @@ def login():
     resp = make_response({'success': True})
     resp.set_cookie(
         'a_session_[PROJECT_ID]',
-        session['secret'],
+        session.secret,
         httponly=True,
         secure=True,
         samesite='Strict',
-        expires=session['expire'],
+        expires=datetime.fromisoformat(session.expire),
         path='/',
     )
     return resp
@@ -170,13 +174,13 @@ def get_user():
 
     session_client = (
         Client()
-        .set_endpoint('https://cloud.appwrite.io/v1')
+        .set_endpoint('https://<REGION>.cloud.appwrite.io/v1')
         .set_project('PROJECT_ID')
         .set_session(session)
         .set_forwarded_user_agent(request.headers.get('user-agent'))
     )
 
-    return Account(session_client).get()
+    return Account(session_client).get().to_dict()
 ```
 
 For Python OAuth SSR, redirect with `create_o_auth2_token(...)`, then exchange
@@ -195,13 +199,13 @@ Forward browser user agent on session client for debug + security context.
 
 ```dart
 final adminClient = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
     .setProject('PROJECT_ID')
     .setKey('API_KEY');
 
 final session = request.cookies['a_session_[PROJECT_ID]'];
 final sessionClient = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
     .setProject('PROJECT_ID');
 
 if (session != null) {
@@ -211,10 +215,10 @@ if (session != null) {
 ```
 
 ```python
-admin_client = Client().set_endpoint('https://cloud.appwrite.io/v1').set_project('PROJECT_ID').set_key('API_KEY')
+admin_client = Client().set_endpoint('https://<REGION>.cloud.appwrite.io/v1').set_project('PROJECT_ID').set_key('API_KEY')
 
 session = request.cookies.get('a_session_[PROJECT_ID]')
-session_client = Client().set_endpoint('https://cloud.appwrite.io/v1').set_project('PROJECT_ID')
+session_client = Client().set_endpoint('https://<REGION>.cloud.appwrite.io/v1').set_project('PROJECT_ID')
 
 if session:
     session_client.set_session(session)
@@ -223,13 +227,13 @@ if session:
 
 ```typescript
 const adminClient = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
     .setProject('PROJECT_ID')
     .setKey('API_KEY');
 
 const session = req.cookies['a_session_[PROJECT_ID]'];
 const sessionClient = new Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
     .setProject('PROJECT_ID');
 
 if (session) {
@@ -284,7 +288,7 @@ JWT for server-side user context.
 final jwt = await users.createJWT(userId: 'user_123');
 
 final client = Client()
-    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setEndpoint('https://<REGION>.cloud.appwrite.io/v1')
     .setProject('PROJECT_ID')
     .setJWT(jwt.jwt);
 ```

@@ -108,7 +108,7 @@ def main(context):
     rows = tables_db.list_rows(
         database_id='db', table_id='items',
         queries=[Query.limit(10)], total=False)
-    return context.res.json({'items': rows['rows']})
+    return context.res.json({'items': [row.to_dict() for row in rows.rows]})
 ```
 
 ### TypeScript
@@ -262,7 +262,7 @@ Use variables for configuration + secrets; never track values in source/manifest
 - scope precedence = project → function/site → Appwrite-injected
 - secret value = unreadable from Console/API after creation
 - secret status = one-way; secret → non-secret requires delete + recreate
-- value change on an existing key = next execution (Cloud `1.9.5`, no redeploy); key add/remove = redeploy; runtime smoke required either way
+- variable create/update/delete = active from the next deployment → redeploy + runtime smoke ([docs](https://appwrite.io/docs/products/functions/environment-variables))
 - read-back = exact key/ID/count + secret metadata, never secret value
 - deployment workflow = validate candidate → upsert metadata → deploy → smoke
 - multi-resource bootstrap → [dependency-aware bounded waves](performance.md#dependency-aware-bootstrap)

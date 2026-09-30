@@ -4,7 +4,7 @@
 
 | Limit | Value | Notes |
 |-------|-------|-------|
-| `Query.equal()` array values | 100 max | Chunk larger ID lists |
+| `Query.equal()` array values | Target `APP_DATABASE_QUERY_MAX_VALUES`; source `500` in `1.9.0`–`2.3.0` | Chunk larger ID lists |
 | Query nesting depth | 3 levels | `Query.and([Query.or([...])])` |
 | Queries per request | 100 max | Each 4096 chars max |
 | Results per page | 25 default, no hard cap | Large pages slow performance |
@@ -12,9 +12,14 @@
 
 ### Chunking Large ID Lists
 
->100 values in `Query.equal()` throws. Chunk to 100, fetch parallel.
+Over-cap `Query.equal()` values or a query string over `APP_LIMIT_ARRAY_ELEMENT_SIZE` (`4096` chars) → `400`.
 
-**Full patterns:** See [chunked-queries.md](chunked-queries.md).
+- ID chunk = min(value cap, IDs whose serialized `Query.equal('$id', ids)` fits `4096` chars).
+- Fit per query: `ID.unique()` (20 chars) → `176`; 36-char IDs → `103`. MariaDB/PostgreSQL cap IDs at 36 chars → `100` always fits.
+- MongoDB allows 255-char IDs (`15` per query) → size chunks by serialized length.
+- Pattern → [chunked-queries.md](chunked-queries.md).
+
+Source (`2.3.0`): [`APP_LIMIT_ARRAY_ELEMENT_SIZE`](https://github.com/appwrite/appwrite/blob/2.3.0/app/init/constants.php#L43) · [`APP_DATABASE_QUERY_MAX_VALUES`](https://github.com/appwrite/appwrite/blob/2.3.0/app/init/constants.php#L118) · [`listRows` query validator](https://github.com/appwrite/appwrite/blob/2.3.0/src/Appwrite/Platform/Modules/Databases/Http/TablesDB/Tables/Rows/XList.php#L58) · ID length: [SQL `36`](https://github.com/utopia-php/database/blob/7.3.11/src/Database/Adapter/SQL.php#L2221-L2224), [MongoDB `255`](https://github.com/utopia-php/database/blob/7.3.11/src/Database/Adapter/Mongo.php#L4114-L4117). Target source/config wins.
 
 ---
 
@@ -62,7 +67,7 @@ print('Active: ${sessions.sessions.length}');
 // Delete specific session
 await account.deleteSession(sessionId: 'session_id');
 
-// Delete all sessions except current
+// Delete every session, current included (signs this client out)
 await account.deleteSessions();
 ```
 
@@ -159,7 +164,7 @@ by [error-handling.md](error-handling.md).
 |-------|-------|
 | Request body | 10MB default |
 | API timeout | 15 seconds |
-| Webhook timeout | 30 seconds |
+| Webhook timeout | 15 seconds |
 
 ---
 
@@ -167,12 +172,12 @@ by [error-handling.md](error-handling.md).
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| 400: Value must be at most 100 | Query.equal() >100 values | Chunk ID list |
+| 400: Query on attribute has greater than N values | `Query.equal()` over target cap | Chunk ID list |
 | 400: Preferences size exceeded | >64KB prefs | Store in database |
 | 400: ID already exists | Duplicate row ID | Use `ID.unique()` |
 | 413: Request too large | >10MB body | Chunk upload |
 | 429: Too many requests | Rate limited | Exponential backoff |
-| 504: Gateway timeout | Query >15s | Add indexes, reduce scope |
+| 408: `database_timeout` | Query >15s | Add indexes, reduce scope |
 
 ---
 
