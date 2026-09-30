@@ -58,6 +58,7 @@ Every delivery is signed: `X-Appwrite-Webhook-Signature` = `base64(HMAC-SHA1(sec
 - `rawBody` = unparsed request bytes; re-serialized JSON breaks the signature.
 - Compare in constant time; mismatch → `401` before any processing.
 - No timestamp/nonce header → replay protection = idempotent processing keyed by events + resource `$id` + `$updatedAt`; `$id` alone merges distinct updates to one resource. Ordering: create/update applies only when its `$updatedAt` is newer than the stored one; a `.delete` event carries the deleted resource's last `$updatedAt` → apply it at an equal or newer revision and keep a tombstone so a delayed update cannot resurrect the resource.
+- Signature covers URL + body only → `X-Appwrite-Webhook-*` headers are unsigned hints. Before a destructive downstream action, confirm with Appwrite (the resource `get` returns `404`); a replayed body with an edited events header must not delete a live resource.
 
 ### Headers
 
@@ -93,7 +94,7 @@ app.post('/webhooks/appwrite', express.raw({ type: 'application/json' }), (req, 
 
     const events = (req.get('x-appwrite-webhook-events') ?? '').split(',');
     const resource = JSON.parse(req.body.toString('utf8'));
-    // Queue durable work keyed by events + resource.$id + resource.$updatedAt, then acknowledge.
+    // Queue durable work keyed by events + resource.$id + resource.$updatedAt; confirm deletes with Appwrite first.
     return res.sendStatus(200);
 });
 ```
