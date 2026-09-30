@@ -57,7 +57,7 @@ Every delivery is signed: `X-Appwrite-Webhook-Signature` = `base64(HMAC-SHA1(sec
 - `webhookUrl` = the webhook's configured `url`, byte-for-byte; not the proxied request URL.
 - `rawBody` = unparsed request bytes; re-serialized JSON breaks the signature.
 - Compare in constant time; mismatch → `401` before any processing.
-- No timestamp/nonce header → replay protection = idempotent processing.
+- No timestamp/nonce header → replay protection = idempotent processing keyed by events + resource `$id` + `$updatedAt`; `$id` alone merges distinct updates to one resource. Apply a revision only when its `$updatedAt` is newer than the stored one.
 
 ### Headers
 
@@ -93,7 +93,7 @@ app.post('/webhooks/appwrite', express.raw({ type: 'application/json' }), (req, 
 
     const events = (req.get('x-appwrite-webhook-events') ?? '').split(',');
     const resource = JSON.parse(req.body.toString('utf8'));
-    // Queue durable work keyed by events + resource.$id, then acknowledge.
+    // Queue durable work keyed by events + resource.$id + resource.$updatedAt, then acknowledge.
     return res.sendStatus(200);
 });
 ```
@@ -205,7 +205,7 @@ await webhooks.delete(webhookId: 'webhook_123');
 1. **Always verify signatures** — Prevent spoofed requests
 2. **Respond quickly** — Return 2xx within 15 seconds
 3. **Process async** — Queue heavy work, respond immediately
-4. **Handle duplicates** — Dedupe by event + resource `$id`
+4. **Handle duplicates** — Dedupe by event + resource `$id` + `$updatedAt` ([replay protection](#signature-verification))
 5. **Use specific events** — Avoid wildcard spam
 
 ---
