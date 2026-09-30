@@ -57,7 +57,7 @@ Every delivery is signed: `X-Appwrite-Webhook-Signature` = `base64(HMAC-SHA1(sec
 - `webhookUrl` = the webhook's configured `url`, byte-for-byte; not the proxied request URL.
 - `rawBody` = unparsed request bytes; re-serialized JSON breaks the signature.
 - Compare in constant time; mismatch → `401` before any processing.
-- No timestamp/nonce header → replay protection = idempotent processing keyed by events + resource `$id` + `$updatedAt`; `$id` alone merges distinct updates to one resource. Apply a revision only when its `$updatedAt` is newer than the stored one.
+- No timestamp/nonce header → replay protection = idempotent processing keyed by events + resource `$id` + `$updatedAt`; `$id` alone merges distinct updates to one resource. Ordering: create/update applies only when its `$updatedAt` is newer than the stored one; a `.delete` event carries the deleted resource's last `$updatedAt` → apply it at an equal or newer revision and keep a tombstone so a delayed update cannot resurrect the resource.
 
 ### Headers
 
