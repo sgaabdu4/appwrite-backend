@@ -1,6 +1,6 @@
 # Bring the Appwrite skill up to date with Appwrite 2.x and its SDKs
 
-Status: Ready
+Status: Complete
 
 ## Outcome + scope
 
@@ -20,14 +20,16 @@ Authority: Autonomous. The user asked to make every recommended audit change, re
 
 ## Acceptance + steps
 
-- [ ] Every changed SDK example uses methods, parameters, enums and response access that exist in the SDK version the skill pins → source check or compile per example.
-- [ ] Self-hosting and version guidance covers Appwrite 2.x with release-matched pins → official install/upgrade docs.
-- [ ] Error handling, chunking and pagination examples keep write intent, bound concurrency and return complete results → consistent with `error-handling.md` rules.
-- [ ] Agent operations stay MCP-only; no CLI/SDK fallback remains in agent guidance → grep.
-- [ ] Every appwrite.io link returns 200 → GET check.
-- [ ] ID chunk sizing respects both the `Query.equal()` value cap and the 4096-char query limit → 2.3.0 source.
-- [ ] Contradictory or duplicated rules have one owner (raw HTTP, session deletion, prefs replacement, 500 handling, upsert scope, transaction client, MCP-only) and every relative/`#anchor` link resolves → link check.
-- [ ] `python3 .hooks/hard-eng.py check` passes, including `skill-contracts`.
+- [x] Every changed SDK example uses methods, parameters, enums and response access that exist in the SDK version the skill pins → source check or compile per example.
+- [x] Self-hosting and version guidance covers Appwrite 2.x with release-matched pins → official install/upgrade docs.
+- [x] Error handling, chunking and pagination examples keep write intent, bound concurrency and return complete results → consistent with `error-handling.md` rules.
+- [x] Agent operations stay MCP-only; no CLI/SDK fallback remains in agent guidance → grep.
+- [x] Every appwrite.io link returns 200 → GET check.
+- [x] ID chunk sizing respects both the `Query.equal()` value cap and the 4096-char query limit → 2.3.0 source.
+- [x] Contradictory or duplicated rules have one owner (raw HTTP, session deletion, prefs replacement, 500 handling, upsert scope, transaction client, MCP-only) and every relative/`#anchor` link resolves → link check.
+- [x] Webhook ingestion deduplicates per resource revision, keeps deletes at an equal revision and confirms an unsigned delete with Appwrite before acting → `webhooks.md` against the webhook docs.
+- [x] Console paths and feature availability match the Appwrite version they name → release notes and docs.
+- [x] `python3 .hooks/hard-eng.py check` passes, including `skill-contracts`.
 
 ## Baseline + execution
 
@@ -45,8 +47,8 @@ N/A — agent skill text; no product appearance.
 
 ## Verification
 
-Result: Pending
-Evidence: Pending
+Result: Passed
+Evidence: `python3 .hooks/hard-eng.py check` passed, including `skill-contracts`. Changed examples were checked against the pinned SDK sources with a scratch harness, and every changed appwrite.io link returned 200. GPT-6 Astra adversarial review approved after four rounds, then flagged the 1.9.x email-policy path in a confirmation pass (fixed in `216affa`) and approved the re-run. Sonnet 5.5 (high) passed; its notes were fixed in `7e6489c` and `12c243d`. GPT-6 Luna (max) found unqualified Console paths, fixed in `5c9cfd2`.
 E2E: N/A — skill documentation; proof is the repository's contract/example checks plus compile checks of changed examples against the pinned SDKs.
 
 Delivery target: PR
