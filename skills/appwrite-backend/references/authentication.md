@@ -372,7 +372,7 @@ Future<Object?> main(Object rawContext) async {
 
 ## Security Settings
 
-Console → Auth → Policies:
+Console → Auth → Policies (`1.9.x`: Auth → Security):
 
 | Setting | Description |
 |---------|-------------|
@@ -395,7 +395,7 @@ Use Auth email policies to block signup/update emails by category:
 | Aliased addresses | Plus-tags/subaddresses/provider aliases |
 | Disposable providers | Temporary/throwaway inboxes |
 
-Configure in Console → Auth → Policies → Emails or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
+Configure in Console → Auth → Policies → Emails (`1.9.x`: Auth → Security) or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
 
 ---
 
