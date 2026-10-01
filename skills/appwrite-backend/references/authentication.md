@@ -395,7 +395,7 @@ Use Auth email policies to block signup/update emails by category:
 | Aliased addresses | Plus-tags/subaddresses/provider aliases |
 | Disposable providers | Temporary/throwaway inboxes |
 
-Configure in Console → Auth → Policies → Emails (`1.9.x`: Auth → Security) or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
+Requires Appwrite Cloud or self-hosted `2.2.0`+; earlier self-hosted releases have no email-policy endpoints. Configure in Console → Auth → Policies → Emails or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
 
 ---
 
