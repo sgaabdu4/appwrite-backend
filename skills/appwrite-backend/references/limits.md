@@ -27,9 +27,9 @@ Source (`2.3.0`): [`APP_LIMIT_ARRAY_ELEMENT_SIZE`](https://github.com/appwrite/a
 
 | Limit | Value | Config |
 |-------|-------|--------|
-| Sessions per user | 10 default, 100 max | Console → Auth → Security |
+| Sessions per user | 10 default, 100 max | Console → Auth → Policies |
 | Password length | 8-256 chars | — |
-| Password history | 20 max | Console → Auth → Security |
+| Password history | 20 max | Console → Auth → Policies |
 | User name | 128 chars | — |
 | User ID | 36 chars | a-z, A-Z, 0-9, `.`, `-`, `_` |
 | Preferences size | 64KB | JSON object |

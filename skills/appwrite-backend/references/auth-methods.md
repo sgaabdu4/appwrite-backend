@@ -133,7 +133,7 @@ await account.updatePhoneSession(userId: userId, secret: '123456');
 
 ### Mock Phone Numbers
 
-Test, no SMS cost. Console → Auth → Security → Mock Numbers. Add: `+15551234567` → OTP: `123456`.
+Test, no SMS cost. Console → Auth → Settings → Mock phone numbers. Add: `+15551234567` → OTP: `123456`.
 
 ---
 

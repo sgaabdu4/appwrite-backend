@@ -395,7 +395,7 @@ Use Auth email policies to block signup/update emails by category:
 | Aliased addresses | Plus-tags/subaddresses/provider aliases |
 | Disposable providers | Temporary/throwaway inboxes |
 
-Configure in Console → Auth → Security or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
+Configure in Console → Auth → Policies → Emails or via server SDK Project service. Policies apply to user creation and email updates; existing users keep sessions and can still log in.
 
 ---
 
