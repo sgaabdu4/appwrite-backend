@@ -16,7 +16,7 @@ Owners: `skills/appwrite-backend/SKILL.md` + `references/`; native contracts in 
 
 Blockers: None
 Handoff: Approval
-Authority: Autonomous. The user asked to make every recommended audit change, review it, run adversarial review with GPT-6 Astra, test with GPT-6 Luna and Sonnet 5.5, and open a PR.
+Authority: Autonomous. The user asked to make every recommended audit change, review it, run adversarial review with GPT-6 Astra, test with GPT-6 Luna and Sonnet 5.5, and open a PR; after the PR opened, the user approved merging it.
 
 ## Acceptance + steps
 
@@ -51,5 +51,5 @@ Result: Passed
 Evidence: `python3 .hooks/hard-eng.py check` passed, including `skill-contracts`. Changed examples were checked against the pinned SDK sources with a scratch harness, and every changed appwrite.io link returned 200. GPT-6 Astra adversarial review approved after four rounds, then flagged the 1.9.x email-policy path in a confirmation pass (fixed in `216affa`) and approved the re-run. Sonnet 5.5 (high) passed; its notes were fixed in `7e6489c` and `12c243d`. GPT-6 Luna (max) found unqualified Console paths, fixed in `5c9cfd2`.
 E2E: N/A — skill documentation; proof is the repository's contract/example checks plus compile checks of changed examples against the pinned SDKs.
 
-Delivery target: PR
-Delivery: Pending — PR checks.
+Delivery target: Merge
+Delivery: Pending — squash merge and post-merge CI on the base branch.
