@@ -372,7 +372,7 @@ Future<Object?> main(Object rawContext) async {
 
 ## Security Settings
 
-Console → Auth → Security:
+Console → Auth → Policies:
 
 | Setting | Description |
 |---------|-------------|
