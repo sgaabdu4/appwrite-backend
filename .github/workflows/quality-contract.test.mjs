@@ -18,6 +18,7 @@ test('quality workflow runs every configured test', async () => {
   assert.match(workflow, /version: latest/u);
   assert.match(workflow, /runtime: node@26/u);
   assert.match(workflow, /install: false/u);
+  assert.match(workflow, /oven-sh\/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6/u);
   assert.match(workflow, /python \.hooks\/hard-eng\.py check --base "\$BASE_SHA"/u);
   assert.equal(gates.shipping.base, 'master');
   assert.deepEqual(gates.shipping.checks, ['Tests']);
@@ -38,10 +39,10 @@ test('quality workflow runs every configured test', async () => {
     'skills/appwrite-backend/scripts',
   ]);
   assert.deepEqual(gates.shared[contractsIndex].command, [
-    'node',
-    '--test',
-    'skills/appwrite-backend/scripts/appwrite-query-contract.test.mjs',
-    'skills/appwrite-backend/scripts/skill-safety-contract.test.mjs',
-    '.github/workflows/quality-contract.test.mjs',
+    'bun',
+    'test',
+    './skills/appwrite-backend/scripts/appwrite-query-contract.test.mjs',
+    './skills/appwrite-backend/scripts/skill-safety-contract.test.mjs',
+    './.github/workflows/quality-contract.test.mjs',
   ]);
 });
