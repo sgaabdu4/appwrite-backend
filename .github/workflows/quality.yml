@@ -42,9 +42,9 @@ jobs:
       - name: Select isolated tool storage
         run: |
           {
-            echo "MISE_DATA_DIR=$RUNNER_TEMP/hard-eng-tools/mise/data"
-            echo "MISE_CACHE_DIR=$RUNNER_TEMP/hard-eng-tools/mise/cache"
-            echo "MISE_STATE_DIR=$RUNNER_TEMP/hard-eng-tools/mise/state"
+            echo "MISE_DATA_DIR=${MISE_DATA_DIR:-$RUNNER_TEMP/hard-eng-tools/mise/data}"
+            echo "MISE_CACHE_DIR=${MISE_CACHE_DIR:-$RUNNER_TEMP/hard-eng-tools/mise/cache}"
+            echo "MISE_STATE_DIR=${MISE_STATE_DIR:-$RUNNER_TEMP/hard-eng-tools/mise/state}"
             echo "PNPM_CONFIG_STORE_DIR=$RUNNER_TEMP/hard-eng-tools/pnpm/store"
             echo "PNPM_CONFIG_CACHE_DIR=$RUNNER_TEMP/hard-eng-tools/pnpm/cache"
           } >> "$GITHUB_ENV"
