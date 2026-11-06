@@ -53,6 +53,7 @@ final webhook = await webhooks.create(
 ## Signature Verification
 
 Every delivery is signed: `X-Appwrite-Webhook-Signature` = `base64(HMAC-SHA1(secret, webhookUrl + rawBody))`.
+
 - `webhookUrl` = the webhook's configured `url`, byte-for-byte; not the proxied request URL.
 - `rawBody` = unparsed request bytes; re-serialized JSON breaks the signature.
 - Compare in constant time; mismatch → `401` before any processing.
@@ -74,28 +75,35 @@ Every delivery is signed: `X-Appwrite-Webhook-Signature` = `base64(HMAC-SHA1(sec
 
 ```typescript
 // TypeScript - Express handler
-import crypto from 'node:crypto';
-import express from 'express';
+import crypto from "node:crypto";
+import express from "express";
 
-const WEBHOOK_URL = 'https://api.example.com/webhooks/appwrite';
+const WEBHOOK_URL = "https://api.example.com/webhooks/appwrite";
 
-app.post('/webhooks/appwrite', express.raw({ type: 'application/json' }), (req, res) => {
-  const received = Buffer.from(req.get('x-appwrite-webhook-signature') ?? '');
-  const expected = Buffer.from(
-    crypto
-      .createHmac('sha1', process.env.APPWRITE_WEBHOOK_SECRET!)
-      .update(Buffer.concat([Buffer.from(WEBHOOK_URL), req.body]))
-      .digest('base64'),
-  );
-  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
-    return res.status(401).send('Invalid signature');
-  }
+app.post(
+	"/webhooks/appwrite",
+	express.raw({ type: "application/json" }),
+	(req, res) => {
+		const received = Buffer.from(req.get("x-appwrite-webhook-signature") ?? "");
+		const expected = Buffer.from(
+			crypto
+				.createHmac("sha1", process.env.APPWRITE_WEBHOOK_SECRET!)
+				.update(Buffer.concat([Buffer.from(WEBHOOK_URL), req.body]))
+				.digest("base64"),
+		);
+		if (
+			received.length !== expected.length ||
+			!crypto.timingSafeEqual(received, expected)
+		) {
+			return res.status(401).send("Invalid signature");
+		}
 
-  const events = (req.get('x-appwrite-webhook-events') ?? '').split(',');
-  const resource = JSON.parse(req.body.toString('utf8'));
-  // Queue durable work keyed by events + resource.$id + resource.$updatedAt; confirm deletes with Appwrite first.
-  return res.sendStatus(200);
-});
+		const events = (req.get("x-appwrite-webhook-events") ?? "").split(",");
+		const resource = JSON.parse(req.body.toString("utf8"));
+		// Queue durable work keyed by events + resource.$id + resource.$updatedAt; confirm deletes with Appwrite first.
+		return res.sendStatus(200);
+	},
+);
 ```
 
 ```python
@@ -133,14 +141,14 @@ Body = the event's resource, same shape as its API response; no envelope. Event 
 
 ```json
 {
-  "$id": "order_456",
-  "$tableId": "orders",
-  "$databaseId": "main",
-  "$createdAt": "2025-01-15T10:30:00.000+00:00",
-  "$updatedAt": "2025-01-15T10:30:00.000+00:00",
-  "$permissions": [],
-  "customer": "John Doe",
-  "total": 99.99
+	"$id": "order_456",
+	"$tableId": "orders",
+	"$databaseId": "main",
+	"$createdAt": "2025-01-15T10:30:00.000+00:00",
+	"$updatedAt": "2025-01-15T10:30:00.000+00:00",
+	"$permissions": [],
+	"customer": "John Doe",
+	"total": 99.99
 }
 ```
 
@@ -213,6 +221,7 @@ await webhooks.delete(webhookId: 'webhook_123');
 ## Retry Behavior
 
 Per worker source ([`2.3.0`](https://github.com/appwrite/appwrite/blob/2.3.0/src/Appwrite/Platform/Workers/Webhooks.php#L123-L220)):
+
 - One POST per event; 15 s connect + total timeout.
 - Failure = transport error or HTTP `>= 400` → `attempts` +1 + `logs` updated. Success resets `attempts` to `0`.
 - `attempts` ≥ `_APP_WEBHOOK_MAX_FAILED_ATTEMPTS` (default `10`) → webhook disabled + alert. Fix the endpoint → re-enable via [full-settings update](#update-webhook).
@@ -227,6 +236,7 @@ Source: [webhooks docs](https://appwrite.io/docs/apis/webhooks)
 View in Console → Project Settings → Webhooks → Select webhook → Logs
 
 Shows:
+
 - Request timestamp
 - Response status
 - Response time
