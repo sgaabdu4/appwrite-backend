@@ -74,14 +74,14 @@ await account.deleteSession(sessionId: 'current');
 
 ```typescript
 await account.create({
-	userId: ID.unique(),
-	email: "user@example.com",
-	password: "password",
+  userId: ID.unique(),
+  email: 'user@example.com',
+  password: 'password',
 });
 
 await account.createEmailPasswordSession({ email, password });
 const user = await account.get();
-await account.deleteSession({ sessionId: "current" });
+await account.deleteSession({ sessionId: 'current' });
 ```
 
 ---
@@ -94,20 +94,18 @@ Server-side session for Next.js, SvelteKit, Nuxt, etc.
 
 ```typescript
 export async function POST({ request }) {
-	const { email, password } = await request.json();
+  const { email, password } = await request.json();
 
-	const client = new Client()
-		.setEndpoint("https://<REGION>.cloud.appwrite.io/v1")
-		.setProject("PROJECT_ID");
+  const client = new Client().setEndpoint('https://<REGION>.cloud.appwrite.io/v1').setProject('PROJECT_ID');
 
-	const account = new Account(client);
-	const session = await account.createEmailPasswordSession({ email, password });
+  const account = new Account(client);
+  const session = await account.createEmailPasswordSession({ email, password });
 
-	return new Response(JSON.stringify({ success: true }), {
-		headers: {
-			"Set-Cookie": `a_session_[PROJECT_ID]=${session.secret}; Path=/; HttpOnly; Secure; SameSite=Strict`,
-		},
-	});
+  return new Response(JSON.stringify({ success: true }), {
+    headers: {
+      'Set-Cookie': `a_session_[PROJECT_ID]=${session.secret}; Path=/; HttpOnly; Secure; SameSite=Strict`,
+    },
+  });
 }
 ```
 
@@ -115,20 +113,17 @@ export async function POST({ request }) {
 
 ```typescript
 export async function GET({ cookies }) {
-	const session = cookies.get("a_session_[PROJECT_ID]");
-	const client = new Client()
-		.setEndpoint("https://<REGION>.cloud.appwrite.io/v1")
-		.setProject("PROJECT_ID")
-		.setSession(session);
+  const session = cookies.get('a_session_[PROJECT_ID]');
+  const client = new Client().setEndpoint('https://<REGION>.cloud.appwrite.io/v1').setProject('PROJECT_ID').setSession(session);
 
-	const account = new Account(client);
+  const account = new Account(client);
 
-	try {
-		const user = await account.get();
-		return { user };
-	} catch {
-		return { user: null };
-	}
+  try {
+    const user = await account.get();
+    return { user };
+  } catch {
+    return { user: null };
+  }
 }
 ```
 
@@ -226,19 +221,14 @@ if session:
 ```
 
 ```typescript
-const adminClient = new Client()
-	.setEndpoint("https://<REGION>.cloud.appwrite.io/v1")
-	.setProject("PROJECT_ID")
-	.setKey("API_KEY");
+const adminClient = new Client().setEndpoint('https://<REGION>.cloud.appwrite.io/v1').setProject('PROJECT_ID').setKey('API_KEY');
 
-const session = req.cookies["a_session_[PROJECT_ID]"];
-const sessionClient = new Client()
-	.setEndpoint("https://<REGION>.cloud.appwrite.io/v1")
-	.setProject("PROJECT_ID");
+const session = req.cookies['a_session_[PROJECT_ID]'];
+const sessionClient = new Client().setEndpoint('https://<REGION>.cloud.appwrite.io/v1').setProject('PROJECT_ID');
 
 if (session) {
-	sessionClient.setSession(session);
-	sessionClient.setForwardedUserAgent(req.headers["user-agent"]);
+  sessionClient.setSession(session);
+  sessionClient.setForwardedUserAgent(req.headers['user-agent']);
 }
 ```
 

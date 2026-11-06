@@ -75,35 +75,28 @@ Every delivery is signed: `X-Appwrite-Webhook-Signature` = `base64(HMAC-SHA1(sec
 
 ```typescript
 // TypeScript - Express handler
-import crypto from "node:crypto";
-import express from "express";
+import crypto from 'node:crypto';
+import express from 'express';
 
-const WEBHOOK_URL = "https://api.example.com/webhooks/appwrite";
+const WEBHOOK_URL = 'https://api.example.com/webhooks/appwrite';
 
-app.post(
-	"/webhooks/appwrite",
-	express.raw({ type: "application/json" }),
-	(req, res) => {
-		const received = Buffer.from(req.get("x-appwrite-webhook-signature") ?? "");
-		const expected = Buffer.from(
-			crypto
-				.createHmac("sha1", process.env.APPWRITE_WEBHOOK_SECRET!)
-				.update(Buffer.concat([Buffer.from(WEBHOOK_URL), req.body]))
-				.digest("base64"),
-		);
-		if (
-			received.length !== expected.length ||
-			!crypto.timingSafeEqual(received, expected)
-		) {
-			return res.status(401).send("Invalid signature");
-		}
+app.post('/webhooks/appwrite', express.raw({ type: 'application/json' }), (req, res) => {
+  const received = Buffer.from(req.get('x-appwrite-webhook-signature') ?? '');
+  const expected = Buffer.from(
+    crypto
+      .createHmac('sha1', process.env.APPWRITE_WEBHOOK_SECRET!)
+      .update(Buffer.concat([Buffer.from(WEBHOOK_URL), req.body]))
+      .digest('base64'),
+  );
+  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
+    return res.status(401).send('Invalid signature');
+  }
 
-		const events = (req.get("x-appwrite-webhook-events") ?? "").split(",");
-		const resource = JSON.parse(req.body.toString("utf8"));
-		// Queue durable work keyed by events + resource.$id + resource.$updatedAt; confirm deletes with Appwrite first.
-		return res.sendStatus(200);
-	},
-);
+  const events = (req.get('x-appwrite-webhook-events') ?? '').split(',');
+  const resource = JSON.parse(req.body.toString('utf8'));
+  // Queue durable work keyed by events + resource.$id + resource.$updatedAt; confirm deletes with Appwrite first.
+  return res.sendStatus(200);
+});
 ```
 
 ```python
@@ -141,14 +134,14 @@ Body = the event's resource, same shape as its API response; no envelope. Event 
 
 ```json
 {
-	"$id": "order_456",
-	"$tableId": "orders",
-	"$databaseId": "main",
-	"$createdAt": "2025-01-15T10:30:00.000+00:00",
-	"$updatedAt": "2025-01-15T10:30:00.000+00:00",
-	"$permissions": [],
-	"customer": "John Doe",
-	"total": 99.99
+  "$id": "order_456",
+  "$tableId": "orders",
+  "$databaseId": "main",
+  "$createdAt": "2025-01-15T10:30:00.000+00:00",
+  "$updatedAt": "2025-01-15T10:30:00.000+00:00",
+  "$permissions": [],
+  "customer": "John Doe",
+  "total": 99.99
 }
 ```
 

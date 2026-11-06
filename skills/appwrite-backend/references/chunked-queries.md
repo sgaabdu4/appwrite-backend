@@ -68,38 +68,28 @@ def fetch_by_ids(
 
 ```typescript
 async function fetchByIds<T extends Models.Row>(
-	dbId: string,
-	tableId: string,
-	ids: string[],
-	chunkSize: number,
-	select?: string[],
+  dbId: string,
+  tableId: string,
+  ids: string[],
+  chunkSize: number,
+  select?: string[],
 ): Promise<T[]> {
-	const rows: T[] = [];
-	for (let i = 0; i < ids.length; i += chunkSize) {
-		const chunk = ids.slice(i, i + chunkSize);
-		const result = await tablesDB.listRows<T>({
-			databaseId: dbId,
-			tableId: tableId,
-			queries: [
-				Query.equal("$id", chunk),
-				Query.limit(chunk.length),
-				...(select ? [Query.select(select)] : []),
-			],
-			total: false,
-		});
-		rows.push(...result.rows);
-	}
-	return rows;
+  const rows: T[] = [];
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    const chunk = ids.slice(i, i + chunkSize);
+    const result = await tablesDB.listRows<T>({
+      databaseId: dbId,
+      tableId: tableId,
+      queries: [Query.equal('$id', chunk), Query.limit(chunk.length), ...(select ? [Query.select(select)] : [])],
+      total: false,
+    });
+    rows.push(...result.rows);
+  }
+  return rows;
 }
 
 // Usage
-const patients = await fetchByIds<Patient>(
-	"db",
-	"patients",
-	patientIds,
-	idChunkSize,
-	["name", "email", "phone"],
-);
+const patients = await fetchByIds<Patient>('db', 'patients', patientIds, idChunkSize, ['name', 'email', 'phone']);
 ```
 
 ---

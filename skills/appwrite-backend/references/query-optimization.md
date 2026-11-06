@@ -190,9 +190,9 @@ final adjacentZones = await tablesDB.listRows(
 ```typescript
 // TypeScript - Routes crossing restricted area
 const violations = await tablesDB.listRows({
-	databaseId: "db",
-	tableId: "routes",
-	queries: [Query.crosses("path", restrictedArea)],
+  databaseId: 'db',
+  tableId: 'routes',
+  queries: [Query.crosses('path', restrictedArea)],
 });
 ```
 
