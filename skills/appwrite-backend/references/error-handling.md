@@ -32,8 +32,8 @@ Rate limits hit Client SDKs. Server SDKs w/ API keys bypass.
 
 ```json
 {
-	"message": "Too many requests",
-	"code": 429
+  "message": "Too many requests",
+  "code": 429
 }
 ```
 
@@ -223,23 +223,19 @@ except AppwriteException as e:
 ```typescript
 // TypeScript
 try {
-	await tablesDB.createRow({
-		databaseId: "db",
-		tableId: "orders",
-		rowId: orderId,
-		data: order,
-	});
+  await tablesDB.createRow({
+    databaseId: 'db',
+    tableId: 'orders',
+    rowId: orderId,
+    data: order,
+  });
 } catch (e) {
-	const err = e as Partial<AppwriteException>;
-	if (
-		typeof err.code !== "number" ||
-		(err.type === undefined && err.response === undefined)
-	)
-		throw e;
-	if (err.code === 409) throw new RowConflictError(e);
-	if (err.code === 429) throw new RateLimitedError(e);
-	if (err.code === 404) throw new RowNotFoundError(err.message);
-	throw e;
+  const err = e as Partial<AppwriteException>;
+  if (typeof err.code !== 'number' || (err.type === undefined && err.response === undefined)) throw e;
+  if (err.code === 409) throw new RowConflictError(e);
+  if (err.code === 429) throw new RateLimitedError(e);
+  if (err.code === 404) throw new RowNotFoundError(err.message);
+  throw e;
 }
 ```
 

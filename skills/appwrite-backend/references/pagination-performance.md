@@ -74,10 +74,10 @@ next_cursor = response.rows[-1].id
 ```typescript
 // TypeScript - Constant performance
 const response = await tablesDB.listRows({
-	databaseId: "db",
-	tableId: "items",
-	queries: [Query.cursorAfter(lastRowId), Query.limit(25)],
-	total: false,
+  databaseId: 'db',
+  tableId: 'items',
+  queries: [Query.cursorAfter(lastRowId), Query.limit(25)],
+  total: false,
 });
 
 const nextCursor = response.rows[response.rows.length - 1].$id;
@@ -113,42 +113,38 @@ Small lookup tables <1,000 rows:
 
 ```typescript
 // TypeScript - Async generator for all rows
-import { Models } from "node-appwrite";
+import { Models } from 'node-appwrite';
 
-async function* fetchAllRows<T extends Models.Row>(
-	dbId: string,
-	tableId: string,
-	baseQueries: string[] = [],
-): AsyncGenerator<T[]> {
-	let cursor: string | undefined;
+async function* fetchAllRows<T extends Models.Row>(dbId: string, tableId: string, baseQueries: string[] = []): AsyncGenerator<T[]> {
+  let cursor: string | undefined;
 
-	while (true) {
-		const queries = [...baseQueries, Query.limit(100)];
+  while (true) {
+    const queries = [...baseQueries, Query.limit(100)];
 
-		if (cursor) {
-			queries.push(Query.cursorAfter(cursor));
-		}
+    if (cursor) {
+      queries.push(Query.cursorAfter(cursor));
+    }
 
-		const response = await tablesDB.listRows<T>({
-			databaseId: dbId,
-			tableId: tableId,
-			queries,
-			total: false,
-		});
+    const response = await tablesDB.listRows<T>({
+      databaseId: dbId,
+      tableId: tableId,
+      queries,
+      total: false,
+    });
 
-		if (response.rows.length === 0) break;
+    if (response.rows.length === 0) break;
 
-		yield response.rows;
+    yield response.rows;
 
-		cursor = response.rows[response.rows.length - 1].$id;
+    cursor = response.rows[response.rows.length - 1].$id;
 
-		if (response.rows.length < 100) break;
-	}
+    if (response.rows.length < 100) break;
+  }
 }
 
 // Usage
-for await (const batch of fetchAllRows("db", "users")) {
-	await processBatch(batch);
+for await (const batch of fetchAllRows('db', 'users')) {
+  await processBatch(batch);
 }
 ```
 

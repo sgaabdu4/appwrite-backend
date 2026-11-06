@@ -118,29 +118,29 @@ let client: Client | null = null;
 let tablesDB: TablesDB | null = null;
 
 function ensureInit(context: any) {
-	const apiKey = context.req.headers["x-appwrite-key"] ?? "";
+  const apiKey = context.req.headers['x-appwrite-key'] ?? '';
 
-	if (client) {
-		client.setKey(apiKey);
-		return;
-	}
+  if (client) {
+    client.setKey(apiKey);
+    return;
+  }
 
-	client = new Client()
-		.setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT!)
-		.setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID!)
-		.setKey(apiKey);
-	tablesDB = new TablesDB(client);
+  client = new Client()
+    .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT!)
+    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID!)
+    .setKey(apiKey);
+  tablesDB = new TablesDB(client);
 }
 
 export default async ({ req, res }: any) => {
-	ensureInit({ req });
-	const rows = await tablesDB!.listRows({
-		databaseId: "db",
-		tableId: "items",
-		queries: [Query.limit(10)],
-		total: false,
-	});
-	return res.json({ items: rows.rows });
+  ensureInit({ req });
+  const rows = await tablesDB!.listRows({
+    databaseId: 'db',
+    tableId: 'items',
+    queries: [Query.limit(10)],
+    total: false,
+  });
+  return res.json({ items: rows.rows });
 };
 ```
 

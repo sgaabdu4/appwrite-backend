@@ -50,14 +50,14 @@ Prefer one query-based `updateRows`/`deleteRows` call over list IDs → per-row 
 
 ```json
 {
-	"action": "update",
-	"databaseId": "main",
-	"tableId": "tasks",
-	"rowId": "task-123",
-	"data": {
-		"status": "cancelled",
-		"$permissions": ["read(\"user:owner\")"]
-	}
+  "action": "update",
+  "databaseId": "main",
+  "tableId": "tasks",
+  "rowId": "task-123",
+  "data": {
+    "status": "cancelled",
+    "$permissions": ["read(\"user:owner\")"]
+  }
 }
 ```
 
@@ -66,14 +66,14 @@ Prefer one query-based `updateRows`/`deleteRows` call over list IDs → per-row 
 Build + validate the complete query set before calling `updateRows` or `deleteRows`.
 
 ```typescript
-const queries = [Query.equal("assigneeId", [departingStaffId])];
-if (queries.length === 0) throw new Error("Refuse unscoped bulk mutation");
+const queries = [Query.equal('assigneeId', [departingStaffId])];
+if (queries.length === 0) throw new Error('Refuse unscoped bulk mutation');
 
 await tablesDB.updateRows({
-	databaseId,
-	tableId: tasksTableId,
-	data: { assigneeId: replacementStaffId },
-	queries,
+  databaseId,
+  tableId: tasksTableId,
+  data: { assigneeId: replacementStaffId },
+  queries,
 });
 ```
 

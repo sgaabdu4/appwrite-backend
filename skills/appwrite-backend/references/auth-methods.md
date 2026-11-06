@@ -25,9 +25,9 @@ await account.createOAuth2Session(
 ```typescript
 // React/browser
 await account.createOAuth2Session({
-	provider: OAuthProvider.Google,
-	success: `${window.location.origin}/auth/callback`,
-	failure: `${window.location.origin}/auth/failure`,
+  provider: OAuthProvider.Google,
+  success: `${window.location.origin}/auth/callback`,
+  failure: `${window.location.origin}/auth/failure`,
 });
 ```
 
@@ -157,9 +157,9 @@ Biometric, passkey, custom flows.
 ```typescript
 // Server SDK — create token
 const token = await users.createToken({
-	userId: "user_123",
-	length: 32,
-	expire: 900,
+  userId: 'user_123',
+  length: 32,
+  expire: 900,
 });
 
 // Client SDK — create session
