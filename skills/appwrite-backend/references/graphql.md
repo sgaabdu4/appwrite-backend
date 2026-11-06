@@ -7,6 +7,7 @@ POST /v1/graphql
 ```
 
 Headers required:
+
 - `X-Appwrite-Project: <project-id>`
 - `X-Appwrite-Key: <api-key>` (server) or `X-Appwrite-JWT: <jwt>` (client)
 
@@ -18,17 +19,17 @@ Explore types + ops.
 
 ```graphql
 query {
-  __schema {
-    types {
-      name
-      fields {
-        name
-        type {
-          name
-        }
-      }
-    }
-  }
+	__schema {
+		types {
+			name
+			fields {
+				name
+				type {
+					name
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -42,36 +43,40 @@ query {
 
 ```graphql
 query ListRows($databaseId: String!, $tableId: String!, $queries: [String!]) {
-  tablesDBListRows(databaseId: $databaseId, tableId: $tableId, queries: $queries) {
-    total
-    rows {
-      _id
-      _databaseId
-      _tableId
-      _permissions
-      data
-    }
-  }
+	tablesDBListRows(
+		databaseId: $databaseId
+		tableId: $tableId
+		queries: $queries
+	) {
+		total
+		rows {
+			_id
+			_databaseId
+			_tableId
+			_permissions
+			data
+		}
+	}
 }
 
 query GetRow($databaseId: String!, $tableId: String!, $rowId: String!) {
-  tablesDBGetRow(databaseId: $databaseId, tableId: $tableId, rowId: $rowId) {
-    _id
-    _tableId
-    _permissions
-    data
-  }
+	tablesDBGetRow(databaseId: $databaseId, tableId: $tableId, rowId: $rowId) {
+		_id
+		_tableId
+		_permissions
+		data
+	}
 }
 ```
 
 ```json
 {
-  "databaseId": "main",
-  "tableId": "products",
-  "queries": [
-    "{\"method\":\"equal\",\"attribute\":\"category\",\"values\":[\"electronics\"]}",
-    "{\"method\":\"lessThan\",\"attribute\":\"price\",\"values\":[500]}"
-  ]
+	"databaseId": "main",
+	"tableId": "products",
+	"queries": [
+		"{\"method\":\"equal\",\"attribute\":\"category\",\"values\":[\"electronics\"]}",
+		"{\"method\":\"lessThan\",\"attribute\":\"price\",\"values\":[500]}"
+	]
 }
 ```
 
@@ -82,24 +87,46 @@ query GetRow($databaseId: String!, $tableId: String!, $rowId: String!) {
 `data` variable = `Json!` object; delete returns `status`.
 
 ```graphql
-mutation CreateRow($databaseId: String!, $tableId: String!, $rowId: String!, $data: Json!, $permissions: [String!]) {
-  tablesDBCreateRow(databaseId: $databaseId, tableId: $tableId, rowId: $rowId, data: $data, permissions: $permissions) {
-    _id
-    data
-  }
+mutation CreateRow(
+	$databaseId: String!
+	$tableId: String!
+	$rowId: String!
+	$data: Json!
+	$permissions: [String!]
+) {
+	tablesDBCreateRow(
+		databaseId: $databaseId
+		tableId: $tableId
+		rowId: $rowId
+		data: $data
+		permissions: $permissions
+	) {
+		_id
+		data
+	}
 }
 
-mutation UpdateRow($databaseId: String!, $tableId: String!, $rowId: String!, $data: Json!) {
-  tablesDBUpdateRow(databaseId: $databaseId, tableId: $tableId, rowId: $rowId, data: $data) {
-    _id
-    data
-  }
+mutation UpdateRow(
+	$databaseId: String!
+	$tableId: String!
+	$rowId: String!
+	$data: Json!
+) {
+	tablesDBUpdateRow(
+		databaseId: $databaseId
+		tableId: $tableId
+		rowId: $rowId
+		data: $data
+	) {
+		_id
+		data
+	}
 }
 
 mutation DeleteRow($databaseId: String!, $tableId: String!, $rowId: String!) {
-  tablesDBDeleteRow(databaseId: $databaseId, tableId: $tableId, rowId: $rowId) {
-    status
-  }
+	tablesDBDeleteRow(databaseId: $databaseId, tableId: $tableId, rowId: $rowId) {
+		status
+	}
 }
 ```
 
@@ -111,18 +138,22 @@ Combine ops in one request with aliases.
 
 ```graphql
 query BatchedQueries($databaseId: String!, $firstTen: [String!]) {
-  products: tablesDBListRows(databaseId: $databaseId, tableId: "products", queries: $firstTen) {
-    rows {
-      _id
-      data
-    }
-  }
-  categories: tablesDBListRows(databaseId: $databaseId, tableId: "categories") {
-    rows {
-      _id
-      data
-    }
-  }
+	products: tablesDBListRows(
+		databaseId: $databaseId
+		tableId: "products"
+		queries: $firstTen
+	) {
+		rows {
+			_id
+			data
+		}
+	}
+	categories: tablesDBListRows(databaseId: $databaseId, tableId: "categories") {
+		rows {
+			_id
+			data
+		}
+	}
 }
 ```
 
@@ -154,6 +185,7 @@ Send GraphQL through the official SDK `Graphql` service. Raw Appwrite HTTP follo
 - App code → GraphQL only where the official SDK lacks the endpoint.
 
 ❌ **Use SDK instead:**
+
 - File up/download
 - Bulk ops
 - Transactions

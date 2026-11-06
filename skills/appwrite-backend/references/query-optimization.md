@@ -3,16 +3,19 @@
 ## Query.select() Rule
 
 **Always use Query.select(). Controls payload size, expands relationships.**
+
 - Select fields = ordered + non-empty + unique; duplicate attribute = local contract FAIL before Appwrite.
 - Reusable oracle = [`appwrite-query-contract.mjs`](../scripts/appwrite-query-contract.mjs); project test owns its adapter/query decoding.
 
 ### Why
 
 No select:
+
 - Returns all columns (waste bandwidth)
 - Relationships return IDs only (useless)
 
 With select:
+
 - Returns only requested columns (smaller payload)
 - Relationships return full objects (12-18x faster vs N+1)
 
@@ -187,13 +190,14 @@ final adjacentZones = await tablesDB.listRows(
 ```typescript
 // TypeScript - Routes crossing restricted area
 const violations = await tablesDB.listRows({
-  databaseId: 'db',
-  tableId: 'routes',
-  queries: [Query.crosses('path', restrictedArea)],
+	databaseId: "db",
+	tableId: "routes",
+	queries: [Query.crosses("path", restrictedArea)],
 });
 ```
 
 **Requirements:**
+
 - Column type: `point`, `line`, or `polygon`
 - Geo queries need spatial index for perf
 
