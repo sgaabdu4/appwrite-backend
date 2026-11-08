@@ -14,7 +14,7 @@ from typing import TextIO, cast
 from coverage_sources import erased_swift, erased_typescript
 from dart_coverage import erased_dart
 from dart_test_report import dart_events, failure_summary
-from fallow_report import validate_fallow, write_istanbul
+from fallow_report import sdk_binaries, validate_fallow, write_istanbul
 from gate_config import Gate, Group, JsonObject
 from gate_schedule import QUICK_ROLES
 from project_setup import (
@@ -809,9 +809,11 @@ def validate_scanner_report(
     elif scanner == "jscpd":
         validate_jscpd(path, lambda: jscpd_below_minimum(command, directory, timeout))
     elif scanner == "freshness":
-        from freshness import bun_waiting, validate_freshness
+        from freshness import freshness_waiting, validate_freshness
 
-        validate_freshness(path, gate, waiting=bun_waiting(directory))
+        validate_freshness(path, gate, waiting=freshness_waiting(gate, directory))
+    elif scanner == "fallow":
+        validate_fallow(path, sdk_binaries(directory))
     else:
         SCANNERS[scanner](path)
 
