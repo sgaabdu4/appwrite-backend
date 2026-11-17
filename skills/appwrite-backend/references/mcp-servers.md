@@ -66,7 +66,11 @@ env_file="${APPWRITE_ENV_FILE:-$repo_root/.env.appwrite.local}"
 
 [[ -f "$env_file" ]] || { echo "appwrite-mcp: missing $env_file" >&2; exit 1; }
 
-while IFS='=' read -r key value; do
+while IFS='=' read -r key value || [[ -n "$key" ]]; do
+  value="${value%$'\r'}"
+  case "$value" in
+    \"?*\" | \'?*\') value="${value:1:${#value}-2}" ;;
+  esac
   case "$key" in
     APPWRITE_ENDPOINT | APPWRITE_PROJECT_ID | APPWRITE_API_KEY) export "$key=$value" ;;
   esac
